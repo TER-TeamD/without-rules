@@ -1,0 +1,33 @@
+version: "3.8"
+
+networks:
+  ter-network:
+    driver: bridge
+
+services:
+  database:
+    image: "mongo:6.0"
+    volumes:
+      - ./cache/database:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - ter-network
+
+  backend:
+    build:
+      context: wor-backend
+      dockerfile: ./Dockerfile
+      target: development
+    restart: always
+    command: npm run start:dev
+    ports:
+      - "8451:3000"
+    environment:
+      - APP_PORT=3000
+      - DATABASE_URI=mongodb://database:27017
+    volumes:
+      - ./wor-backend:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - ter-network
