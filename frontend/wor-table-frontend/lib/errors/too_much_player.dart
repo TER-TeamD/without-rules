@@ -1,0 +1,1 @@
+class TooMuchPlayer implements Exception {}
