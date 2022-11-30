@@ -43,6 +43,12 @@ export class GameEngineService implements OnModuleInit{
 
     public async createNewGame(): Promise<NewGameDto> {
 
+        const existingGames: Game[] = await this.gameModel.find({});
+
+        if (existingGames.length != 0) {
+            throw new HttpException('A game is existing, please delete game before', HttpStatus.UNPROCESSABLE_ENTITY)
+        }
+
         const game: Game = new Game();
         game.players = []
         for (let i = 1; i <= 2; i++) {
@@ -62,6 +68,11 @@ export class GameEngineService implements OnModuleInit{
         newGameDto.potential_players_id = gameInDB.players.map<string>(p => p.id)
 
         return newGameDto;
+    }
+
+    public async deleteGame(): Promise<StatusDto> {
+        await this.gameModel.deleteMany({});
+        return new StatusDto();
     }
 
 
