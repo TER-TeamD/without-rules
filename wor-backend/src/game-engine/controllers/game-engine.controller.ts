@@ -40,4 +40,12 @@ export class GameEngineController {
     }
 
 
+    @Post('/game/delete')
+    @ApiOkResponse({ type: StatusDto })
+    public async deleteGame(): Promise<StatusDto> {
+        return this.gameEngineService.deleteGame();
+    }
+
+
+
 }
