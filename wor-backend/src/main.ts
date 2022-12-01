@@ -31,6 +31,11 @@ async function bootstrap() {
   // Starts listening for shutdown hooks
   app.enableShutdownHooks();
 
+  app.enableCors({
+    origin: "*",
+    methods: ["GET", "POST"]
+  })
+
   await app.listen(3000).then(c => {
     console.log(3000)
   });

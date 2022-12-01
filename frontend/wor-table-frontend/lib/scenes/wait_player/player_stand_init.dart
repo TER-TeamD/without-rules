@@ -11,7 +11,7 @@ class PlayerStandInit extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 200,
-      height: 100,
+      height: 110,
       child: Container(
         decoration: const BoxDecoration(
             color: Color.fromARGB(255, 161, 161, 161),
@@ -19,9 +19,14 @@ class PlayerStandInit extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            QrImage(
-              data: ticket.id,
-              size: 90,
+            Column(
+              children: [
+                QrImage(
+                  data: ticket.id,
+                  size: 90,
+                ),
+                Text("Id: " + ticket.id)
+              ],
             ),
             Column(mainAxisSize: MainAxisSize.min, children: [
               const Text("Scan to log"),

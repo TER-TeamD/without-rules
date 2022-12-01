@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:worfrontend/scenes/wait_player/player_stand_init.dart';
 import 'package:worfrontend/services/game_states/wait_players.dart';
+import 'package:worfrontend/services/network/network_service.dart';
 
 import '../../errors/too_much_player.dart';
 
@@ -51,13 +53,16 @@ class _WaitPlayerSceneState extends State<WaitPlayerScene> {
             child: Stack(children: [
               ...widget.gameState.borrowed
                   .map((e) => Positioned(
-                      top: e.position.dy - 50,
+                      top: e.position.dy - 55,
                       left: e.position.dx - 100,
                       child: PlayerStandInit(ticket: e)))
                   .toList(),
               Center(
-                child:
-                    TextButton(child: const Text("Start !"), onPressed: () {}),
+                child: TextButton(
+                    child: const Text("Start !"),
+                    onPressed: () {
+                      widget.gameState.setComplete();
+                    }),
               )
             ]),
           )),
