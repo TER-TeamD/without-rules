@@ -9,6 +9,7 @@ class GameRuntimeService {
 
   changeState(GameState state) {
     this.state = state;
+    state.onLoad();
     stateObservable.add(state);
   }
 }

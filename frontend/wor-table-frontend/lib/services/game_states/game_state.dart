@@ -6,5 +6,7 @@ abstract class GameState {
 
   const GameState(this.runtimeService);
 
+  void onLoad() {}
+
   Widget buildUI(BuildContext context);
 }

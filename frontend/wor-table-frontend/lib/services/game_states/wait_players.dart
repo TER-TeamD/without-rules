@@ -1,19 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/errors/too_much_player.dart';
+import 'package:worfrontend/scenes/choose_card/choose_card_scene.dart';
 import 'package:worfrontend/scenes/wait_player/wait_player_scene.dart';
+import 'package:worfrontend/services/game_states/game_runtime_state.dart';
 import 'package:worfrontend/services/game_states/game_state.dart';
+import 'package:worfrontend/services/network/models/new_game_dto.dart';
+import 'package:worfrontend/services/network/network_service.dart';
+import 'package:worfrontend/services/table_service.dart';
 
 class WaitPlayerState extends GameState {
+  final NewGameDto createdGame;
   final List<String> availableIds;
   final List<PlayerInitialisationTicket> borrowed;
   final BehaviorSubject<List<PlayerInitialisationTicket>> borrowedObservable =
       BehaviorSubject();
 
-  WaitPlayerState(super.runtimeService, this.availableIds)
-      : borrowed = List<PlayerInitialisationTicket>.empty(growable: true);
+  WaitPlayerState(super.runtimeService, this.createdGame)
+      : borrowed = List<PlayerInitialisationTicket>.empty(growable: true),
+        availableIds = createdGame.potentialPlayersId;
 
-  setComplete() {}
+  setComplete() {
+    GetIt.I.get<TableService>().startGame().then((value) =>
+        runtimeService.changeState(GameRuntimeState(runtimeService, value)));
+  }
+
+  @override
+  void onLoad() {
+    print("Waiting for player :\n" + createdGame.potentialPlayersId.join("\n"));
+  }
 
   borrow(Offset position) {
     if (availableIds.isEmpty) {
@@ -23,6 +39,7 @@ class WaitPlayerState extends GameState {
     var ticket = PlayerInitialisationTicket(this, id, position);
     borrowed.add(ticket);
     borrowedObservable.add(borrowed);
+    GetIt.I.get<TableService>().setPlayerPosition(id, position);
     return ticket;
   }
 

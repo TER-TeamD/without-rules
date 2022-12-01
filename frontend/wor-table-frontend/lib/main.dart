@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:worfrontend/services/game_runtime_service.dart';
+import 'package:worfrontend/services/game_states/game_runtime_state.dart';
 import 'package:worfrontend/services/game_states/game_state.dart';
-import 'package:worfrontend/services/game_states/wait_players.dart';
+import 'package:worfrontend/services/game_states/wait_server.dart';
+import 'package:worfrontend/services/table_service.dart';
+import 'package:worfrontend/services/table_service_mock.dart';
+
+Future initScene(
+    GameRuntimeService runtimeService, TableService tableService) async {
+  // var createdGame = await tableService.createGame();
+  // for (var i in Iterable.generate(createdGame.potentialPlayersId.length)) {
+  //   tableService.setPlayerPosition(
+  //       createdGame.potentialPlayersId[i], Offset(100.0 + i * 300.0, 100));
+  // }
+
+  // var game = await tableService.startGame();
+  runtimeService.changeState(WaitServerState(runtimeService));
+}
 
 void main() {
-  var runtimeService = GameRuntimeService();
-  var firstState =
-      WaitPlayerState(runtimeService, List<String>.from(["Id1", "Id2"]));
-  runtimeService.changeState(firstState);
+  //var service = NetworkService("localhost:8451");
+  //GetIt.I.registerSingleton(service);
+  var tableService = TableServiceMock();
+  GetIt.I.registerSingleton<TableService>(tableService);
 
+  var runtimeService = GameRuntimeService();
+  //var firstState = WaitServerState(runtimeService);
+
+  Future.wait([initScene(runtimeService, tableService)]);
   runApp(MyApp(gameRuntime: runtimeService));
 }
 
