@@ -17,12 +17,13 @@ class NetworkService {
   NetworkService(this.hostname);
 
   Future connect() async {
-    _socket = io(hostname);
+    _socket = io("ws://" + hostname);
   }
 
   StreamSubscription<SocketMessage> listen(
       String topic, void Function(SocketMessage message) callback) {
     if (_socket == null) throw NetworkUninitialized();
+
     _socket!.on(topic, (data) {
       print(data);
       _onEvent.add(SocketMessage.create(topic, data));
