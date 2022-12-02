@@ -21,7 +21,7 @@ export class LoginPageComponent {
     this.gameService.joinGame(this.playerId).subscribe(
       () => {
         console.log('Partie rejoint');
-        this.router.navigate(['/cards']);
+        this.router.navigate(['/cards/' + this.playerId]);
 
       },
       (error) => {

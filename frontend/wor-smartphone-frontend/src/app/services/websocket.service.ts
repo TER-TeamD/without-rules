@@ -14,13 +14,17 @@ export class WebsocketService {
 
   constructor() { }
 
-  getCards(): Subject<GameCards> {
+  getCards(playerId: string): Subject<GameCards> {
     this.socket = io('http://localhost:8451');
 
     let observable = new Observable(observer => {
       this.socket.on('player', (data: any) => {
-        console.log("Received message from Websocket Server")
-        observer.next(data);
+        console.log(data.value.id_player);
+        console.log(playerId);
+        if (data.value.id_player === playerId) {
+          console.log("Received message from Websocket Server")
+          observer.next(data);
+        }
       })
       return () => {
         this.socket.disconnect();

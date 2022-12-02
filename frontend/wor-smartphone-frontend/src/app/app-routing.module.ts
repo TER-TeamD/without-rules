@@ -9,7 +9,7 @@ const routes: Routes = [
     component: LoginPageComponent
   },
   {
-    path: "cards",
+    path: "cards/:playerId",
     component: DisplayCardsComponent
   }
 ];
