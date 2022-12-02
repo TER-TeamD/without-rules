@@ -15,7 +15,7 @@ export class GameService {
     return this.httpClient.post(this.url + playerId + "/join-game", null);
   }
 
-  public playCard(playerId: string, cardValue: string) {
+  public playCard(playerId: string, cardValue: number) {
     return this.httpClient.post(this.url + playerId + "/play-card", { card_value: cardValue });
   }
 }
