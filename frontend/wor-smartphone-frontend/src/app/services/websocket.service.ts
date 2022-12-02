@@ -27,6 +27,12 @@ export class WebsocketService {
       }
     })
 
-    return Subject.create(observable);
+    let observer = {
+      next: (data: Object) => {
+        this.socket.emit('player', JSON.stringify(data));
+      }
+    }
+
+    return Subject.create(observer, observable);
   }
 }
