@@ -1,0 +1,10 @@
+<div *ngIf="loading">
+    <p>Loading...</p>
+</div>
+<div *ngIf="!loading">
+    <div *ngFor="let card of gameCards?.value?.cards">
+        <div class="card">
+            <h2>{{ card.value }}</h2>
+            <p>{{ card.cattleHead }}</p>
+        </div>
+    </div>
