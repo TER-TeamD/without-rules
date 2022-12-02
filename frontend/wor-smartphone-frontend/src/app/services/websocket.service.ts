@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
+import { GameCards } from '../model/gamecards';
 
 
 
@@ -13,7 +14,7 @@ export class WebsocketService {
 
   constructor() { }
 
-  getCards(): Subject<Object> {
+  getCards(): Subject<GameCards> {
     this.socket = io('http://localhost:8451');
 
     let observable = new Observable(observer => {

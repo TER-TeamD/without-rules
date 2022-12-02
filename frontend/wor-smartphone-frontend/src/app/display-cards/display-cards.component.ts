@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { GameCards } from '../model/gamecards';
 import { WebsocketService } from '../services/websocket.service';
 
 @Component({
@@ -8,19 +9,20 @@ import { WebsocketService } from '../services/websocket.service';
 })
 export class DisplayCardsComponent {
 
-  public card: string[] = [];
+  public gameCards?: GameCards;
   public loading: boolean = true;
-  public playerId: string = "";
 
   constructor(private wsService: WebsocketService) {
     wsService.getCards().subscribe(
       (data) => {
         console.log(data);
+        this.gameCards = data;
         this.loading = false;
-        this.playerId = data.value.player_id;
-        this.card
-
       }
     );
   }
+
+
+
+
 }
