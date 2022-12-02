@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/scenes/game_scene.dart';
+import 'package:worfrontend/services/game_states/final_state.dart';
 import 'package:worfrontend/services/game_states/game_state.dart';
 import 'package:worfrontend/services/network/models/action/action_types.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
+import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 import 'package:worfrontend/services/table_service.dart';
 
 import '../network/models/game.dart';
+import '../network/models/socket_models/results.dart';
 
 class PlayerPlayingState {
   final String id;
@@ -30,7 +33,10 @@ class PlayerPlayingState {
 }
 
 class GameRuntimeState extends GameState {
-  late StreamSubscription<SocketMessage> playerChooseSubs, gameAction;
+  late StreamSubscription<SocketMessage> playerChooseSubs,
+      gameAction,
+      initiateGame,
+      results;
   final Game game;
   final List<PlayerPlayingState> states;
   final GameSceneState guiState;
@@ -47,6 +53,11 @@ class GameRuntimeState extends GameState {
   @override
   void onLoad() {
     guiState.setTurnStart();
+
+    initiateGame = GetIt.I.get<TableService>().listen<InitiateGame>((message) {
+      guiState.setStacks(message.stacks);
+    });
+
     playerChooseSubs =
         GetIt.I.get<TableService>().listen<CardPlayedByUser>((message) {
       states
@@ -85,6 +96,8 @@ class GameRuntimeState extends GameState {
         await Future.delayed(const Duration(seconds: 1));
       }
     });
+    results = GetIt.I.get<TableService>().listen<Results>((message) =>
+        runtimeService.changeState(FinalState(runtimeService, message)));
   }
 
   playerChose(String idPlayer) {
