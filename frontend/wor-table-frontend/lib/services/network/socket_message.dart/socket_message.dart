@@ -1,6 +1,7 @@
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
+import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/models/socket_models/results.dart';
 
 abstract class SocketMessage {
@@ -16,7 +17,7 @@ abstract class SocketMessage {
       case SocketMessageTypes.cardPlayedByUser:
         return CardPlayedByUser.fromJson(topic, type, json["value"]);
       case SocketMessageTypes.newActions:
-        return CardPlayedByUser.fromJson(topic, type, json["value"]);
+        return NewActions.fromJson(topic, type, json["value"]);
       case SocketMessageTypes.results:
         return Results.fromJson(topic, type, json["value"]);
     }
