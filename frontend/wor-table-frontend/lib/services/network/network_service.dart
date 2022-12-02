@@ -23,8 +23,10 @@ class NetworkService {
   StreamSubscription<SocketMessage> listen(
       String topic, void Function(SocketMessage message) callback) {
     if (_socket == null) throw NetworkUninitialized();
-    _socket!
-        .on(topic, (data) => _onEvent.add(SocketMessage.create(topic, data)));
+    _socket!.on(topic, (data) {
+      print(data);
+      _onEvent.add(SocketMessage.create(topic, data));
+    });
     return _onEvent.listen((value) {
       if (value.topic == topic) callback(value);
     });

@@ -4,6 +4,7 @@ import 'package:worfrontend/services/game_runtime_service.dart';
 import 'package:worfrontend/services/game_states/game_runtime_state.dart';
 import 'package:worfrontend/services/game_states/game_state.dart';
 import 'package:worfrontend/services/game_states/wait_server.dart';
+import 'package:worfrontend/services/network/network_service.dart';
 import 'package:worfrontend/services/table_service.dart';
 import 'package:worfrontend/services/table_service_mock.dart';
 
@@ -20,9 +21,10 @@ Future initScene(
 }
 
 void main() {
-  //var service = NetworkService("localhost:8451");
+  var service = NetworkService("localhost:8451");
+  service.connect();
   //GetIt.I.registerSingleton(service);
-  var tableService = TableServiceMock();
+  var tableService = TableServiceImplementation(service);
   GetIt.I.registerSingleton<TableService>(tableService);
 
   var runtimeService = GameRuntimeService();

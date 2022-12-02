@@ -41,8 +41,8 @@ class GameRuntimeState extends GameState {
       : states = game.players
             .map((p) => PlayerPlayingState(p.id))
             .toList(growable: false),
-        guiState = GameSceneState(
-            game.inGameProperty.stacks, GetIt.I.get<TableService>().players!);
+        guiState = GameSceneState(game.inGameProperty?.stacks ?? [],
+            GetIt.I.get<TableService>().players!);
 
   @override
   void onLoad() {
