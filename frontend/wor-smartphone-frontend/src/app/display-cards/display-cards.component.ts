@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Card } from '../model/card.model';
 import { GameCards } from '../model/gamecards';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
@@ -12,11 +13,13 @@ import { WebsocketService } from '../services/websocket.service';
 export class DisplayCardsComponent {
 
   public gameCards?: GameCards;
+  public selectedCard?: Card;
+  public select: boolean = false;
   public loading: boolean = true;
 
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
-      wsService.getCards(params["playerId"]).subscribe(
+      this.wsService.connect(params["playerId"]).subscribe(
         (data) => {
           console.log(data);
           this.gameCards = data;
@@ -24,6 +27,14 @@ export class DisplayCardsComponent {
         }
       );
     });
+  }
+
+  ngOnInit(): void {
+  }
+
+  public selectCard(card: Card) {
+    this.selectedCard = card;
+    this.select = true;
   }
 
   public play() {

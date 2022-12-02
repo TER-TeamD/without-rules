@@ -1,12 +1,9 @@
-<div *ngIf="loading">
-    <p>Loading...</p>
+<div *ngIf="loading" class="content-container">
+    <p>Waiting for the game to be launched...</p>
 </div>
-<div *ngIf="!loading">
-    <div *ngFor="let card of gameCards?.value?.cards">
-        <div class="card">
-            <h2>{{ card.value }}</h2>
-            <p>{{ card.cattleHead }}</p>
-        </div>
+<div *ngIf="!loading" class="content-container">
+    <div id="cards" *ngFor="let card of gameCards?.value?.cards">
+        <app-card [card]="card" (click)="selectCard(card)"></app-card>
     </div>
-    <button type="button" (click)="play()">Jouer la carte</button>
+    <button type="button" id="button-play" (click)="play()" [disabled]="!select">Play the card</button>
 </div>

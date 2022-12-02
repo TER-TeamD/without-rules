@@ -1,0 +1,31 @@
+.card {
+    width: 120px;
+    height: 200px;
+    background: #999;
+    border: 1px solid #000;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.top-card,
+.bottom-card {
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.top-card p,
+.bottom-card p {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.center-card {
+    display: flex;
+    justify-content: center;
+}

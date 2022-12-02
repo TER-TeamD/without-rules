@@ -4,7 +4,6 @@ import { io } from 'socket.io-client';
 import { GameCards } from '../model/gamecards';
 
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -12,15 +11,11 @@ export class WebsocketService {
 
   private socket: any;
 
-  constructor() { }
-
-  getCards(playerId: string): Subject<GameCards> {
+  connect(playerId: string): Subject<GameCards> {
     this.socket = io('http://localhost:8451');
 
     let observable = new Observable(observer => {
       this.socket.on('player', (data: any) => {
-        console.log(data.value.id_player);
-        console.log(playerId);
         if (data.value.id_player === playerId) {
           console.log("Received message from Websocket Server")
           observer.next(data);

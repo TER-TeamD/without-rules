@@ -17,18 +17,16 @@ export class LoginPageComponent {
   }
 
   public login() {
-    console.log(this.playerId);
-    this.gameService.joinGame(this.playerId).subscribe(
-      () => {
-        console.log('Partie rejoint');
-        this.router.navigate(['/cards/' + this.playerId]);
-
-      },
-      (error) => {
-        console.log('Erreur ! : ' + error);
-      }
-    );
-
+    if (this.playerId.length > 0) {
+      this.gameService.joinGame(this.playerId).subscribe(
+        () => {
+          this.router.navigate(['/cards/' + this.playerId]);
+        },
+        (err) => {
+          alert("This player ID doesn't exist");
+        }
+      );
+    }
   }
 
 }
