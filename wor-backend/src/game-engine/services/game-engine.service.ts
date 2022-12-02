@@ -1,8 +1,8 @@
-import {HttpException, HttpStatus, Injectable, OnModuleInit} from '@nestjs/common';
-import {MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
-import {Server} from "socket.io";
-import {NewGameDto} from "../dto/new-game.dto";
-import {InjectModel} from "@nestjs/mongoose";
+import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { Server } from "socket.io";
+import { NewGameDto } from "../dto/new-game.dto";
+import { InjectModel } from "@nestjs/mongoose";
 import {
     Action,
     ActionTypeEnum,
@@ -15,11 +15,11 @@ import {
     Player, Result,
     StackCard
 } from "../schema/game.schema";
-import {Model} from "mongoose";
-import {StatusDto} from "../dto/status.dto";
-import {PlayedCardDto} from "../dto/played-card.dto";
-import {Cron, CronExpression} from "@nestjs/schedule";
-import {sortPlayerByCardsIncreasingOrder, sortStackCardsByHeadCardsIncreasingOrder} from "../utils/utils";
+import { Model } from "mongoose";
+import { StatusDto } from "../dto/status.dto";
+import { PlayedCardDto } from "../dto/played-card.dto";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { sortPlayerByCardsIncreasingOrder, sortStackCardsByHeadCardsIncreasingOrder } from "../utils/utils";
 
 @WebSocketGateway({
     cors: {
@@ -27,12 +27,12 @@ import {sortPlayerByCardsIncreasingOrder, sortStackCardsByHeadCardsIncreasingOrd
     },
 })
 @Injectable()
-export class GameEngineService implements OnModuleInit{
+export class GameEngineService implements OnModuleInit {
 
     @WebSocketServer()
     server: Server;
 
-    constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
+    constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) { }
 
     onModuleInit(): any {
         this.server.on('connection', socket => {
@@ -78,7 +78,7 @@ export class GameEngineService implements OnModuleInit{
 
     public async playerWantToJoinAGame(idPlayer: string): Promise<Player> {
 
-        const game: Game = await this.gameModel.findOne({'players.id': idPlayer})
+        const game: Game = await this.gameModel.findOne({ 'players.id': idPlayer })
 
         if (!game) {
             throw new HttpException(`Any game found with this player`, HttpStatus.NOT_ACCEPTABLE)
@@ -91,7 +91,7 @@ export class GameEngineService implements OnModuleInit{
 
         game.players[index].is_logged = true;
 
-        const updatedGame: Game = await this.gameModel.findOneAndUpdate({'players.id': idPlayer}, {'players': game.players}, { returnDocument: 'after' } )
+        const updatedGame: Game = await this.gameModel.findOneAndUpdate({ 'players.id': idPlayer }, { 'players': game.players }, { returnDocument: 'after' })
 
         return game.players[index];
     }
@@ -111,7 +111,7 @@ export class GameEngineService implements OnModuleInit{
             throw new HttpException(`You cannot start a game with less than 2 players`, HttpStatus.UNPROCESSABLE_ENTITY)
         }
 
-        const updatedGame: Game = await this.gameModel.findOneAndUpdate({'_id': game._id}, {'players': game.players}, { returnDocument: 'after' })
+        const updatedGame: Game = await this.gameModel.findOneAndUpdate({ '_id': game._id }, { 'players': game.players }, { returnDocument: 'after' })
 
         await this.initiateGameCards(updatedGame._id);
 
@@ -120,7 +120,7 @@ export class GameEngineService implements OnModuleInit{
 
 
     private async initiateGameCards(idGame: string) {
-        const game: Game = await this.gameModel.findOne({'_id': idGame})
+        const game: Game = await this.gameModel.findOne({ '_id': idGame })
 
         if (!game) {
             throw new HttpException(`Any game found`, HttpStatus.NOT_ACCEPTABLE)
@@ -135,9 +135,9 @@ export class GameEngineService implements OnModuleInit{
         }
 
         // We give a card to each player
-        game.players.forEach(player => {player.cards.push(game.in_game_property.deck.pop())})
+        game.players.forEach(player => { player.cards.push(game.in_game_property.deck.pop()) })
 
-        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({'_id': game._id}, {'in_game_property': game.in_game_property, 'players': game.players}, { returnDocument: 'after' })
+        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({ '_id': game._id }, { 'in_game_property': game.in_game_property, 'players': game.players }, { returnDocument: 'after' })
 
         for (const p of game.players) {
             await this.giveCardsToPlayerAtTheBeginningOfGame(p.id, p.cards)
@@ -149,7 +149,7 @@ export class GameEngineService implements OnModuleInit{
 
     public async playerPlayedACard(idPlayer: string, body: PlayedCardDto): Promise<StatusDto> {
 
-        const game: Game = await this.gameModel.findOne({'players.id': idPlayer})
+        const game: Game = await this.gameModel.findOne({ 'players.id': idPlayer })
 
         if (!game) {
             throw new HttpException(`Any game found with this player`, HttpStatus.NOT_ACCEPTABLE)
@@ -175,7 +175,7 @@ export class GameEngineService implements OnModuleInit{
         player.in_player_game_property.played_card = cardPlayed;
         player.in_player_game_property.had_played_turn = true;
 
-        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({'_id': game._id}, {'players': game.players}, { returnDocument: 'after' })
+        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({ '_id': game._id }, { 'players': game.players }, { returnDocument: 'after' })
         await this.sendToTableCardsPlayedByPlayers(game._id, player.id, cardPlayed)
 
         this.verifyEndTurn()
@@ -255,8 +255,8 @@ export class GameEngineService implements OnModuleInit{
         }
 
         const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
-            {'_id': game._id},
-            {'players': game.players, 'in_game_property.stacks': game.in_game_property.stacks},
+            { '_id': game._id },
+            { 'players': game.players, 'in_game_property.stacks': game.in_game_property.stacks },
             { returnDocument: 'after' })
 
 
