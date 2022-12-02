@@ -1,1 +1,14 @@
-<p>display-cards works!</p>
+<div *ngIf="loading">
+    <p>Loading...</p>
+</div>
+<div *ngIf="!loading">
+    <div *ngFor="let card of cards">
+        <div class="card">
+            <div class="card-header">
+                <h2>{{ card.name }}</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ card.description }}</p>
+            </div>
+        </div>
+    </div>
