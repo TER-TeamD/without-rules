@@ -43,9 +43,6 @@ class TableServiceMock implements TableService {
       Player("id1", true, [], null),
       Player("id2", true, [], null)
     ];
-    players = mockedPlayers
-        .map((e) => TablePlayer(e, playersPosition[e.id]!))
-        .toList(growable: false);
 
     simulateGame();
 

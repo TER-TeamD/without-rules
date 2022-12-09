@@ -1,6 +1,5 @@
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
+import 'package:worfrontend/components/card_components/card_component.dart';
 
 class CardHolder extends StatelessWidget {
   const CardHolder({super.key});
@@ -11,6 +10,7 @@ class CardHolder extends StatelessWidget {
         decoration: const BoxDecoration(
             color: Color.fromARGB(255, 244, 244, 244),
             borderRadius: BorderRadius.all(Radius.circular(5))),
-        child: const SizedBox(width: 100, height: 150));
+        child: SizedBox(
+            width: CardComponent.size.dx, height: CardComponent.size.dy));
   }
 }

@@ -1,10 +1,8 @@
-import 'package:flutter/widgets.dart';
-
 import '../services/network/models/http_dtos/player.dart';
 
 class TablePlayer {
-  final Player player;
-  final Offset position;
+  final String id;
+  final Player? player;
 
-  TablePlayer(this.player, this.position);
+  TablePlayer(this.id, this.player);
 }

@@ -25,6 +25,7 @@ class TableServiceImplementation implements TableService {
   Map<String, Offset> playerPositions = <String, Offset>{};
   @override
   List<TablePlayer>? players = List.empty(growable: true);
+  List<String>? possibleIds;
 
   TableServiceImplementation(this._network);
 
@@ -37,15 +38,20 @@ class TableServiceImplementation implements TableService {
   Future<NewGameDto> createGame() async {
     var game = await _network.createGame();
     gameId = game.idGame;
+    possibleIds = game.potentialPlayersId;
     return game;
   }
 
   @override
   Future<Game> startGame() async {
+    if (possibleIds == null) throw "Please create a game firstly.";
     game = await _network.startGame();
-    players = game!.players
-        .map((e) => TablePlayer(e, playerPositions[e.id] ?? Offset.zero))
-        .toList();
+    players = possibleIds!
+        .map((id) => TablePlayer(
+            id,
+            // ignore: unnecessary_null_in_if_null_operators
+            game?.players.firstWhere((element) => element.id == id) ?? null))
+        .toList(growable: false);
     return game!;
   }
 

@@ -2,7 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
-import 'package:worfrontend/components/player_deck.dart';
+import 'package:worfrontend/components/decks.dart';
+import 'package:worfrontend/components/player_deck/player_deck_state.dart';
+import 'package:worfrontend/components/player_deck/states/no_player.dart';
+import 'package:worfrontend/components/player_deck/states/played.dart';
+import 'package:worfrontend/components/player_deck/states/playing.dart';
+import 'package:worfrontend/components/player_deck/states/wait_other_players.dart';
+import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/models/table_player.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
 
@@ -17,58 +23,52 @@ class GameScene extends StatefulWidget {
   State<GameScene> createState() => guiState;
 }
 
-class PlayerTurn {
-  final PlayerState state;
-  final Card? playedCard;
-
-  PlayerTurn({this.state = PlayerState.waiting, this.playedCard});
-}
-
 class GameSceneState extends State<GameScene> {
   List<StackCard> stacks;
   List<TablePlayer> players;
 
-  Map<String, PlayerTurn> playerPlayed;
+  Map<String, PlayerDeckState> deckStates;
 
   GameSceneState(this.stacks, this.players)
-      : playerPlayed = <String, PlayerTurn>{
-          for (var element in players) element.player.id: PlayerTurn()
+      : deckStates = <String, PlayerDeckState>{
+          for (var element in players)
+            element.id: element.player == null
+                ? DeckNoPlayer()
+                : DeckWaitPlayer(element.id)
         };
 
   setTurnStart() {
-    playerPlayed = <String, PlayerTurn>{
+    deckStates = <String, PlayerDeckState>{
       for (var element in players)
-        element.player.id: PlayerTurn(state: PlayerState.playing)
+        element.id: element.player == null ? DeckNoPlayer() : DeckPlaying()
     };
-    if (mounted) setState(() => playerPlayed = playerPlayed);
+    if (mounted) setState(() => deckStates = deckStates);
   }
 
   setPlayerPlayed(String playerId) {
     log(playerId);
     setState(() {
-      playerPlayed[playerId] =
-          PlayerTurn(state: PlayerState.waitingAfterPlaying);
+      deckStates[playerId] = DeckWaitOtherPlayers();
     });
   }
 
   setPlayerPlayedCard(String playerId, Card card) {
     setState(() {
-      playerPlayed[playerId] =
-          PlayerTurn(state: PlayerState.revealCard, playedCard: card);
+      deckStates[playerId] = DeckPlayed(card);
     });
   }
 
   unsetPlayerPlayed(String playerId) {
     setState(() {
-      playerPlayed[playerId] = PlayerTurn();
+      deckStates[playerId] = DeckPlaying();
     });
   }
 
   resetPlayerPlayed() {
     setState(() {
-      playerPlayed = <String, PlayerTurn>{
+      deckStates = <String, PlayerDeckState>{
         for (var e in players)
-          e.player.id: PlayerTurn(state: PlayerState.playing)
+          e.id: e.player == null ? DeckNoPlayer() : DeckPlaying()
       };
     });
   }
@@ -81,7 +81,6 @@ class GameSceneState extends State<GameScene> {
 
   @override
   Widget build(BuildContext context) {
-    log(players.map((e) => e.position).join("\n"));
     return Stack(
       children: [
         Center(
@@ -92,14 +91,7 @@ class GameSceneState extends State<GameScene> {
                         padding: const EdgeInsets.all(10),
                         child: CardComponent(card: e.stackHead)))
                     .toList())),
-        ...players.map((e) {
-          var result = playerPlayed[e.player.id]!;
-          return Positioned(
-              top: e.position.dy,
-              left: e.position.dx,
-              child: PlayerDeck(
-                  state: result.state, playedCard: result.playedCard));
-        })
+        Decks(states: deckStates)
       ],
     );
   }
