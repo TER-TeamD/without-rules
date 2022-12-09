@@ -19,7 +19,11 @@ import { Model } from "mongoose";
 import { StatusDto } from "../dto/status.dto";
 import { PlayedCardDto } from "../dto/played-card.dto";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { sortPlayerByCardsIncreasingOrder, sortStackCardsByHeadCardsIncreasingOrder } from "../utils/utils";
+import {
+    sortPlayerByCardsIncreasingOrder,
+    sortResultByCattleHead,
+    sortStackCardsByHeadCardsIncreasingOrder
+} from "../utils/utils";
 
 @WebSocketGateway({
     cors: {
@@ -50,7 +54,7 @@ export class GameEngineService implements OnModuleInit {
         }
 
         const game: Game = new Game();
-        game.players = []
+        game.players = [];
         for (let i = 1; i <= 2; i++) {
             const player: Player = new Player();
             player.cards = [];
@@ -128,6 +132,7 @@ export class GameEngineService implements OnModuleInit {
 
         game.in_game_property = new InGameProperty();
         game.in_game_property.deck = generateCardDeck();
+        game.in_game_property.current_round = 1;
 
         // We add 4 stackCards
         for (let i = 0; i < 4; i++) {
@@ -182,7 +187,7 @@ export class GameEngineService implements OnModuleInit {
         const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({ '_id': game._id }, { 'players': game.players }, { returnDocument: 'after' })
         await this.sendToTableCardsPlayedByPlayers(game._id, player.id, cardPlayed)
 
-        this.verifyEndTurn()
+        await this.verifyEndTurn()
 
         return new StatusDto();
     }
@@ -191,7 +196,6 @@ export class GameEngineService implements OnModuleInit {
 
 
     public async verifyEndTurn() {
-        console.log("cron")
         const games: Game[] = await this.gameModel.find({})
 
         if (games.length === 0) {
@@ -225,32 +229,42 @@ export class GameEngineService implements OnModuleInit {
 
         const actions: Action[] = [];
 
+
         for (const player of playerOrderByIncreasingCardValue) {
+            console.log(player.id)
 
             let lastCard: Card | null = null;
             for (const stack of stackCardInDecreasingOrder) {
                 const playerHeadCardValue: number = player.in_player_game_property.played_card.value
+                console.log("PlayedCardValue", playerHeadCardValue)
 
                 if (playerHeadCardValue < stack.stackHead.value && lastCard === null) {
+                    console.log("defosse")
                     // We need to recreate a new stack and add the card to the defosse du player
                     player.in_player_game_property.player_discard.push(...stack.stackCards)
                     stack.stackHead = player.in_player_game_property.played_card
                     stack.stackCards = [stack.stackHead]
+                    player.cards = player.cards.filter(c => c.value !== player.in_player_game_property.played_card.value);
                     player.in_player_game_property.played_card = null;
                     player.in_player_game_property.had_played_turn = false
 
                     actions.push(new Action(ActionTypeEnum.CLEAR_PUSH, player.id, stack))
+                    lastCard = stack.stackHead;
                     break;
                 }
 
-                if (lastCard !== null && playerHeadCardValue > stack.stackHead.value) {
+                // if (lastCard !== null && playerHeadCardValue > stack.stackHead.value) {
+                if (playerHeadCardValue > stack.stackHead.value) {
                     // Player put his card here
+                    console.log("Cardd")
                     stack.stackCards.push(player.in_player_game_property.played_card)
                     stack.stackHead = player.in_player_game_property.played_card
+                    player.cards = player.cards.filter(c => c.value !== player.in_player_game_property.played_card.value);
                     player.in_player_game_property.played_card = null;
                     player.in_player_game_property.had_played_turn = false
 
                     actions.push(new Action(ActionTypeEnum.PUSH_ON_TOP, player.id, stack))
+                    lastCard = stack.stackHead;
                     break;
                 }
 
@@ -258,18 +272,34 @@ export class GameEngineService implements OnModuleInit {
             }
         }
 
+
         const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
             { '_id': game._id },
-            { 'players': game.players, 'in_game_property.stacks': game.in_game_property.stacks },
-            { returnDocument: 'after' })
+            { 'players': game.players, 'in_game_property': game.in_game_property },
+            { returnDocument: 'after' });
 
 
         await this.sendActionListToTable(gameUpdated._id, actions);
 
-        // Send results to players dans table
-        await this.endGame();
+        // Send results to players dans table or next round
+        if (gameUpdated.in_game_property.current_round >= 10) {
+            await this.endGame();
+        } else {
+            await this.launchNextRound(gameUpdated);
+        }
+
     }
 
+
+    private async launchNextRound(game: Game): Promise<void> {
+        game.in_game_property.current_round = game.in_game_property.current_round + 1;
+        const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
+            { '_id': game._id },
+            { 'in_game_property': game.in_game_property },
+            { returnDocument: 'after' });
+
+        await this.sendNextRound();
+    }
 
     private async endGame() {
         const games: Game[] = await this.gameModel.find({})
@@ -285,11 +315,16 @@ export class GameEngineService implements OnModuleInit {
         game.players.forEach(p => {
             const result: Result = new Result();
             result.id_player = p.id
-            result.is_winner = p.in_player_game_property.player_discard.reduce((a, b) => a + b.value, 0) == 0
+            result.cattle_heads = p.in_player_game_property.player_discard.reduce((a, b) => a + b.value, 0);
             results.push(result)
-        })
+        });
 
-        await this.sendResultToAll(game._id, results)
+        const rankedResults: Result[] = sortResultByCattleHead(results);
+        for (let i = 0; i < rankedResults.length; i++) {
+            rankedResults[i].rank = i + 1;
+        }
+
+        await this.sendResultToAll(game._id, rankedResults)
         await this.gameModel.deleteMany({});
     }
 
@@ -317,6 +352,15 @@ export class GameEngineService implements OnModuleInit {
 
 
 
+    private async sendNextRound() {
+        this.server.emit('table', {
+            type: 'NEXT_ROUND',
+        })
+
+        this.server.emit('player', {
+            type: 'NEXT_ROUND',
+        })
+    }
 
     private async giveCardsToPlayerAtTheBeginningOfGame(idPlayer: string, cards: Card[]) {
         this.server.emit('player', {
