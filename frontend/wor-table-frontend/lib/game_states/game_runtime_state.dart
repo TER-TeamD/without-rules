@@ -10,6 +10,7 @@ import 'package:worfrontend/services/network/models/card.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
+import 'package:worfrontend/services/network/models/socket_models/next_round.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 import 'package:worfrontend/services/table_service.dart';
 
@@ -36,7 +37,8 @@ class GameRuntimeState extends GameState {
   late StreamSubscription<SocketMessage> playerChooseSubs,
       gameAction,
       initiateGame,
-      results;
+      results,
+      nextRound;
   final Game game;
   final List<PlayerPlayingState> states;
   final GameSceneState guiState;
@@ -69,8 +71,7 @@ class GameRuntimeState extends GameState {
       if (states.every((element) => element.played)) turnEnd();
     });
 
-    gameAction =
-        GetIt.I.get<TableService>().listen<NewActions>((message) async {
+    gameAction = GetIt.I.get<TableService>().listen<NewActions>((message) {
       for (int i = 0; i < message.actions.length; i++) {
         var action = message.actions[i];
         var playerState = states.firstWhere(
@@ -92,12 +93,14 @@ class GameRuntimeState extends GameState {
         if (states.every((element) => !element.played)) {
           guiState.resetPlayerPlayed();
         }
-
-        await Future.delayed(const Duration(seconds: 1));
       }
     });
     results = GetIt.I.get<TableService>().listen<Results>((message) =>
         runtimeService.changeState(FinalState(runtimeService, message)));
+
+    nextRound = GetIt.I
+        .get<TableService>()
+        .listen<NextRound>((message) => {guiState.resetPlayerPlayed()});
   }
 
   playerChose(String idPlayer) {

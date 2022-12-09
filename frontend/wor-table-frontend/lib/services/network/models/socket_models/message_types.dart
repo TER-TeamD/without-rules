@@ -1,4 +1,10 @@
-enum SocketMessageTypes { initiateGame, cardPlayedByUser, newActions, results }
+enum SocketMessageTypes {
+  initiateGame,
+  cardPlayedByUser,
+  newActions,
+  results,
+  nextRound
+}
 
 SocketMessageTypes getSocketMessageType(String type) {
   switch (type) {
@@ -10,6 +16,8 @@ SocketMessageTypes getSocketMessageType(String type) {
       return SocketMessageTypes.newActions;
     case "RESULTS":
       return SocketMessageTypes.results;
+    case "NEXT_ROUND":
+      return SocketMessageTypes.nextRound;
   }
   throw "Message type not found.";
 }

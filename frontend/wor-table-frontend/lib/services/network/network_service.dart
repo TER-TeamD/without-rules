@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:worfrontend/errors/network_uninitialized.dart';
+import 'package:worfrontend/errors/server_error.dart';
 import 'models/http_dtos/game.dart';
 import 'models/http_dtos/new_game_dto.dart';
 import 'socket_message.dart/socket_message.dart';
@@ -47,15 +50,25 @@ class NetworkService {
     _socket!.emitWithAck(topic, value);
   }
 
+  handleHttpErrors(Response response) {
+    if (!response.statusCode.toString().startsWith("2")) {
+      print(response.body);
+      print(response.statusCode);
+      throw ServerError(response.statusCode, response.body);
+    }
+  }
+
   // Create a game and return possible ids for players
   Future<NewGameDto> createGame() async {
     var result = await http.post(Uri.http(hostname, "game-engine/create-game"));
+    handleHttpErrors(result);
     return NewGameDto.fromJson(jsonDecode(result.body));
   }
 
   // Start the game and return the beginning stacks
   Future<Game> startGame() async {
     var result = await http.post(Uri.http(hostname, "game-engine/start-game"));
+    handleHttpErrors(result);
     return Game.fromJson(jsonDecode(result.body));
   }
 }
