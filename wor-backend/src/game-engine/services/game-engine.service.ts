@@ -134,8 +134,12 @@ export class GameEngineService implements OnModuleInit {
             game.in_game_property.stacks.push(new StackCard(i, game.in_game_property.deck.pop()))
         }
 
-        // We give a card to each player
-        game.players.forEach(player => { player.cards.push(game.in_game_property.deck.pop()) })
+        // We give 10 cards to each player
+        game.players.forEach(player => {
+            for (let i = 0; i < 10; i++) {
+                player.cards.push(game.in_game_property.deck.pop())
+            }
+        })
 
         const gameWithDeck: Game = await this.gameModel.findOneAndUpdate({ '_id': game._id }, { 'in_game_property': game.in_game_property, 'players': game.players }, { returnDocument: 'after' })
 
@@ -372,8 +376,4 @@ export class GameEngineService implements OnModuleInit {
             }
         })
     }
-
-
-
-
 }
