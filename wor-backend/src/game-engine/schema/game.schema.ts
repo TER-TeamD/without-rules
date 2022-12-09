@@ -6,6 +6,7 @@ import {shuffle} from "../utils/utils";
 export class InGameProperty {
     deck: Card[] = [];
     stacks: StackCard[] = [];
+    current_round: number = 0;
 }
 
 export type GameDocument = Game & Document;
@@ -84,7 +85,8 @@ export class Action {
 
 export class Result {
     id_player: string;
-    is_winner: boolean;
+    cattle_heads: number;
+    rank: number = 0;
 }
 
 
