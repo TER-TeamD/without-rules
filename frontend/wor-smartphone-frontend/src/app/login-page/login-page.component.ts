@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { GameService } from '../services/game.service';
 import { Router } from '@angular/router';
+import {WebsocketService} from "../services/websocket.service";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-login-page',
@@ -16,9 +18,10 @@ export class LoginPageComponent {
   ngOnInit(): void {
   }
 
+
   public login() {
     if (this.playerId.length > 0) {
-      this.gameService.joinGame(this.playerId).subscribe(
+      this.gameService.joinGame(this.playerId).then(
         () => {
           this.router.navigate(['/cards/' + this.playerId]);
         },

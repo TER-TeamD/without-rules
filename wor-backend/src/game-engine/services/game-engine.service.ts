@@ -49,11 +49,58 @@ export class GameEngineService implements OnModuleInit {
   constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
 
   onModuleInit(): any {
-    this.server.on('connection', (socket) => {
+    this.server.on('connection', async (socket) => {
+      console.log((new Date()).toISOString())
       console.log(socket.id);
-      console.log('Connected');
+      console.log(socket.handshake.auth);
+
+      if (socket.handshake.auth.type == 'PLAYER') {
+        // Le player ayant comme ID socket.handshake.auth.id vient de se connecter
+        await this.newPlayerConnection(socket.handshake.auth.id, socket.id);
+      }
+
+      if (socket.handshake.auth.type == 'TABLE') {
+        // Le player ayant comme ID socket.handshake.auth.id vient de se connecter
+        await this.newTableConnection(socket.handshake.auth.id, socket.id);
+      }
     });
   }
+
+  private async newPlayerConnection(idPlayer: string, socketId: string) {
+    const games: Game[] = await this.gameModel.find({});
+    if (games == null || games.length === 0) {
+      await this.server.socketsLeave(socketId);
+      throw new HttpException("Any game found", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    const game: Game = games[0];
+
+    let isPlayerFound: boolean = false;
+    game.players.forEach(p => {
+      if (p.id === idPlayer) {
+        p.socket_id = socketId;
+        isPlayerFound = true;
+      }
+    })
+
+    if (!isPlayerFound) {
+      await this.server.socketsLeave(socketId);
+      throw new HttpException("Any user found with this ID", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    await this.gameModel.findOneAndUpdate({_id: game._id}, {players: game.players} );
+  }
+
+  private async newTableConnection(idTable: string, socketId: string) {
+    const game: Game = await this.gameModel.findOne({_id: idTable});
+    if (game == null) {
+      await this.server.socketsLeave(socketId);
+      throw new HttpException("Any game found", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    await this.gameModel.findOneAndUpdate({_id: game._id}, {socket_id: socketId} );
+  }
+
 
   public async createNewGame(): Promise<NewGameDto> {
     const existingGames: Game[] = await this.gameModel.find({});
