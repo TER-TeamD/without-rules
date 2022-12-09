@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/scenes/wait_player/player_stand_init.dart';
-import 'package:worfrontend/services/game_states/wait_players.dart';
+import 'package:worfrontend/game_states/wait_players.dart';
 import 'package:worfrontend/services/network/network_service.dart';
 
 import '../../errors/too_much_player.dart';

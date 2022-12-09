@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:worfrontend/services/game_states/game_runtime_state.dart';
-
-import '../../services/network/models/game.dart';
+import 'package:worfrontend/game_states/game_runtime_state.dart';
 
 class ChooseCardScene extends StatefulWidget {
   final GameRuntimeState state;

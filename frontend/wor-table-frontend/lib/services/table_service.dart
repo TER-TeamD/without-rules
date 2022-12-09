@@ -5,8 +5,8 @@ import 'package:worfrontend/services/network/network_service.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 
 import '../models/table_player.dart';
-import 'network/models/game.dart';
-import 'network/models/new_game_dto.dart';
+import 'network/models/http_dtos/game.dart';
+import 'network/models/http_dtos/new_game_dto.dart';
 
 abstract class TableService {
   abstract List<TablePlayer>? players;

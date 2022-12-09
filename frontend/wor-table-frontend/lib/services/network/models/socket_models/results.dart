@@ -1,6 +1,6 @@
-import 'package:worfrontend/services/network/models/result.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 
+import 'result.dart';
 import 'message_types.dart';
 
 class Results extends TableSocketMessage {

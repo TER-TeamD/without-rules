@@ -1,6 +1,5 @@
-import 'package:worfrontend/services/network/models/InPlayerGameProperty.dart';
-
-import 'card.dart';
+import 'InPlayerGameProperty.dart';
+import '../card.dart';
 
 class Player {
   final String id;

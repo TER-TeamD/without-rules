@@ -1,5 +1,6 @@
-import 'package:worfrontend/services/network/models/in_game_property.dart';
-import 'package:worfrontend/services/network/models/player.dart';
+import 'package:worfrontend/services/network/models/http_dtos/player.dart';
+
+import 'in_game_property.dart';
 
 class Game {
   final List<Player> players;

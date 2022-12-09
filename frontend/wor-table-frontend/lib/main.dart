@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/services/game_runtime_service.dart';
-import 'package:worfrontend/services/game_states/game_runtime_state.dart';
-import 'package:worfrontend/services/game_states/game_state.dart';
-import 'package:worfrontend/services/game_states/wait_server.dart';
+import 'package:worfrontend/game_states/game_runtime_state.dart';
+import 'package:worfrontend/game_states/game_state.dart';
+import 'package:worfrontend/game_states/wait_server.dart';
 import 'package:worfrontend/services/network/network_service.dart';
 import 'package:worfrontend/services/table_service.dart';
 import 'package:worfrontend/services/table_service_mock.dart';

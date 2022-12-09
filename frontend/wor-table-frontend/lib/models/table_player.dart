@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../services/network/models/player.dart';
+import '../services/network/models/http_dtos/player.dart';
 
 class TablePlayer {
   final Player player;

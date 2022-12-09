@@ -1,6 +1,6 @@
-import 'package:worfrontend/services/network/models/stack_card.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 
+import '../stack_card.dart';
 import 'message_types.dart';
 
 class InitiateGame extends TableSocketMessage {

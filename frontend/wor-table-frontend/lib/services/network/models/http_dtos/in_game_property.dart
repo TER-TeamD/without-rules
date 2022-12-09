@@ -1,6 +1,5 @@
-import 'package:worfrontend/services/network/models/stack_card.dart';
-
-import 'card.dart';
+import '../card.dart';
+import '../stack_card.dart';
 
 class InGameProperty {
   final List<Card> deck;

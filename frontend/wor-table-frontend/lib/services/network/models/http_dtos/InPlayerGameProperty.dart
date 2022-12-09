@@ -1,4 +1,4 @@
-import 'card.dart';
+import '../card.dart';
 
 class InPlayerGameProperty {
   //final Card? playedCard;

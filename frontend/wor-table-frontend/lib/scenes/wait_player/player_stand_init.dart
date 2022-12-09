@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:worfrontend/services/game_states/wait_players.dart';
+import 'package:worfrontend/game_states/wait_players.dart';
 
 class PlayerStandInit extends StatelessWidget {
   final PlayerInitialisationTicket ticket;

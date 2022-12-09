@@ -2,22 +2,22 @@ import 'dart:ui';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/models/table_player.dart';
-import 'package:worfrontend/services/network/models/InPlayerGameProperty.dart';
 import 'package:worfrontend/services/network/models/action/action.dart';
 import 'package:worfrontend/services/network/models/action/action_types.dart';
 import 'package:worfrontend/services/network/models/card.dart';
-import 'package:worfrontend/services/network/models/in_game_property.dart';
-import 'package:worfrontend/services/network/models/player.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
-import 'package:worfrontend/services/network/models/new_game_dto.dart';
-import 'package:worfrontend/services/network/models/game.dart';
 import 'dart:async';
 
 import 'package:worfrontend/services/table_service.dart';
+
+import 'network/models/http_dtos/game.dart';
+import 'network/models/http_dtos/in_game_property.dart';
+import 'network/models/http_dtos/new_game_dto.dart';
+import 'network/models/http_dtos/player.dart';
 
 class TableServiceMock implements TableService {
   Map<String, Offset> playersPosition = {};

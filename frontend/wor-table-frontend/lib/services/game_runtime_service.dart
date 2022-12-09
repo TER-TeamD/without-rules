@@ -1,5 +1,5 @@
 import 'package:rxdart/subjects.dart';
-import 'package:worfrontend/services/game_states/game_state.dart';
+import 'package:worfrontend/game_states/game_state.dart';
 
 class GameRuntimeService {
   late GameState state;

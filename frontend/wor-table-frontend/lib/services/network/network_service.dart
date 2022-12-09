@@ -5,8 +5,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:worfrontend/errors/network_uninitialized.dart';
-import 'package:worfrontend/services/network/models/game.dart';
-import 'package:worfrontend/services/network/models/new_game_dto.dart';
+import 'models/http_dtos/game.dart';
+import 'models/http_dtos/new_game_dto.dart';
 import 'socket_message.dart/socket_message.dart';
 
 class NetworkService {

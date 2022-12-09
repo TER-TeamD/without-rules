@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/errors/too_much_player.dart';
-import 'package:worfrontend/scenes/choose_card/choose_card_scene.dart';
 import 'package:worfrontend/scenes/wait_player/wait_player_scene.dart';
-import 'package:worfrontend/services/game_states/game_runtime_state.dart';
-import 'package:worfrontend/services/game_states/game_state.dart';
-import 'package:worfrontend/services/network/models/new_game_dto.dart';
-import 'package:worfrontend/services/network/network_service.dart';
+import 'package:worfrontend/game_states/game_runtime_state.dart';
+import 'package:worfrontend/game_states/game_state.dart';
 import 'package:worfrontend/services/table_service.dart';
+
+import '../services/network/models/http_dtos/new_game_dto.dart';
 
 class WaitPlayerState extends GameState {
   final NewGameDto createdGame;
