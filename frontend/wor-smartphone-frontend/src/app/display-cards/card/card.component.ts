@@ -16,8 +16,10 @@ export class CardComponent {
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  ngOnChanges(): void {
     this.cattleHeads = "🐮".repeat(this.card?.cattleHead || 0);
-    console.log(this.cattleHeads);
   }
 
 }

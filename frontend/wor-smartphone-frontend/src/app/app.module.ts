@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { DisplayCardsComponent } from './display-cards/display-cards.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { CardComponent } from './display-cards/card/card.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { CardComponent } from './display-cards/card/card.component';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]
