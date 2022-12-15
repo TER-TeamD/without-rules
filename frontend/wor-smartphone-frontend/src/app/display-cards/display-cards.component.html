@@ -1,9 +1,15 @@
-<div *ngIf="loading" class="content-container">
+<div *ngIf="loading" class="loading">
     <p>Waiting for the game to be launched...</p>
 </div>
+
 <div *ngIf="!loading" class="content-container">
-    <div id="cards" *ngFor="let card of gameCards?.value?.cards">
-        <app-card [card]="card" (click)="selectCard(card)"></app-card>
+    <app-card [card]="selectedCard"></app-card>
+
+    <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let card of cardsArray" cdkDrag>
+            <app-card [card]="card" (click)="selectCard(card)"></app-card>
+        </div>
     </div>
+
     <button type="button" id="button-play" (click)="play()" [disabled]="!select">Play the card</button>
 </div>
