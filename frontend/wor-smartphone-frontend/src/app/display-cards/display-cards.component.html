@@ -2,7 +2,12 @@
     <p>Waiting for the game to be launched...</p>
 </div>
 
-<div *ngIf="!loading" class="content-container">
+<div *ngIf="played" class="loading">
+    <p>Waiting for everyone to play...</p>
+    <p>Results of the round will be on the table !</p>
+</div>
+
+<div *ngIf="!loading && !played" class="content-container">
     <app-card [card]="selectedCard"></app-card>
 
     <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">

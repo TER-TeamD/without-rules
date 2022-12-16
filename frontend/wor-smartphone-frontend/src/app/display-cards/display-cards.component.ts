@@ -16,6 +16,7 @@ export class DisplayCardsComponent {
   public gameCards?: GameCards;
   public select: boolean = false;
   public loading: boolean = true;
+  public played: boolean = false;
   public cardsArray: Card[] = [];
   public selectedCard: Card = this.cardsArray[0];
 
@@ -23,8 +24,8 @@ export class DisplayCardsComponent {
   }
 
   ngOnInit(): void {
-    // this.loading = false;
-
+    this.loading = false;
+    this.played = true;
     // this.cardsArray = [
     //   { value: 1, cattleHead: 1 },
     //   { value: 2, cattleHead: 2 },
@@ -56,6 +57,7 @@ export class DisplayCardsComponent {
     this.gameService.playCard(playerId!, cardValue!).subscribe(
       () => {
         console.log('Carte jouée', this.selectedCard);
+        this.played = true;
       }
     );
   }
