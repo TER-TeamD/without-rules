@@ -24,11 +24,13 @@ export class DisplayCardsComponent {
   }
 
   ngOnInit(): void {
-    this.loading = false;
+    this.loading = true;
     this.played = true;
 
     this.gameService.playerCards$.subscribe(cards => {
       this.cardsArray = cards;
+      this.loading = false;
+      this.played = false;
     })
 
     // this.route.params.subscribe(params => {

@@ -27,8 +27,10 @@ export class GameService {
       await this.webSocketService.playerJoinGame(playerId);
 
       this.webSocketService.listeningUserConnexion().subscribe(connexionStatus => {
+        console.log(connexionStatus)
         if (connexionStatus && connexionStatus.status === ConnexionStatusEnum.USER_IS_LOGGED) {
           // User connected
+
         } else {
           // Error : User not connected
           throw new Error("Cannot logged the user, this ID doesn't exist");

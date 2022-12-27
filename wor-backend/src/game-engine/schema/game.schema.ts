@@ -18,9 +18,6 @@ export class Game {
   @IsMongoId()
   _id: string;
 
-  @Prop()
-  socket_id: string;
-
   @Prop({ required: true })
   @IsArray()
   players: Player[];
@@ -46,7 +43,6 @@ export class StackCard {
 export class Player {
   id: string;
   is_logged: boolean;
-  socket_id: string;
   cards: Card[];
   in_player_game_property: InPlayerGameProperty | null;
 }

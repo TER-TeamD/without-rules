@@ -2,23 +2,23 @@ import { io } from 'socket.io-client';
 
 
 const socket = io('http://localhost:8451', {
-    // autoConnect: false,
+    autoConnect: false,
     auth: {
         id: "0",
         type: "TABLE",
     }
 });
 
-// const connectSocket = async () => {
-//     await socket.disconnect().connect();
-// }
+const connectSocket = () => {
+    socket.disconnect().connect();
+}
 
 const createNewGame = async () => {
     await socket.emit('table_create_game', {});
-}
+};
 
-const sendMessage = (value) => {
-    socket.emit('message_topic_1', value);
+const startGame = () => {
+    socket.emit('table_start_game', {});
 }
 
 socket.on('connection_status_server', (message) => {
@@ -27,10 +27,15 @@ socket.on('connection_status_server', (message) => {
 
 socket.on('player_initialization', (message) => {
     console.log(message)
-})
+});
+
+socket.on('table_cards_initialization', (message) => {
+    console.log(message)
+});
 
 export const SocketService = {
     socket,
-    sendMessage,
-    createNewGame
+    createNewGame,
+    startGame,
+    connectSocket,
 }

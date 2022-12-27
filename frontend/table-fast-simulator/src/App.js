@@ -5,12 +5,18 @@ import {SocketService} from "./services/socket.service";
 function App() {
 
   const launchGame = async () => {
+    await SocketService.connectSocket();
     await SocketService.createNewGame();
+  }
+
+  const startGame = async () => {
+    await SocketService.startGame();
   }
 
   return (
     <div className="App">
-      <button onClick={launchGame}>Launch Game</button>
+      <button onClick={launchGame}>Launch Session</button>
+      <button onClick={startGame}>Start Game</button>
     </div>
   );
 }

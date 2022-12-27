@@ -31,13 +31,13 @@ export class WebsocketService {
   }
 
   public listeningNewPlayerCards(): Observable<Card[] | null> {
-    this._socket.on('new_player_cards', (message: {id_player: string, cards: Card[]}) => {
+    this._socket.on('player_cards_initialization', (message: {cards: Card[]}) => {
       this._playerCards$.next(message.cards);
+      console.log(message.cards)
     });
 
     return this._playerCards$.asObservable();
   }
-
 
   public async sendNewPlayedCard(playerId: string, cardValue: number): Promise<any> {
     return this._socket.emit('player_play_card', {player_id: playerId, card_value: cardValue});
