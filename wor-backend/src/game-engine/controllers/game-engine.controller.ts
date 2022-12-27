@@ -20,21 +20,24 @@ export class GameEngineController {
     @ApiOkResponse({ type: NewGameDto, description: 'We instanciate a new game and propose to some players to join' })
     public async createGame(): Promise<NewGameDto> {
         this.logger.log('Create new game');
-        return this.gameEngineService.createNewGame();
+        return null;
+        // return this.gameEngineService.createNewGame();
     }
 
     @Post('/player/:id_player/join-game')
     @ApiOkResponse({ type: StatusDto, description: 'The player is ready to start the game' })
     public async playerWantToJoinAGame(@Param('id_player') idPlayer: string): Promise<Player> {
         this.logger.log(`Player ${idPlayer} join the game`);
-        return this.gameEngineService.playerWantToJoinAGame(idPlayer);
+        return null;
+        // return this.gameEngineService.playerWantToJoinAGame(idPlayer);
     }
 
     @Post('/start-game')
     @ApiOkResponse({ type: Game, description: 'The game is launched' })
     public async startGame(): Promise<Game> {
         this.logger.log(`Start the game`);
-        return this.gameEngineService.startGame();
+        return null;
+        // return this.gameEngineService.startGame();
     }
 
     @Post('/player/:id_player/play-card')
@@ -42,7 +45,8 @@ export class GameEngineController {
     @ApiOkResponse({ type: StatusDto, description: 'The player played a card' })
     public async playerPlayedACard(@Param('id_player') idPlayer: string, @Body() body: PlayedCardDto): Promise<StatusDto> {
         this.logger.log(`Player ${idPlayer} played the card ${body.card_value}`);
-        return this.gameEngineService.playerPlayedACard(idPlayer, body);
+        return null;
+        // return this.gameEngineService.playerPlayedACard(idPlayer, body);
     }
 
 
@@ -50,6 +54,7 @@ export class GameEngineController {
     @ApiOkResponse({ type: StatusDto })
     public async deleteGame(): Promise<StatusDto> {
         this.logger.log(`Delete the game`);
-        return this.gameEngineService.deleteGame();
+        return null;
+        // return this.gameEngineService.deleteGame();
     }
 }

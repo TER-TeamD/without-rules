@@ -26,23 +26,21 @@ export class DisplayCardsComponent {
   ngOnInit(): void {
     this.loading = false;
     this.played = true;
-    // this.cardsArray = [
-    //   { value: 1, cattleHead: 1 },
-    //   { value: 2, cattleHead: 2 },
-    //   { value: 3, cattleHead: 3 },
-    //   { value: 4, cattleHead: 4 }
-    // ];
 
-    this.route.params.subscribe(params => {
-      this.wsService.connect(params["playerId"]).subscribe(
-        (data) => {
-          console.log('data', data);
-          this.gameCards = data;
-          this.loading = false;
-          this.cardsArray = this.gameCards?.value?.cards;
-        }
-      );
-    });
+    this.gameService.playerCards$.subscribe(cards => {
+      this.cardsArray = cards;
+    })
+
+    // this.route.params.subscribe(params => {
+    //   this.wsService.connect(params["playerId"]).subscribe(
+    //     (data) => {
+    //       console.log('data', data);
+    //       this.gameCards = data;
+    //       this.loading = false;
+    //       this.cardsArray = this.gameCards?.value?.cards;
+    //     }
+    //   );
+    // });
   }
 
   public selectCard(card: Card) {
@@ -54,12 +52,14 @@ export class DisplayCardsComponent {
   public play() {
     let playerId = this.gameCards?.value?.id_player;
     let cardValue = this.gameCards?.value?.cards[0].value;
-    this.gameService.playCard(playerId!, cardValue!).subscribe(
-      () => {
+
+    this.gameService.playCard(playerId!, cardValue!).then(() => {
         console.log('Carte jouée', this.selectedCard);
         this.played = true;
       }
-    );
+    ).catch((e) => {
+      console.error(e);
+    });
   }
 
   drop(event: CdkDragDrop<string[]>) {

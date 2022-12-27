@@ -1,8 +1,10 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {AuthService} from "./auth.service";
 import {WebsocketService} from "./websocket.service";
+import {Card} from "../model/card.model";
+import {ConnexionStatusEnum} from "../model/connexion-status.model";
 
 
 @Injectable({
@@ -10,7 +12,8 @@ import {WebsocketService} from "./websocket.service";
 })
 export class GameService {
 
-  private url: string = "http://localhost:8451/game-engine/player/";
+  private _playerCards: Card[] = [];
+  private _playerCards$: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(this._playerCards);
 
   constructor(
     private httpClient: HttpClient,
@@ -18,22 +21,36 @@ export class GameService {
     private webSocketService: WebsocketService,
   ) { }
 
-  public joinGame(playerId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  public async joinGame(playerId: string): Promise<void> {
       this.authService.idPlayer = playerId;
-      this.webSocketService.connectToSocket();
+      await this.webSocketService.connectPlayer(playerId);
+      await this.webSocketService.playerJoinGame(playerId);
 
+      this.webSocketService.listeningUserConnexion().subscribe(connexionStatus => {
+        if (connexionStatus && connexionStatus.status === ConnexionStatusEnum.USER_IS_LOGGED) {
+          // User connected
+        } else {
+          // Error : User not connected
+          throw new Error("Cannot logged the user, this ID doesn't exist");
+        }
+      })
 
-      this.httpClient.post(this.url + playerId + "/join-game", null).subscribe(r => {
-        resolve();
-      }, e => {
-        reject();
-      });
-    })
-
+      this.webSocketService.listeningNewPlayerCards().subscribe(newCards => {
+        if (newCards) {
+          this._playerCards = newCards;
+          this._playerCards$.next(this._playerCards);
+        } else {
+          // Any cards found
+        }
+      })
   }
 
-  public playCard(playerId: string, cardValue: number) {
-    return this.httpClient.post(this.url + playerId + "/play-card", { card_value: cardValue });
+  public async playCard(playerId: string, cardValue: number): Promise<any> {
+    return await this.webSocketService.sendNewPlayedCard(playerId, cardValue);
+  }
+
+
+  get playerCards$(): BehaviorSubject<Card[]> {
+    return this._playerCards$;
   }
 }
