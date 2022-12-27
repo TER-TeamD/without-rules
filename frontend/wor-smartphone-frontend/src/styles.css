@@ -19,13 +19,14 @@ app-root {
     height: 100%;
 }
 
-app-display-cards,
-app-login-page {
-    flex: 1;
+app-display-cards {
     display: flex;
-    flex-direction: column;
+    height: 100%;
+}
+
+app-login-page {
+    display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
     height: 100%;
 }
