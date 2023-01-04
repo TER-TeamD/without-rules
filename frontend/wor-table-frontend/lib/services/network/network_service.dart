@@ -2,12 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:worfrontend/errors/network_uninitialized.dart';
 import 'package:worfrontend/errors/server_error.dart';
+import 'package:worfrontend/errors/socket_error.dart';
+import 'package:worfrontend/services/error_manager.dart';
+import 'package:worfrontend/services/network/socket_request.dart';
 import 'models/http_dtos/game.dart';
 import 'models/http_dtos/new_game_dto.dart';
 import 'socket_message.dart/socket_message.dart';
@@ -20,7 +24,12 @@ class NetworkService {
   NetworkService(this.hostname);
 
   Future connect() async {
-    _socket = io("ws://" + hostname);
+    _socket = io("ws://$hostname", <String, dynamic>{
+      'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
+    });
+    _socket!.on('error', (data) {
+      ErrorManager.handle(SocketError(data));
+    });
   }
 
   StreamSubscription<SocketMessage> listen(
@@ -60,6 +69,13 @@ class NetworkService {
 
   // Create a game and return possible ids for players
   Future<NewGameDto> createGame() async {
+    if (_socket == null) throw '';
+    return SocketRequest.send(
+        socket: _socket!,
+        requestEvent: 'table_create_game',
+        responseEvent: '',
+        responseBuilder: (data) => NewGameDto.fromJson(data));
+
     var result = await http.post(Uri.http(hostname, "game-engine/create-game"));
     handleHttpErrors(result);
     return NewGameDto.fromJson(jsonDecode(result.body));
