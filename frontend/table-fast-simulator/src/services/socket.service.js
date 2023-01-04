@@ -22,15 +22,15 @@ const startGame = () => {
 }
 
 socket.on('connection_status_server', (message) => {
-    console.log(message);
+    console.log('connection_status_server', message);
 });
 
 socket.on('player_initialization', (message) => {
-    console.log(message)
+    console.log('player_initialization', message)
 });
 
 socket.on('table_cards_initialization', (message) => {
-    console.log(message)
+    console.log('table_cards_initialization', message)
 });
 
 export const SocketService = {

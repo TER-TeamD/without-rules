@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_runtime_service.dart';
 import 'package:worfrontend/game_states/game_runtime_state.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late GameState state;
+  AppError? error;
 
   @override
   void initState() {
@@ -55,14 +57,28 @@ class _MyAppState extends State<MyApp> {
     widget.gameRuntime.stateObservable.listen((value) => setState(() {
           state = value;
         }));
+
+    // Display errors
+    GetIt.I.get<ErrorManager>().onError.listen((value) {
+      setState(() {
+        error = value;
+      });
+    });
+    error = GetIt.I.get<ErrorManager>().error;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Container(child: state.buildUI(context)),
+        body: error == null
+            ? Container(child: state.buildUI(context))
+            : drawError(context),
       ),
     );
+  }
+
+  Widget drawError(BuildContext context) {
+    return Center(child: Text('Error: ${error!.screenMessage()}'));
   }
 }
