@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class CardComponent extends StatelessWidget {

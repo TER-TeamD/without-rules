@@ -1,14 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
-import 'package:http/http.dart' as http;
 import 'package:worfrontend/errors/network_uninitialized.dart';
-import 'package:worfrontend/errors/server_error.dart';
 import 'package:worfrontend/errors/socket_error.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/socket_request.dart';
@@ -37,7 +30,6 @@ class NetworkService {
     if (_socket == null) throw NetworkUninitialized();
 
     _socket!.on(topic, (data) {
-      print(data);
       _onEvent.add(SocketMessage.create(topic, data));
     });
     return _onEvent.listen((value) {
@@ -57,12 +49,6 @@ class NetworkService {
   send(String topic, dynamic value) {
     if (_socket == null) throw NetworkUninitialized();
     _socket!.emitWithAck(topic, value);
-  }
-
-  handleHttpErrors(Response response) {
-    if (!response.statusCode.toString().startsWith("2")) {
-      throw ServerError(response.statusCode, response.body);
-    }
   }
 
   // Create a game and return possible ids for players

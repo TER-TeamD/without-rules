@@ -1,5 +1,3 @@
-import 'dart:math';
-
 class NewGameDto {
   final String idGame;
   final List<String> potentialPlayersId;

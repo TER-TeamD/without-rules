@@ -26,9 +26,7 @@ class WaitPlayerState extends GameState {
   }
 
   @override
-  void onLoad() {
-    print("Waiting for player :\n" + createdGame.potentialPlayersId.join("\n"));
-  }
+  void onLoad() {}
 
   borrow(Offset position) {
     if (availableIds.isEmpty) {

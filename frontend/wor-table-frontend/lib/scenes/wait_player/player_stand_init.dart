@@ -25,7 +25,7 @@ class PlayerStandInit extends StatelessWidget {
                   data: ticket.id,
                   size: 90,
                 ),
-                Text("Id: " + ticket.id)
+                Text("Id: ${ticket.id}")
               ],
             ),
             Column(mainAxisSize: MainAxisSize.min, children: [

@@ -1,4 +1,4 @@
-import 'InPlayerGameProperty.dart';
+import 'in_player_game_property.dart';
 import '../card.dart';
 
 class Player {
