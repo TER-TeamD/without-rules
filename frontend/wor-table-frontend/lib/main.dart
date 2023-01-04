@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_runtime_service.dart';
 import 'package:worfrontend/game_states/game_runtime_state.dart';
 import 'package:worfrontend/game_states/game_state.dart';
@@ -21,6 +22,7 @@ Future initScene(
 }
 
 void main() {
+  GetIt.I.registerSingleton<ErrorManager>(ErrorManager());
   var service = NetworkService("localhost:8451");
   service.connect();
   //GetIt.I.registerSingleton(service);
