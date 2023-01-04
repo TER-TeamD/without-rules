@@ -61,8 +61,6 @@ class NetworkService {
 
   handleHttpErrors(Response response) {
     if (!response.statusCode.toString().startsWith("2")) {
-      print(response.body);
-      print(response.statusCode);
       throw ServerError(response.statusCode, response.body);
     }
   }
@@ -73,18 +71,17 @@ class NetworkService {
     return SocketRequest.send(
         socket: _socket!,
         requestEvent: 'table_create_game',
-        responseEvent: '',
+        responseEvent: 'player_initialization',
         responseBuilder: (data) => NewGameDto.fromJson(data));
-
-    var result = await http.post(Uri.http(hostname, "game-engine/create-game"));
-    handleHttpErrors(result);
-    return NewGameDto.fromJson(jsonDecode(result.body));
   }
 
   // Start the game and return the beginning stacks
   Future<Game> startGame() async {
-    var result = await http.post(Uri.http(hostname, "game-engine/start-game"));
-    handleHttpErrors(result);
-    return Game.fromJson(jsonDecode(result.body));
+    if (_socket == null) throw ErrorManager.handle(NetworkUninitialized());
+    return SocketRequest.send(
+        socket: _socket!,
+        requestEvent: 'table_start_game',
+        responseEvent: 'table_cards_initialization',
+        responseBuilder: (data) => Game.fromJson(data));
   }
 }
