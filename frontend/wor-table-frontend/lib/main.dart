@@ -3,12 +3,10 @@ import 'package:get_it/get_it.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_runtime_service.dart';
-import 'package:worfrontend/game_states/game_runtime_state.dart';
 import 'package:worfrontend/game_states/game_state.dart';
 import 'package:worfrontend/game_states/wait_server.dart';
 import 'package:worfrontend/services/network/network_service.dart';
 import 'package:worfrontend/services/table_service.dart';
-import 'package:worfrontend/services/table_service_mock.dart';
 
 Future initScene(
     GameRuntimeService runtimeService, TableService tableService) async {
@@ -38,9 +36,9 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  GameRuntimeService gameRuntime;
+  final GameRuntimeService gameRuntime;
 
-  MyApp({super.key, required this.gameRuntime});
+  const MyApp({super.key, required this.gameRuntime});
 
   @override
   State<MyApp> createState() => _MyAppState();
