@@ -1,12 +1,9 @@
 import {
-  Body,
   forwardRef,
   HttpException,
   HttpStatus,
   Inject,
-  Injectable,
   Logger,
-  Param,
 } from '@nestjs/common';
 import {
   OnGatewayConnection,
@@ -18,10 +15,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameEngineService } from './game-engine.service';
-import {
-  AnyGameFoundException,
-  AnyPlayerFoundException,
-} from '../exceptions/exeptions-handler';
 import { NewGameDto } from '../dto/new-game.dto';
 import { ConnexionStatusEnum } from '../schema/manager.enums';
 import { Action, Card, Result, StackCard } from '../schema/game.schema';
@@ -44,7 +37,7 @@ export class WebsocketGateway
     private readonly gameEngineService: GameEngineService,
   ) {}
 
-  afterInit(server: Server): any {
+  afterInit(): any {
     this.logger.log('Init');
   }
 

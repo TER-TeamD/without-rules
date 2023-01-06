@@ -14,9 +14,11 @@ function App() {
     }
 
     return (
-        <div className="App">
-            <button onClick={launchGame}>Launch Session</button>
-            <button onClick={startGame}>Start Game</button>
+        <div className="App container-sm py-5">
+            <div className="d-flex mb-3">
+                <button className="btn btn-primary me-3" onClick={launchGame}>Launch Session</button>
+                <button className="btn btn-primary" onClick={startGame}>Start Game</button>
+            </div>
 
             <MessageList/>
         </div>

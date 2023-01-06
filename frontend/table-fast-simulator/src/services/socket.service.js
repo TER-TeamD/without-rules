@@ -40,7 +40,7 @@ socket.on('table_new_player', (message) => {
 
 socket.onAny((...args) => {
     console.log("Socket message received", args)
-    addMessage({title: "Socket message received", message: args});
+    addMessage({title: args[0], message: args[1]});
 })
 
 export const SocketService = {

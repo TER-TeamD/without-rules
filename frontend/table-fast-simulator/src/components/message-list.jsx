@@ -24,7 +24,7 @@ export default class MessageList extends React.Component {
          */
         const messages = this.state.messages;
         return (
-            <ul>
+            <ul className="list-group">
                 {messages.map(message => {
                     return (
                         <ListItem message={message.message} title={message.title}></ListItem>
