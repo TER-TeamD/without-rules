@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { addMessage } from './messages.service';
 
 
 const socket = io('http://localhost:8451', {
@@ -37,7 +38,10 @@ socket.on('table_new_player', (message) => {
     console.log("table_new_player", message)
 })
 
-socket.onAny((...args) => console.log("Socket message received", args))
+socket.onAny((...args) => {
+    console.log("Socket message received", args)
+    addMessage({title: "Socket message received", message: args});
+})
 
 export const SocketService = {
     socket,
