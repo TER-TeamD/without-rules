@@ -21,7 +21,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     @WebSocketServer()
     server: Server;
 
-    private entitiesConnected: {} = {}; // socket_id: string, type: string
+    private entitiesConnected: { [entityId: string]: { socket_id: string, type: string } } = {}; // socket_id: string, type: string
     private readonly logger: Logger = new Logger(WebsocketGateway.name);
 
 

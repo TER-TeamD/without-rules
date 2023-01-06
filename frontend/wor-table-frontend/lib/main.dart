@@ -17,7 +17,7 @@ Future initScene(
   // }
 
   // var game = await tableService.startGame();
-  runtimeService.changeState(WaitServerState(runtimeService));
+  runtimeService.changeState(WaitServerState());
 }
 
 void main() {

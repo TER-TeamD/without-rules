@@ -21,8 +21,7 @@ class WaitPlayerState extends GameState {
         availableIds = createdGame.potentialPlayersId;
 
   setComplete() {
-    GetIt.I.get<TableService>().startGame().then((value) =>
-        runtimeService.changeState(GameRuntimeState(runtimeService, value)));
+    GetIt.I.get<TableService>().startGame();
   }
 
   @override

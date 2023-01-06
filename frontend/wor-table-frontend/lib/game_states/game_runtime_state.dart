@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/scenes/game_scene.dart';
 import 'package:worfrontend/game_states/final_state.dart';
-import 'package:worfrontend/game_states/game_state.dart';
 import 'package:worfrontend/services/network/models/action/action_types.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
@@ -13,9 +12,9 @@ import 'package:worfrontend/services/network/models/socket_models/new_actions.da
 import 'package:worfrontend/services/network/models/socket_models/next_round.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 import 'package:worfrontend/services/table_service.dart';
-
 import '../services/network/models/http_dtos/game.dart';
 import '../services/network/models/socket_models/results.dart';
+import 'game_state.dart';
 
 class PlayerPlayingState {
   final String id;
@@ -96,7 +95,7 @@ class GameRuntimeState extends GameState {
       }
     });
     results = GetIt.I.get<TableService>().listen<Results>((message) =>
-        runtimeService.changeState(FinalState(runtimeService, message)));
+        gameController.changeState(FinalState(gameController, message)));
 
     nextRound = GetIt.I
         .get<TableService>()

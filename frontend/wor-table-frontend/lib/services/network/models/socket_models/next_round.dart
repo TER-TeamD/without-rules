@@ -1,3 +1,4 @@
+import 'package:worfrontend/services/network/models/http_dtos/game.dart';
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
 
 import '../../socket_message.dart/socket_message.dart';
@@ -16,4 +17,9 @@ class NextRound extends TableSocketMessage {
   NextRound.fromJson(this.topic, Map<String, dynamic> json)
       : idGame = json["id_game"],
         type = SocketMessageTypes.nextRound;
+
+  @override
+  Future execute(Game game) async {
+    game.nextRound();
+  }
 }

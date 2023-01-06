@@ -1,3 +1,5 @@
+import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/models/http_dtos/game.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 
 import 'result.dart';
@@ -19,4 +21,9 @@ class Results extends TableSocketMessage {
 
   @override
   SocketMessageTypes type;
+
+  @override
+  Future execute(GameController game) async {
+    game.showResult(results);
+  }
 }

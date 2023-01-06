@@ -1,10 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:worfrontend/services/game_runtime_service.dart';
+import 'package:worfrontend/services/game_controller.dart';
 
 abstract class GameState {
-  final GameRuntimeService runtimeService;
-
-  const GameState(this.runtimeService);
+  const GameState();
 
   void onLoad() {}
 

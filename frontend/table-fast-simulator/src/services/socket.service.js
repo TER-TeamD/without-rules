@@ -33,6 +33,12 @@ socket.on('table_cards_initialization', (message) => {
     console.log('table_cards_initialization', message)
 });
 
+socket.on('table_new_player', (message) => {
+    console.log("table_new_player", message)
+})
+
+socket.onAny((...args) => console.log("Socket message received", args))
+
 export const SocketService = {
     socket,
     createNewGame,

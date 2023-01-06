@@ -1,3 +1,4 @@
+import 'package:worfrontend/services/network/models/http_dtos/game.dart';
 import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
 
 import '../card.dart';
@@ -20,4 +21,9 @@ class CardPlayedByUser extends TableSocketMessage {
 
   @override
   SocketMessageTypes type;
+
+  @override
+  Future execute(Game game) async {
+    game.playerPlayCard(playerId, playedCard);
+  }
 }
