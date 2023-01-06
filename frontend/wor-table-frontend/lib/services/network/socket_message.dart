@@ -1,5 +1,4 @@
 import 'package:worfrontend/services/game_controller.dart';
-import 'package:worfrontend/services/network/models/http_dtos/game.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
@@ -12,7 +11,7 @@ abstract class SocketMessage {
   abstract String topic;
   abstract SocketMessageTypes type;
 
-  Future execute(GameController game);
+  void execute(GameController game);
 
   static SocketMessage create(String topic, Map<String, dynamic> json) {
     String typeStr = json["type"];
@@ -34,8 +33,4 @@ abstract class SocketMessage {
     // ignore: dead_code
     throw "Type not handled.";
   }
-}
-
-abstract class TableSocketMessage extends SocketMessage {
-  abstract final String idGame;
 }

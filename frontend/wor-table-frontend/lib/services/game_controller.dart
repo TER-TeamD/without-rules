@@ -1,17 +1,15 @@
 import 'dart:convert';
 
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
-import 'package:worfrontend/components/player_deck/states/played.dart';
 import 'package:worfrontend/components/player_deck/states/playing.dart';
 import 'package:worfrontend/components/player_deck/states/wait_other_players.dart';
 import 'package:worfrontend/errors/incoherent_message_for_state.dart';
 import 'package:worfrontend/game_states/final_state.dart';
-import 'package:worfrontend/game_states/game_runtime_state.dart';
 import 'package:worfrontend/game_states/wait_players.dart';
-import 'package:worfrontend/game_states/wait_server.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/socket_models/results.dart';
 import '../game_states/game_state.dart';
+import '../game_states/wait_server.dart';
 import 'network/models/action/action.dart';
 import 'network/models/card.dart';
 import 'network/models/socket_models/result.dart';
@@ -48,7 +46,7 @@ class GameController {
     }
   }
 
-  void showResult(Results results) {
+  void showResult(List<Result> results) {
     state = FinalState(results);
   }
 

@@ -7,7 +7,7 @@ import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/socket_request.dart';
 import 'models/http_dtos/game.dart';
 import 'models/http_dtos/new_game_dto.dart';
-import 'socket_message.dart/socket_message.dart';
+import 'socket_message.dart';
 
 class NetworkService {
   final String hostname;

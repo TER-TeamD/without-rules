@@ -10,7 +10,7 @@ import 'package:worfrontend/services/network/models/socket_models/card_played_by
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/models/socket_models/next_round.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/table_service.dart';
 import '../services/network/models/http_dtos/game.dart';
 import '../services/network/models/socket_models/results.dart';
@@ -44,7 +44,7 @@ class GameRuntimeState extends GameState {
 
   final List<CardPlayedByUser> playedMessages = List.empty(growable: true);
 
-  GameRuntimeState(super.runtimeService, this.game)
+  GameRuntimeState(this.game)
       : states = game.players
             .map((p) => PlayerPlayingState(p.id))
             .toList(growable: false),
@@ -55,51 +55,51 @@ class GameRuntimeState extends GameState {
   void onLoad() {
     guiState.setTurnStart();
 
-    initiateGame = GetIt.I.get<TableService>().listen<InitiateGame>((message) {
-      guiState.setStacks(message.stacks);
-    });
+    // initiateGame = GetIt.I.get<TableService>().listen<InitiateGame>((message) {
+    //   guiState.setStacks(message.stacks);
+    // });
 
-    playerChooseSubs =
-        GetIt.I.get<TableService>().listen<CardPlayedByUser>((message) {
-      states
-          .firstWhere((element) => element.id == message.playerId,
-              orElse: () => throw "Player not found.")
-          .played = true;
-      playedMessages.add(message);
-      guiState.setPlayerPlayed(message.playerId);
-      if (states.every((element) => element.played)) turnEnd();
-    });
+    // playerChooseSubs =
+    //     GetIt.I.get<TableService>().listen<CardPlayedByUser>((message) {
+    //   states
+    //       .firstWhere((element) => element.id == message.playerId,
+    //           orElse: () => throw "Player not found.")
+    //       .played = true;
+    //   playedMessages.add(message);
+    //   guiState.setPlayerPlayed(message.playerId);
+    //   if (states.every((element) => element.played)) turnEnd();
+    // });
 
-    gameAction = GetIt.I.get<TableService>().listen<NewActions>((message) {
-      for (int i = 0; i < message.actions.length; i++) {
-        var action = message.actions[i];
-        var playerState = states.firstWhere(
-            (element) => element.id == action.playerId,
-            orElse: () => throw "Player not found.");
+    // gameAction = GetIt.I.get<TableService>().listen<NewActions>((message) {
+    //   for (int i = 0; i < message.actions.length; i++) {
+    //     var action = message.actions[i];
+    //     var playerState = states.firstWhere(
+    //         (element) => element.id == action.playerId,
+    //         orElse: () => throw "Player not found.");
 
-        playerState.played = false;
-        switch (action.type) {
-          case ActionTypes.pushOnTop:
-            break;
-          case ActionTypes.clearPush:
-            playerState.appendCards(
-                guiState.stacks[action.stack.stackNumber].stackCards);
-            break;
-        }
-        guiState.stacks[action.stack.stackNumber] = action.stack;
-        guiState.setStacks(guiState.stacks);
-        guiState.unsetPlayerPlayed(action.playerId);
-        if (states.every((element) => !element.played)) {
-          guiState.resetPlayerPlayed();
-        }
-      }
-    });
-    results = GetIt.I.get<TableService>().listen<Results>((message) =>
-        gameController.changeState(FinalState(gameController, message)));
+    //     playerState.played = false;
+    //     switch (action.type) {
+    //       case ActionTypes.pushOnTop:
+    //         break;
+    //       case ActionTypes.clearPush:
+    //         playerState.appendCards(
+    //             guiState.stacks[action.stack.stackNumber].stackCards);
+    //         break;
+    //     }
+    //     guiState.stacks[action.stack.stackNumber] = action.stack;
+    //     guiState.setStacks(guiState.stacks);
+    //     guiState.unsetPlayerPlayed(action.playerId);
+    //     if (states.every((element) => !element.played)) {
+    //       guiState.resetPlayerPlayed();
+    //     }
+    //   }
+    // });
+    // results = GetIt.I.get<TableService>().listen<Results>((message) =>
+    //     gameController.changeState(FinalState(gameController, message)));
 
-    nextRound = GetIt.I
-        .get<TableService>()
-        .listen<NextRound>((message) => {guiState.resetPlayerPlayed()});
+    // nextRound = GetIt.I
+    //     .get<TableService>()
+    //     .listen<NextRound>((message) => {guiState.resetPlayerPlayed()});
   }
 
   playerChose(String idPlayer) {

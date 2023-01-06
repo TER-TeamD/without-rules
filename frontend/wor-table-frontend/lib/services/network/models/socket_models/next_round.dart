@@ -1,9 +1,9 @@
-import 'package:worfrontend/services/network/models/http_dtos/game.dart';
+import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
 
-import '../../socket_message.dart/socket_message.dart';
+import '../../socket_message.dart';
 
-class NextRound extends TableSocketMessage {
+class NextRound extends SocketMessage {
   @override
   String topic;
 
@@ -19,7 +19,7 @@ class NextRound extends TableSocketMessage {
         type = SocketMessageTypes.nextRound;
 
   @override
-  Future execute(Game game) async {
+  void execute(GameController game) {
     game.nextRound();
   }
 }

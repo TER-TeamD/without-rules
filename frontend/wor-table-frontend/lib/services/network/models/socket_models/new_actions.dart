@@ -1,14 +1,13 @@
-import 'package:worfrontend/services/network/models/action/action_types.dart';
-import 'package:worfrontend/services/network/models/http_dtos/game.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
 
+import '../../../game_controller.dart';
 import '../action/action.dart';
 import 'message_types.dart';
 
-class NewActions extends TableSocketMessage {
+class NewActions extends SocketMessage {
   @override
   String topic;
-  @override
+
   final String idGame;
   final List<Action> actions;
 
@@ -23,7 +22,7 @@ class NewActions extends TableSocketMessage {
   SocketMessageTypes type;
 
   @override
-  Future execute(Game game) async {
+  void execute(GameController game) async {
     game.playActions(actions);
   }
 }

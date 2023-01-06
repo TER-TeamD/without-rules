@@ -1,15 +1,13 @@
 import 'package:worfrontend/services/game_controller.dart';
-import 'package:worfrontend/services/network/models/http_dtos/game.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
-
+import '../../socket_message.dart';
 import 'result.dart';
 import 'message_types.dart';
 
-class Results extends TableSocketMessage {
+class Results extends SocketMessage {
   @override
   String topic;
-  @override
   final String idGame;
+  
   final List<Result> results;
 
   Results(this.topic, this.type, this.idGame, this.results);

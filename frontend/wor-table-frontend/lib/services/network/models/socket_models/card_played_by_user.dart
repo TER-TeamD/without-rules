@@ -1,13 +1,13 @@
-import 'package:worfrontend/services/network/models/http_dtos/game.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
 
 import '../card.dart';
 import 'message_types.dart';
 
-class CardPlayedByUser extends TableSocketMessage {
+class CardPlayedByUser extends SocketMessage {
   @override
   String topic;
-  @override
+
   final String idGame;
   final String playerId;
   final Card playedCard;
@@ -23,7 +23,7 @@ class CardPlayedByUser extends TableSocketMessage {
   SocketMessageTypes type;
 
   @override
-  Future execute(Game game) async {
+  void execute(GameController game) async {
     game.playerPlayCard(playerId, playedCard);
   }
 }

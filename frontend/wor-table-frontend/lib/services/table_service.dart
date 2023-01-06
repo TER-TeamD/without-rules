@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/services/network/network_service.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
 
 import '../models/table_player.dart';
 import 'network/models/http_dtos/game.dart';

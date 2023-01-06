@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/errors/too_much_player.dart';
 import 'package:worfrontend/scenes/wait_player/wait_player_scene.dart';
-import 'package:worfrontend/game_states/game_runtime_state.dart';
 import 'package:worfrontend/game_states/game_state.dart';
 import 'package:worfrontend/services/table_service.dart';
 
@@ -16,7 +15,7 @@ class WaitPlayerState extends GameState {
   final BehaviorSubject<List<PlayerInitialisationTicket>> borrowedObservable =
       BehaviorSubject();
 
-  WaitPlayerState(super.runtimeService, this.createdGame)
+  WaitPlayerState(this.createdGame)
       : borrowed = List<PlayerInitialisationTicket>.empty(growable: true),
         availableIds = createdGame.potentialPlayersId;
 

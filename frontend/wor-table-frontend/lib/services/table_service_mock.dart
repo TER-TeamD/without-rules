@@ -9,7 +9,7 @@ import 'package:worfrontend/services/network/models/socket_models/card_played_by
 import 'package:worfrontend/services/network/models/socket_models/message_types.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
 import 'dart:async';
 
 import 'package:worfrontend/services/table_service.dart';
