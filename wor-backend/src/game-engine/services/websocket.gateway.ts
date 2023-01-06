@@ -59,6 +59,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
         const message: { player_id: string } = payload;
         this.logger.log(`Player join game -> ID : ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id])} : ${JSON.stringify(payload)} `);
         await this.gameEngineService.playerJoinGame(message.player_id);
+        await this.notifyNewPlayerToTable(message.player_id);
     }
 
     @SubscribeMessage('table_start_game')
@@ -115,6 +116,10 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     public async sendResultToPlayer(results: Result[], playerId: string): Promise<void> {
         await this.sendMessageToEntity(playerId, 'RESULTS', {results: results,});
+    }
+
+    public async notifyNewPlayerToTable(playerId: string) {
+        await this.sendMessageToEntity("0", "table_new_player", { playerId: playerId });
     }
 
 
