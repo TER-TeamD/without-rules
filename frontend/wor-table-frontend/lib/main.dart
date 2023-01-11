@@ -1,82 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:worfrontend/errors/app_error.dart';
+import 'package:socket_io_client/socket_io_client.dart';
+import 'package:worfrontend/components/table.dart';
 import 'package:worfrontend/services/error_manager.dart';
-import 'package:worfrontend/services/game_runtime_service.dart';
-import 'package:worfrontend/game_states/game_state.dart';
-import 'package:worfrontend/game_states/wait_server.dart';
-import 'package:worfrontend/services/network/network_service.dart';
-import 'package:worfrontend/services/table_service.dart';
+import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/socket_gateway.dart';
 
-Future initScene(
-    GameRuntimeService runtimeService, TableService tableService) async {
-  // var createdGame = await tableService.createGame();
-  // for (var i in Iterable.generate(createdGame.potentialPlayersId.length)) {
-  //   tableService.setPlayerPosition(
-  //       createdGame.potentialPlayersId[i], Offset(100.0 + i * 300.0, 100));
-  // }
-
-  // var game = await tableService.startGame();
-  runtimeService.changeState(WaitServerState());
-}
 
 void main() {
-  GetIt.I.registerSingleton<ErrorManager>(ErrorManager());
-  var service = NetworkService("localhost:8451");
-  service.connect();
-  //GetIt.I.registerSingleton(service);
-  var tableService = TableServiceImplementation(service);
-  GetIt.I.registerSingleton<TableService>(tableService);
+  var errorManager = ErrorManager();
+  var socket = io("ws://localhost:8451", <String, dynamic>{
+    'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
+  });
 
-  var runtimeService = GameRuntimeService();
-  //var firstState = WaitServerState(runtimeService);
+  var socketGateway = SocketGateway(socket);
 
-  Future.wait([initScene(runtimeService, tableService)]);
-  runApp(MyApp(gameRuntime: runtimeService));
+  socketGateway.listenEvents();
+
+  var controllers = GameControllers.create(socketGateway);
+
+
+  GetIt.I.registerSingleton(errorManager);
+  GetIt.I.registerSingleton(socketGateway);
+  GetIt.I.registerSingleton(controllers.socketGameController);
+  GetIt.I.registerSingleton(controllers.tableGameController);
+
+  runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  final GameRuntimeService gameRuntime;
 
-  const MyApp({super.key, required this.gameRuntime});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late GameState state;
-  AppError? error;
-
-  @override
-  void initState() {
-    super.initState();
-    state = widget.gameRuntime.state;
-    widget.gameRuntime.stateObservable.listen((value) => setState(() {
-          state = value;
-        }));
-
-    // Display errors
-    GetIt.I.get<ErrorManager>().onError.listen((value) {
-      setState(() {
-        error = value;
-      });
-    });
-    error = GetIt.I.get<ErrorManager>().error;
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       home: Scaffold(
-        body: error == null
-            ? Container(child: state.buildUI(context))
-            : drawError(context),
+        body: TableComponent(game: GetIt.I.get<TableGameController>()),
       ),
     );
-  }
-
-  Widget drawError(BuildContext context) {
-    return Center(child: Text('Error: ${error!.screenMessage()}'));
   }
 }

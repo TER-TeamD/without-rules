@@ -3,12 +3,13 @@ import 'package:worfrontend/components/player_deck/player_deck.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
 import 'package:worfrontend/components/player_deck/player_spot.dart';
 import 'package:worfrontend/components/player_deck/states/no_player.dart';
+import 'dart:math' as math;
 
 class DeckTransform {
   final Offset position;
-  final int orientation;
+  final double rotation;
 
-  const DeckTransform(this.position, this.orientation);
+  const DeckTransform(this.position, this.rotation);
 }
 
 class Decks extends StatelessWidget {
@@ -20,37 +21,37 @@ class Decks extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return [
       ...Iterable.generate(4)
-          .map((i) => DeckTransform(Offset((1 / 5) * (i + 1), 1 / 5), 2)),
+          .map((i) => DeckTransform(Offset((1 / 5) * (i + 1), 1 / 5), math.pi)),
       ...Iterable.generate(4)
           .map((i) => DeckTransform(Offset((1 / 5) * (i + 1), 4 / 5), 0)),
-      const DeckTransform(Offset(1 / 5, 1 / 2), 3),
-      const DeckTransform(Offset(4 / 5, 1 / 2), 1)
+      const DeckTransform(Offset(1 / 5, 1 / 2), 3 * math.pi / 2),
+      const DeckTransform(Offset(4 / 5, 1 / 2), math.pi / 2)
     ]
         .map((e) => DeckTransform(
             Offset(e.position.dx * size.width, e.position.dy * size.height),
-            e.orientation))
+            e.rotation))
         .toList(growable: false);
   }
 
-  List<PlayerDeckState> getOrdenedStates() {
+  List<MapEntry<String, PlayerDeckState>> getOrderedStates() {
     var result = states.entries.toList(growable: false);
     result.sort(((a, b) => a.key.compareTo(b.key)));
-    return result.map((e) => e.value).toList(growable: false);
+    return result.toList(growable: false);
   }
 
   @override
   Widget build(BuildContext context) {
     //if (states.length != 10) throw "There is some missing states.";
     var positions = getPositions(context);
-    var ordenedStates = getOrdenedStates();
+    var orderedState = getOrderedStates();
     return Stack(
         children: Iterable.generate(states.length)
             .map((i) => PlayerSpot(
                 position: positions[i].position,
-                orientation: positions[i].orientation,
+                rotation: positions[i].rotation,
                 child: i >= states.length
-                    ? PlayerDeck(visualState: DeckNoPlayer())
-                    : PlayerDeck(visualState: ordenedStates[i])))
+                    ? PlayerDeck(visualState: DeckNoPlayer(id: orderedState[i].key))
+                    : PlayerDeck(visualState: orderedState[i].value)))
             .toList(growable: false));
   }
 }

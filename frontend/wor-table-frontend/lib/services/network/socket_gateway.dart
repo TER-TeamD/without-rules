@@ -1,0 +1,55 @@
+import 'dart:convert';
+
+import 'package:get_it/get_it.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:socket_io_client/socket_io_client.dart';
+import 'package:worfrontend/errors/server_error.dart';
+import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
+import 'package:worfrontend/services/network/models/socket_models/player_joined.dart';
+import 'package:worfrontend/services/network/socket_message.dart';
+import 'package:worfrontend/services/network/socket_topics.dart';
+
+import '../error_manager.dart';
+import 'models/socket_models/game_initialisation.dart';
+
+class SocketGateway {
+  final Socket socket;
+  final Subject<SocketMessage> onMessage;
+  final Subject connected = BehaviorSubject();
+
+  SocketGateway(this.socket) : onMessage = PublishSubject();
+
+  void log(Map<String, dynamic> json) {
+    print(jsonEncode(json));
+  }
+
+  listenEvents() {
+    socket.onConnect((data) {
+      print("Connected");
+      connected.add(true);
+    });
+    socket.onAny((String topic, data) {
+      print("Data received from $topic: $data");
+    });
+
+    socket.on('exception', (data) {
+      GetIt.I.get<ErrorManager>().throwError(ServerError(500, data["message"]));
+    });
+    socket.on(socketTopicsToString(SocketTopics.newPlayerTopic), (data) {
+      log(data);
+      onMessage.add(PlayerJoined.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.initiateGameTopic), (data) {
+      log(data);
+      onMessage.add(InitiateGame.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.gameInitialisationTopic), (data) {
+      onMessage.add(GameInitialisation.fromJson(data));
+    });
+  }
+
+  emit(String topic, dynamic data) {
+    print("Emitting $topic: $data");
+    socket.emit(topic, data);
+  }
+}

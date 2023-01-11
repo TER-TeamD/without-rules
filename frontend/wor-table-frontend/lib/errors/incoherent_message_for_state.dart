@@ -1,15 +1,13 @@
-import 'dart:convert';
-
 import 'package:worfrontend/errors/app_error.dart';
 
-class IncoherentActionForState extends AppError {
-  final String stateName;
-  final String action;
+class UnexpectedState extends AppError {
+  final String expected;
+  final String received;
 
-  const IncoherentActionForState(this.stateName, this.action);
+  const UnexpectedState(this.expected, this.received);
 
   @override
   String screenMessage() {
-    return "Incoherent action ($action) for the state + $stateName";
+    return "Incoherent action ($received) for the state + $expected";
   }
 }
