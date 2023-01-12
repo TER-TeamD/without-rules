@@ -4,7 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/errors/server_error.dart';
+import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
+import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
+import 'package:worfrontend/services/network/models/socket_models/next_round.dart';
 import 'package:worfrontend/services/network/models/socket_models/player_joined.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
@@ -45,6 +48,15 @@ class SocketGateway {
     });
     socket.on(socketTopicsToString(SocketTopics.gameInitialisationTopic), (data) {
       onMessage.add(GameInitialisation.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.cardPlayedTopic), (data) {
+      onMessage.add(CardPlayedByUser.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.newActionsTopic), (data) {
+      onMessage.add(NewActions.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.nextRoundTopic), (data) {
+      onMessage.add(NextRound.fromJson(data));
     });
   }
 

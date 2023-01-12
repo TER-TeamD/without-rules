@@ -8,6 +8,7 @@ import 'package:worfrontend/components/player_deck/states/wait_other_players.dar
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/errors/incoherent_message_for_state.dart';
 import 'package:worfrontend/services/error_manager.dart';
+import 'package:worfrontend/services/network/models/action/action_types.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'network/models/action/action.dart';
 import 'network/models/card.dart';
@@ -105,6 +106,7 @@ class SocketGameController {
   }
 
   void playerPlayCard(String playerId, Card playedCard) {
+    print("Player play card: $playerId");
     run(() {
       checkState(GameStates.playing);
       _game.decks[playerId] = DeckWaitOtherPlayers();
@@ -112,9 +114,20 @@ class SocketGameController {
     });
   }
 
-  void playActions(List<Action> actions) {}
+  void playActions(List<Action> actions) {
+    print("${actions.length} new actions.");
+
+    for(var action in actions) {
+      if(action.type == ActionTypes.pushOnTop) {
+        _game.stacks[action.stack.stackNumber] = action.stack;
+      }
+    }
+
+    _game.stacks$.add(_game.stacks);
+  }
 
   void nextRound() {
+    print("next round.");
     run(() {
       var decks = _game.decks;
       for (var element in _game.decks.keys) {
