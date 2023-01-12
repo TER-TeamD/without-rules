@@ -1,4 +1,4 @@
-import {Body, forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, Param} from "@nestjs/common";
+import { Body, forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, Param } from "@nestjs/common";
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
@@ -6,13 +6,13 @@ import {
     WebSocketGateway,
     WebSocketServer
 } from "@nestjs/websockets";
-import {Server, Socket} from "socket.io";
-import {GameEngineService} from "./game-engine.service";
-import {AnyGameFoundException, AnyPlayerFoundException} from "../exceptions/exeptions-handler";
-import {NewGameDto} from "../dto/new-game.dto";
-import {ConnexionStatusEnum} from "../schema/manager.enums";
-import {Action, Card, Result, StackCard} from "../schema/game.schema";
-import {PlayedCardDto} from "../dto/played-card.dto";
+import { Server, Socket } from "socket.io";
+import { GameEngineService } from "./game-engine.service";
+import { AnyGameFoundException, AnyPlayerFoundException } from "../exceptions/exeptions-handler";
+import { NewGameDto } from "../dto/new-game.dto";
+import { ConnexionStatusEnum } from "../schema/manager.enums";
+import { Action, Card, Result, StackCard } from "../schema/game.schema";
+import { PlayedCardDto } from "../dto/played-card.dto";
 
 
 @WebSocketGateway({ cors: { origin: '*' } })
@@ -27,7 +27,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     constructor(
         @Inject(forwardRef(() => GameEngineService)) private readonly gameEngineService: GameEngineService
-    ) {}
+    ) { }
 
     afterInit(server: Server): any {
         this.logger.log('Init');
@@ -35,9 +35,9 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     handleConnection(client: Socket): any {
         this.logger.log(`Client connected: ${client.handshake.auth.id}, type : ${client.handshake.auth.type}`);
-        this.entitiesConnected[client.handshake.auth.id] = {socket_id: client.id, type: client.handshake.auth.type};
+        this.entitiesConnected[client.handshake.auth.id] = { socket_id: client.id, type: client.handshake.auth.type };
 
-        this.server.to(client.id).emit('connection_status_server', {"status": "Connection established"})
+        this.server.to(client.id).emit('connection_status_server', { "status": "Connection established" })
     }
 
     handleDisconnect(client: Socket): any {
@@ -69,9 +69,9 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
     @SubscribeMessage('player_play_card')
     public async playerPlayCard(client: Socket, payload: any): Promise<void> {
-        const message: { id_player: string, body: PlayedCardDto } = payload;
+        const message: { player_id: string, body: PlayedCardDto } = payload;
         this.logger.log(`Player play card -> ID : ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id])} : ${JSON.stringify(payload)} `);
-        await this.gameEngineService.playerPlayedACard(message.body, message.id_player);
+        await this.gameEngineService.playerPlayedACard(message.body, message.player_id);
     }
 
 
@@ -82,23 +82,23 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }
 
     public async sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(status: ConnexionStatusEnum, playerId: string): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'new_player_connexion', {status: status, message: ""});
+        await this.sendMessageToEntity(playerId, 'new_player_connexion', { status: status, message: "" });
     }
 
     public async giveCardsToPlayerAtTheBeginningOfGame(playerId: string, cards: Card[]): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'player_cards_initialization', {cards});
+        await this.sendMessageToEntity(playerId, 'player_cards_initialization', { cards });
     }
 
     public async giveCardsToTableAtTheBeginningOfGame(stackCards: StackCard[]): Promise<void> {
-        await this.sendMessageToEntity("0", 'table_cards_initialization', {stack_cards: stackCards});
+        await this.sendMessageToEntity("0", 'table_cards_initialization', { stack_cards: stackCards });
     }
 
     public async sendToTableCardsPlayedByPlayers(playerId: string, playedCard: Card,): Promise<void> {
-        await this.sendMessageToEntity("0", 'CARD_PLAYED_BY_USER', {player_id: playerId, played_cards: playedCard,});
+        await this.sendMessageToEntity("0", 'CARD_PLAYED_BY_USER', { player_id: playerId, played_cards: playedCard, });
     }
 
     public async sendActionListToTable(actions: Action[]): Promise<void> {
-        await this.sendMessageToEntity("0", 'NEW_ACTIONS', {actions: actions,});
+        await this.sendMessageToEntity("0", 'NEW_ACTIONS', { actions: actions, });
     }
 
     public async sendNextRoundToTable(): Promise<void> {
@@ -110,11 +110,11 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     }
 
     public async sendResultToTable(results: Result[]): Promise<void> {
-        await this.sendMessageToEntity("0", 'RESULTS', {results: results,});
+        await this.sendMessageToEntity("0", 'RESULTS', { results: results, });
     }
 
     public async sendResultToPlayer(results: Result[], playerId: string): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'RESULTS', {results: results,});
+        await this.sendMessageToEntity(playerId, 'RESULTS', { results: results, });
     }
 
 

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { GameService } from '../services/game.service';
 import { Router } from '@angular/router';
-import {WebsocketService} from "../services/websocket.service";
-import {AuthService} from "../services/auth.service";
+import { WebsocketService } from "../services/websocket.service";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: 'app-login-page',
@@ -18,18 +18,15 @@ export class LoginPageComponent {
   ngOnInit(): void {
   }
 
-
   public login() {
     if (this.playerId.length > 0) {
-      this.gameService.joinGame(this.playerId).then(
-        () => {
+      this.gameService.joinGame(this.playerId);
+      this.gameService.isConnected().subscribe(isConnected => {
+        if (isConnected) {
           this.router.navigate(['/cards/' + this.playerId]);
-        },
-        (err) => {
-          alert("This player ID doesn't exist");
         }
-      );
+      });
+
     }
   }
-
 }

@@ -13,59 +13,59 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 })
 export class DisplayCardsComponent {
 
-  public gameCards?: GameCards;
   public select: boolean = false;
   public loading: boolean = true;
   public played: boolean = false;
-  public cardsArray: Card[] = [];
-  public selectedCard: Card = this.cardsArray[0];
+  public playerId: string = "";
+  public cards: Card[] = [];
+  public selectedCard: Card = this.cards[0];
 
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    this.loading = true;
-    this.played = true;
-
+    this.route.params.subscribe(params => {
+      this.playerId = params['playerId'];
+    });
     this.gameService.playerCards$.subscribe(cards => {
-      this.cardsArray = cards;
-      this.loading = false;
-      this.played = false;
-    })
+      if (cards.length > 0) {
+        console.log('cards', cards);
+        this.cards = cards;
+        this.loading = false;
+      }
+    });
 
-    // this.route.params.subscribe(params => {
-    //   this.wsService.connect(params["playerId"]).subscribe(
-    //     (data) => {
-    //       console.log('data', data);
-    //       this.gameCards = data;
-    //       this.loading = false;
-    //       this.cardsArray = this.gameCards?.value?.cards;
-    //     }
-    //   );
-    // });
+    this.wsService.listeningNextRound().subscribe((nextRound) => {
+      if (nextRound) {
+        this.select = false;
+        this.played = false;
+        this.selectedCard = this.cards[0];
+      }
+    });
   }
 
   public selectCard(card: Card) {
-    console.log('Carte sélectionnée', card);
     this.selectedCard = card;
     this.select = true;
   }
 
   public play() {
-    let playerId = this.gameCards?.value?.id_player;
-    let cardValue = this.gameCards?.value?.cards[0].value;
+    let cardValue = this.selectedCard.value;
 
-    this.gameService.playCard(playerId!, cardValue!).then(() => {
-        console.log('Carte jouée', this.selectedCard);
-        this.played = true;
-      }
+    this.gameService.playCard(this.playerId, cardValue).then(() => {
+      console.log('Carte jouée', this.selectedCard);
+      this.played = true;
+      let cardToRemove = this.cards.indexOf(this.selectedCard);
+      this.cards.splice(cardToRemove, 1);
+    }
     ).catch((e) => {
       console.error(e);
     });
+
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.cardsArray, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.cards, event.previousIndex, event.currentIndex);
   }
 
 }
