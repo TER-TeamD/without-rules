@@ -11,7 +11,8 @@ export class CardComponent {
   @Input()
   public card?: Card;
 
-  public cattleHeads: string = "";
+  public cattleHeadsLine1: string = "";
+  public cattleHeadsLine2: string = "";
 
   constructor() { }
 
@@ -19,7 +20,17 @@ export class CardComponent {
   }
 
   ngOnChanges(): void {
-    this.cattleHeads = "🐮".repeat(this.card?.cattleHead || 0);
+    let cattleHeads = this.card?.cattleHead || 0;
+
+    if (cattleHeads == 5) {
+      this.cattleHeadsLine1 = "🐮🐮🐮";
+      this.cattleHeadsLine2 = "🐮🐮";
+    } else if (cattleHeads == 7) {
+      this.cattleHeadsLine1 = "🐮🐮🐮🐮";
+      this.cattleHeadsLine2 = "🐮🐮🐮";
+    } else {
+      this.cattleHeadsLine1 = "🐮".repeat(cattleHeads);
+    }
   }
 
 }

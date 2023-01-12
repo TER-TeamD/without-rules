@@ -6,6 +6,7 @@ import { WebsocketService } from "./websocket.service";
 import { Card } from "../model/card.model";
 import { ConnexionStatusEnum } from "../model/connexion-status.model";
 import { Router } from "@angular/router";
+import { Result } from "../model/result.model";
 
 
 @Injectable({
@@ -15,25 +16,13 @@ export class GameService {
 
   private _playerCards: Card[] = [];
   private _playerCards$: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(this._playerCards);
-  private connected$: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
+  private _connected$: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
 
   constructor(
     private httpClient: HttpClient,
     private authService: AuthService,
     private webSocketService: WebsocketService
   ) { }
-
-
-  public async updateCards() {
-    this.webSocketService.listeningNewPlayerCards().subscribe(newCards => {
-      if (newCards) {
-        this._playerCards = newCards;
-        this._playerCards$.next(this._playerCards);
-      } else {
-        // Any cards found
-      }
-    })
-  }
 
 
   public async joinGame(playerId: string) {
@@ -45,15 +34,23 @@ export class GameService {
       console.log(connexionStatus)
       if (connexionStatus && connexionStatus.status === ConnexionStatusEnum.USER_IS_LOGGED) {
         // User connected
-        this.connected$.next(true);
+        this._connected$.next(true);
       }
     })
 
-    this.updateCards();
+    this.webSocketService.listeningNewPlayerCards().subscribe(newCards => {
+      if (newCards) {
+        this._playerCards = newCards;
+        this._playerCards$.next(this._playerCards);
+      } else {
+        // Any cards found
+      }
+    })
   }
 
+
   public isConnected(): BehaviorSubject<Boolean> {
-    return this.connected$;
+    return this._connected$;
   }
 
 
@@ -65,4 +62,5 @@ export class GameService {
   get playerCards$(): BehaviorSubject<Card[]> {
     return this._playerCards$;
   }
+
 }

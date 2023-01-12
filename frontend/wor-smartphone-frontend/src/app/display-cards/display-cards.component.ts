@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Card } from '../model/card.model';
-import { GameCards } from '../model/gamecards';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Result } from '../model/result.model';
 
 @Component({
   selector: 'app-display-cards',
@@ -13,12 +13,15 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 })
 export class DisplayCardsComponent {
 
-  public select: boolean = false;
   public loading: boolean = true;
+  public end: boolean = false;
   public played: boolean = false;
   public playerId: string = "";
   public cards: Card[] = [];
   public selectedCard: Card = this.cards[0];
+  public result!: Result;
+
+  public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
@@ -27,26 +30,35 @@ export class DisplayCardsComponent {
     this.route.params.subscribe(params => {
       this.playerId = params['playerId'];
     });
+
     this.gameService.playerCards$.subscribe(cards => {
       if (cards.length > 0) {
         console.log('cards', cards);
         this.cards = cards;
         this.loading = false;
+        this.selectedCard = this.cards[0];
       }
     });
 
     this.wsService.listeningNextRound().subscribe((nextRound) => {
       if (nextRound) {
-        this.select = false;
         this.played = false;
         this.selectedCard = this.cards[0];
+      }
+    });
+
+    this.wsService.listeningResults().subscribe((results) => {
+      if (results) {
+        this.end = true;
+        this.played = false;
+        this.result = results.find((result) => result.id_player === this.playerId) as Result;
+        console.log('result', this.result);
       }
     });
   }
 
   public selectCard(card: Card) {
     this.selectedCard = card;
-    this.select = true;
   }
 
   public play() {
