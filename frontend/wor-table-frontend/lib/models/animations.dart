@@ -1,10 +1,7 @@
 import 'package:worfrontend/services/network/models/card.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
 
-enum GameAnimations {
-  pushOnTop,
-  pushAndPop
-}
+enum GameAnimations { pushOnTop, pushAndPop }
 
 class GameAnimation {
   final GameAnimations type;

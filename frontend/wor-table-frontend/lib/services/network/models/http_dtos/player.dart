@@ -1,5 +1,5 @@
-import 'in_player_game_property.dart';
 import '../card.dart';
+import 'in_player_game_property.dart';
 
 class Player {
   final String id;
@@ -8,6 +8,7 @@ class Player {
   final InPlayerGameProperty? playerGameProperty;
 
   Player(this.id, this.isLogged, this.cards, this.playerGameProperty);
+
   Player.fromJson(Map<String, dynamic> json)
       : id = json["id"],
         isLogged = json["is_logged"],

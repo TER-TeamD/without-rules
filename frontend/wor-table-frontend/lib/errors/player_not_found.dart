@@ -9,5 +9,4 @@ class PlayerNotFound extends AppError {
   String screenMessage() {
     return "Player $playerId not found.";
   }
-
 }

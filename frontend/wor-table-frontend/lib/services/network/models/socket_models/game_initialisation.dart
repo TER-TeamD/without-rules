@@ -2,7 +2,6 @@ import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 
 class GameInitialisation extends SocketMessage {
-
   final List<String> potentialPlayers;
 
   GameInitialisation.fromJson(Map<String, dynamic> json)

@@ -28,7 +28,8 @@ class _PushOnTopState extends State<PushOnTop>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: const Duration(seconds: 1), vsync: this);
+    _controller =
+        AnimationController(duration: const Duration(seconds: 1), vsync: this);
     _controller.addListener(() {
       setState(() {});
     });

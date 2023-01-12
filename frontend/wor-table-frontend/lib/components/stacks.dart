@@ -11,6 +11,7 @@ class StackViewInstance {
 
 class StacksComponent extends StatelessWidget {
   final List<StackViewInstance> stacks;
+
   const StacksComponent({Key? key, required this.stacks}) : super(key: key);
 
   @override

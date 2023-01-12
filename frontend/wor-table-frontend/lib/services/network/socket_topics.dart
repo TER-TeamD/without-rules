@@ -5,8 +5,13 @@ const String cardPlayedTopic = "CARD_PLAYED_BY_USER";
 const String newActionsTopic = "NEW_ACTIONS";
 const String nextRoundTopic = "NEXT_ROUND";
 
-enum SocketTopics {newPlayerTopic,
-  initiateGameTopic,gameInitialisationTopic, cardPlayedTopic, newActionsTopic, nextRoundTopic
+enum SocketTopics {
+  newPlayerTopic,
+  initiateGameTopic,
+  gameInitialisationTopic,
+  cardPlayedTopic,
+  newActionsTopic,
+  nextRoundTopic
 }
 
 SocketTopics socketTopicsFromString(String socketTopic) {

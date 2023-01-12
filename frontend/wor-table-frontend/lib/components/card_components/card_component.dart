@@ -5,6 +5,7 @@ class CardComponent extends StatelessWidget {
   static const Offset size = Offset(100, 150);
 
   final GameCard card;
+
   const CardComponent({super.key, required this.card});
 
   @override

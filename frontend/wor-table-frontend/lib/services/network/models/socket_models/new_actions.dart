@@ -7,6 +7,7 @@ class NewActions extends SocketMessage {
   final List<Action> actions;
 
   NewActions(this.actions);
+
   NewActions.fromJson(Map<String, dynamic> json)
       : actions = (json["actions"] as List<dynamic>)
             .map((e) => Action.fromJson(e))

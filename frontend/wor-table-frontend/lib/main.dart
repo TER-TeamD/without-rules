@@ -7,7 +7,6 @@ import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
-
 void main() {
   var errorManager = ErrorManager();
   var socket = io("ws://localhost:8451", <String, dynamic>{
@@ -20,7 +19,6 @@ void main() {
 
   var controllers = GameControllers.create(socketGateway);
 
-
   GetIt.I.registerSingleton(errorManager);
   GetIt.I.registerSingleton(socketGateway);
   GetIt.I.registerSingleton(controllers.socketGameController);
@@ -31,7 +29,6 @@ void main() {
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);

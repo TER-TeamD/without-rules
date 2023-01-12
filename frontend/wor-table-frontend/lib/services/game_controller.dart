@@ -15,6 +15,7 @@ import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/action/action_types.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
+
 import 'network/models/action/action.dart';
 import 'network/models/card.dart';
 import 'network/models/socket_models/result.dart';
@@ -148,7 +149,7 @@ class SocketGameController {
     print("${actions.length} new actions.");
 
     for (var action in actions) {
-      if(action.type == ActionTypes.pushOnTop) {
+      if (action.type == ActionTypes.pushOnTop) {
         _game.stacks[action.stack.stackNumber] = action.stack;
       }
       // _game.animations.add(action);

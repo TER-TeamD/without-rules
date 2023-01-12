@@ -6,6 +6,7 @@ class InGameProperty {
   final List<StackCard> stacks;
 
   InGameProperty(this.deck, this.stacks);
+
   InGameProperty.fromJson(Map<String, dynamic> json)
       : deck = (json["deck"] as List<dynamic>)
             .map((e) => GameCard.fromJson(e))

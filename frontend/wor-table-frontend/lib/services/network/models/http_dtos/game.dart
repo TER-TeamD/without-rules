@@ -7,6 +7,7 @@ class Game {
   final InGameProperty? inGameProperty;
 
   Game(this.players, this.inGameProperty);
+
   Game.fromJson(Map<String, dynamic> json)
       : players = (json["players"] as List<dynamic>)
             .map((e) => Player.fromJson(e))

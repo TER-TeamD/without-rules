@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:worfrontend/components/player_deck/player_deck.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
 import 'package:worfrontend/components/player_deck/player_spot.dart';
-import 'package:worfrontend/components/player_deck/states/no_player.dart';
-import 'dart:math' as math;
 
 class DeckTransform {
   final Offset position;
@@ -24,7 +22,6 @@ class Decks extends StatelessWidget {
   final List<PositionedPlayerDeckState> states;
 
   const Decks({super.key, required this.states});
-
 
   @override
   Widget build(BuildContext context) {

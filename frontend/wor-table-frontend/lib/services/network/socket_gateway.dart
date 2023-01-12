@@ -46,7 +46,8 @@ class SocketGateway {
       log(data);
       onMessage.add(InitiateGame.fromJson(data));
     });
-    socket.on(socketTopicsToString(SocketTopics.gameInitialisationTopic), (data) {
+    socket.on(socketTopicsToString(SocketTopics.gameInitialisationTopic),
+        (data) {
       onMessage.add(GameInitialisation.fromJson(data));
     });
     socket.on(socketTopicsToString(SocketTopics.cardPlayedTopic), (data) {

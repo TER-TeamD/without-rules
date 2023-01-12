@@ -6,6 +6,7 @@ class StackCard {
   final List<GameCard> stackCards;
 
   StackCard(this.stackNumber, this.stackHead, this.stackCards);
+
   StackCard.fromJson(Map<String, dynamic> json)
       : stackNumber = json["stackNumber"],
         stackHead = GameCard.fromJson(json["stackHead"]),
