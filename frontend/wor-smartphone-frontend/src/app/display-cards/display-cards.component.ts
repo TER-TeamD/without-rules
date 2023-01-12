@@ -21,6 +21,8 @@ export class DisplayCardsComponent {
   public selectedCard: Card = this.cards[0];
   public result!: Result;
 
+  public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
+
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
 
