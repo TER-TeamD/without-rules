@@ -7,7 +7,7 @@ enum PlayerState { waiting, playing, revealCard, waitingAfterPlaying }
 class PlayerDeck extends StatelessWidget {
   final PlayerState state;
   final PlayerDeckState visualState;
-  final card_model.Card? playedCard;
+  final card_model.GameCard? playedCard;
 
   const PlayerDeck({
     super.key,

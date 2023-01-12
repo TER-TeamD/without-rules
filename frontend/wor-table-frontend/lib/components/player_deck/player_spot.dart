@@ -5,16 +5,20 @@ import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
 import 'dart:math' as math;
 
+import 'package:worfrontend/components/decks.dart';
+
 class PlayerSpot extends StatefulWidget {
   final Widget child;
   final Offset position;
   final double rotation;
+  final void Function(DeckTransform)? positionChanged;
 
   const PlayerSpot(
       {Key? key,
       required this.child,
       required this.position,
-      this.rotation = 0})
+      this.rotation = 0,
+      this.positionChanged})
       : super(key: key);
 
   @override
@@ -54,6 +58,9 @@ class _PlayerSpotState extends State<PlayerSpot> {
             setState(() {
               rotation = angle;
             });
+          },
+          onPanEnd: (_) {
+            widget.positionChanged?.call(DeckTransform(position, rotation));
           },
           child: SizedBox.square(
             dimension: 10,
@@ -103,6 +110,9 @@ class _PlayerSpotState extends State<PlayerSpot> {
                         }
                         position = details.focalPoint + startDelta;
                       });
+                    },
+                    onScaleEnd: (_) {
+                      widget.positionChanged?.call(DeckTransform(position, rotation));
                     },
                     child: content()),
               ))),

@@ -4,7 +4,7 @@ import 'package:worfrontend/components/player_deck/player_deck_state.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class DeckPlayed extends PlayerDeckState {
-  final Card card;
+  final GameCard card;
 
   const DeckPlayed(this.card);
 

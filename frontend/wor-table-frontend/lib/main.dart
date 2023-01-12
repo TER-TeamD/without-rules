@@ -5,6 +5,7 @@ import 'package:worfrontend/components/table.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
+import 'package:worfrontend/services/screen_service.dart';
 
 
 void main() {
@@ -25,6 +26,9 @@ void main() {
   GetIt.I.registerSingleton(controllers.socketGameController);
   GetIt.I.registerSingleton(controllers.tableGameController);
 
+  var screenService = ScreenService();
+  GetIt.I.registerSingleton(screenService);
+
   runApp(const MyApp());
 }
 
@@ -34,7 +38,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       home: Scaffold(
         body: TableComponent(game: GetIt.I.get<TableGameController>()),

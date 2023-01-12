@@ -6,12 +6,12 @@ import '../card.dart';
 class CardPlayedByUser extends SocketMessage {
 
   final String playerId;
-  final Card playedCard;
+  final GameCard playedCard;
 
   CardPlayedByUser(this.playerId, this.playedCard);
   CardPlayedByUser.fromJson(Map<String, dynamic> json)
       : playerId = json["player_id"],
-        playedCard = Card.fromJson(json["played_cards"]);
+        playedCard = GameCard.fromJson(json["played_cards"]);
 
   @override
   void execute(SocketGameController game) async {
