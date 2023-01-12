@@ -2,9 +2,18 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:worfrontend/components/decks.dart';
+import 'package:worfrontend/components/stacks.dart';
+
+class StackPosition {
+  final Offset position;
+  final int number;
+
+  StackPosition(this.position, this.number);
+}
 
 class ScreenService {
   Size? _screenSize;
+  List<StackPosition> stacks = [];
 
   void setScreenSize(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
@@ -25,5 +34,19 @@ class ScreenService {
                 e.position.dy * _screenSize!.height),
             e.rotation))
         .toList(growable: false);
+  }
+
+  void setStackPositions(List<StackViewInstance> stacks) {
+    this.stacks = stacks.map((stack) {
+      var context = stack.key.currentContext;
+      if(context == null) throw "The context of the stack is null.";
+      var box = context.findRenderObject() as RenderBox;
+
+      return StackPosition(box.localToGlobal(Offset.zero), stack.stack.stackNumber);
+    }).toList(growable: false);
+  }
+
+  Offset getStackPosition(int stack) {
+    return stacks.firstWhere((element) => element.number == stack, orElse: () => throw "Stack not found.").position;
   }
 }

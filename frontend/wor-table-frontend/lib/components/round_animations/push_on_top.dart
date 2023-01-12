@@ -7,7 +7,7 @@ import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class PushOnTop extends StatefulWidget {
-  final DeckTransform destination;
+  final GlobalKey destination;
   final DeckTransform departure;
   final GameCard card;
   final void Function()? onComplete;
@@ -29,10 +29,17 @@ class _PushOnTopState extends State<PushOnTop>
   late AnimationController _controller;
 
   @override
+  void didUpdateWidget(covariant PushOnTop oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _controller.reset();
+    _controller.forward();
+  }
+
+  @override
   void initState() {
     super.initState();
     _controller =
-        AnimationController(duration: const Duration(seconds: 1), vsync: this);
+        AnimationController(duration: const Duration(seconds: 1), value: 0, vsync: this);
     _controller.addListener(() {
       setState(() {});
       if(_controller.isCompleted) {
@@ -40,7 +47,7 @@ class _PushOnTopState extends State<PushOnTop>
         widget.onComplete?.call();
       }
     });
-    _controller.value = 0;
+    _controller.reset();
     _controller.forward();
   }
 
@@ -51,11 +58,18 @@ class _PushOnTopState extends State<PushOnTop>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
+
+    var destinationRenderBox = widget.destination.currentContext?.findRenderObject() as RenderBox?;
+    if(destinationRenderBox == null) return Container();
+    var destinationPosition = destinationRenderBox?.localToGlobal(Offset.zero);
+
+
     var location = Offset.lerp(widget.departure.position,
-        widget.destination.position, _controller.value);
+        destinationPosition, _controller.value);
     var rotation = lerpDouble(widget.departure.rotation,
-        widget.destination.rotation, _controller.value);
+        0, _controller.value);
 
     if (location == null) throw 'Unexpected null location.';
     if (rotation == null) throw 'Unexpected null rotation.';

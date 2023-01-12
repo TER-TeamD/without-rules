@@ -29,46 +29,19 @@ class _TableComponentState extends State<TableComponent> {
   Widget? buildPlayable(GameAnimation animation) {
     Logger.log("Playing animation");
     if (animation is PushOnTopAnimationData) {
+
       Logger.log("Push on top animation");
-      var instance = stacks.singleWhere(
-          (element) => element.stack.stackNumber == animation.stack.stackNumber,
-          orElse: () => throw "Stack not found for playing animation.");
-      var renderBox =
-          instance.key.currentContext?.findRenderObject() as RenderBox?;
-      if (renderBox == null) throw "Unable to get renderbox of the stack";
-      var position = renderBox.localToGlobal(Offset.zero);
 
       var departureDeck = widget.game.getPlayerDeckState(animation.playerId);
       var departure = departureDeck.transform;
 
       return PushOnTop(
-          destination: DeckTransform(position, 0),
+          destination: stacks.firstWhere((element) => element.stack.stackNumber == animation.stack.stackNumber).key,
           departure: departure,
           card: animation.card,
-          onComplete: () {
-            currentAnimation = null;
-            animate();
-            widget.game.pushOnTop(animation.stack, animation.card, animation.playerId);
-          });
+          onComplete: () => widget.game.animationComplete(animation));
     }
     return null;
-  }
-
-  Widget? updateAnimation() {
-    if(currentAnimation != null) return null;
-
-    if (widget.game.animations.isNotEmpty) {
-      return buildPlayable(widget.game.animations.removeFirst());
-    }
-
-    return null;
-  }
-
-  void animate() {
-    if(currentAnimation != null) return;
-    setState(() {
-      currentAnimation = updateAnimation();
-    });
   }
 
   @override
@@ -87,19 +60,28 @@ class _TableComponentState extends State<TableComponent> {
     });
 
     widget.game.decks$.listen((value) => setState(() {
-      Logger.log("Decks changed (count: ${value.length})");
+          Logger.log("Decks changed (count: ${value.length})");
           decks = value;
         }));
     widget.game.stacks$.listen((value) => setState(() {
-          stacks = value.map((e) => StackViewInstance(e)).toList();
-        }));
+      stacks = value.map((e) => StackViewInstance(e)).toList();
+    }));
     widget.game.state$.listen((value) => setState(() {
           state = value;
         }));
-    widget.game.animations$.listen((value) {
-      animate();
+    widget.game.currentAnimation$.listen((value) {
+      if (value == null) {
+        setState(() {
+          currentAnimation = null;
+        });
+      } else {
+        setState(() {
+          currentAnimation = buildPlayable(value);
+        });
+      }
     });
   }
+
 
   bool alreadyCalled = false;
 
@@ -126,7 +108,10 @@ class _TableComponentState extends State<TableComponent> {
   }
 
   Widget drawAnimation() {
-    if (currentAnimation == null) return Container();
+    if (currentAnimation == null) {
+      Logger.log("No animation");
+      return Container();
+    }
     return currentAnimation!;
   }
 
@@ -134,8 +119,7 @@ class _TableComponentState extends State<TableComponent> {
   Widget build(BuildContext context) {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
-    Logger.log("Animation: $currentAnimation");
-    return Container(
+    var result = Container(
       color: Colors.black,
       child: Stack(children: [
         logDecks(context),
@@ -145,5 +129,7 @@ class _TableComponentState extends State<TableComponent> {
         drawAnimation(),
       ]),
     );
+
+    return result;
   }
 }

@@ -37,6 +37,7 @@ class _State {
   final BehaviorSubject<List<StackCard>> stacks$ = BehaviorSubject.seeded([]);
   final BehaviorSubject<GameStates> state$ =
       BehaviorSubject.seeded(GameStates.waitServer);
+  final BehaviorSubject<GameAnimation?> currentAnimation$ = BehaviorSubject.seeded(null);
 
   Map<String, GameCard> playedCards = {};
   final animations$ = BehaviorSubject.seeded(Queue<GameAnimation>());
@@ -58,6 +59,12 @@ class _State {
     state$.add(state);
   }
 
+  set currentAnimation(GameAnimation? animation) {
+    Logger.log("Setting animation");
+    currentAnimation$.add(animation);
+  }
+
+
   PositionedPlayerDeckState getPlayerDeckState(String playerId) {
     return decks.singleWhere((element) => element.playerId == playerId,
         orElse: () => throw PlayerNotFound(playerId));
@@ -78,8 +85,12 @@ class _State {
   }
 
   pushAnimation(GameAnimation animation) {
-    animations$.value.add(animation);
-    animations$.add(animations$.value);
+    if(currentAnimation == null) {
+      currentAnimation = animation;
+    } else {
+      animations$.value.add(animation);
+      animations$.add(animations$.value);
+    }
   }
 
   List<PositionedPlayerDeckState> get decks => decks$.value;
@@ -89,6 +100,8 @@ class _State {
   GameStates get state => state$.value;
 
   Queue<GameAnimation> get animations => animations$.value;
+
+  GameAnimation? get currentAnimation => currentAnimation$.value;
 
 }
 
@@ -163,7 +176,7 @@ class SocketGameController {
       // }
       // _game.animations.add(action);
 
-      _game.pushAnimation(PushOnTopAnimationData(action.stack.stackHead, _game.stacks.singleWhere((element) => element.stackNumber == action.stack.stackNumber), action.playerId, GameAnimations.pushOnTop));
+      _game.pushAnimation(PushOnTopAnimationData(_game.playedCards[action.playerId]!, _game.stacks.singleWhere((element) => element.stackNumber == action.stack.stackNumber), action.playerId, GameAnimations.pushOnTop));
     }
 
     // _game.stacks$.add(_game.stacks);
@@ -199,6 +212,8 @@ class TableGameController {
   BehaviorSubject<GameStates> get state$ => _game.state$;
   BehaviorSubject<Queue<GameAnimation>> get animations$ => _game.animations$;
 
+  BehaviorSubject<GameAnimation?> get currentAnimation$ => _game.currentAnimation$;
+
 
   TableGameController(this._game, this._socket);
 
@@ -221,6 +236,18 @@ class TableGameController {
     var newStack = StackCard(stack.stackNumber, card, [...stack.stackCards, card]);
 
     _game.stacks = [..._game.stacks.where((element) => element.stackNumber != stack.stackNumber), newStack]..sort((a, b) => a.stackNumber.compareTo(b.stackNumber));
+  }
+
+  animationComplete(GameAnimation animation) {
+    if(animation is PushOnTopAnimationData) {
+      pushOnTop(animation.stack, animation.card, animation.playerId);
+    }
+
+    if(_game.animations.isNotEmpty) {
+      _game.currentAnimation = _game.animations.removeFirst();
+    } else {
+      _game.currentAnimation = null;
+    }
   }
 }
 
