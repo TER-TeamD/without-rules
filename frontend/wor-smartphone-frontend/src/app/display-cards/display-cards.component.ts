@@ -13,7 +13,6 @@ import { Result } from '../model/result.model';
 })
 export class DisplayCardsComponent {
 
-  public select: boolean = true;
   public loading: boolean = true;
   public end: boolean = false;
   public played: boolean = false;
@@ -29,6 +28,7 @@ export class DisplayCardsComponent {
     this.route.params.subscribe(params => {
       this.playerId = params['playerId'];
     });
+
     this.gameService.playerCards$.subscribe(cards => {
       if (cards.length > 0) {
         console.log('cards', cards);
@@ -57,7 +57,6 @@ export class DisplayCardsComponent {
 
   public selectCard(card: Card) {
     this.selectedCard = card;
-    this.select = true;
   }
 
   public play() {
