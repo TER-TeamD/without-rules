@@ -3,18 +3,21 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
 import 'package:worfrontend/components/decks.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class PushOnTop extends StatefulWidget {
   final DeckTransform destination;
   final DeckTransform departure;
   final GameCard card;
+  final void Function()? onComplete;
 
   const PushOnTop(
       {Key? key,
       required this.destination,
       required this.departure,
-      required this.card})
+      required this.card,
+      this.onComplete})
       : super(key: key);
 
   @override
@@ -32,7 +35,12 @@ class _PushOnTopState extends State<PushOnTop>
         AnimationController(duration: const Duration(seconds: 1), vsync: this);
     _controller.addListener(() {
       setState(() {});
+      if(_controller.isCompleted) {
+        Logger.log("Animation complete");
+        widget.onComplete?.call();
+      }
     });
+    _controller.value = 0;
     _controller.forward();
   }
 

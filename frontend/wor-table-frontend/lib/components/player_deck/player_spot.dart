@@ -59,7 +59,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
               startRotation +
               math.pi / 2;
           setState(() {
-            rotation = angle;
+            rotation = angle % (2 * math.pi);
           });
         });
       },
@@ -98,7 +98,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
                           onScaleUpdate: (details) {
                             setState(() {
                               if (details.pointerCount != 1) {
-                                rotation = details.rotation;
+                                rotation = details.rotation % (2 * math.pi);
                               }
                               position = details.focalPoint + startDelta;
                             });

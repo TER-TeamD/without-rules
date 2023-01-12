@@ -5,7 +5,7 @@ import 'package:worfrontend/components/round_animations/push_on_top.dart';
 import 'package:worfrontend/components/stacks.dart';
 import 'package:worfrontend/models/animations.dart';
 import 'package:worfrontend/services/game_controller.dart';
-import 'package:worfrontend/services/network/models/card.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
 import '../services/error_manager.dart';
@@ -26,8 +26,10 @@ class _TableComponentState extends State<TableComponent> {
 
   Widget? currentAnimation;
 
-  void playAnimation(GameAnimation animation) {
+  Widget? buildPlayable(GameAnimation animation) {
+    Logger.log("Playing animation");
     if (animation is PushOnTopAnimationData) {
+      Logger.log("Push on top animation");
       var instance = stacks.singleWhere(
           (element) => element.stack.stackNumber == animation.stack.stackNumber,
           orElse: () => throw "Stack not found for playing animation.");
@@ -39,13 +41,34 @@ class _TableComponentState extends State<TableComponent> {
       var departureDeck = widget.game.getPlayerDeckState(animation.playerId);
       var departure = departureDeck.transform;
 
-      setState(() {
-        currentAnimation = PushOnTop(
-            destination: DeckTransform(position, 0),
-            departure: departure,
-            card: animation.card);
-      });
+      return PushOnTop(
+          destination: DeckTransform(position, 0),
+          departure: departure,
+          card: animation.card,
+          onComplete: () {
+            currentAnimation = null;
+            animate();
+            widget.game.pushOnTop(animation.stack, animation.card, animation.playerId);
+          });
     }
+    return null;
+  }
+
+  Widget? updateAnimation() {
+    if(currentAnimation != null) return null;
+
+    if (widget.game.animations.isNotEmpty) {
+      return buildPlayable(widget.game.animations.removeFirst());
+    }
+
+    return null;
+  }
+
+  void animate() {
+    if(currentAnimation != null) return;
+    setState(() {
+      currentAnimation = updateAnimation();
+    });
   }
 
   @override
@@ -56,7 +79,7 @@ class _TableComponentState extends State<TableComponent> {
     state = widget.game.state;
 
     GetIt.I.get<ErrorManager>().onError.listen((event) {
-      print("Error: $event");
+      Logger.log("Error: $event");
       showDialog(
           context: context,
           builder: (context) =>
@@ -64,36 +87,21 @@ class _TableComponentState extends State<TableComponent> {
     });
 
     widget.game.decks$.listen((value) => setState(() {
-          print("Decks changed (count: ${value.length})");
+      Logger.log("Decks changed (count: ${value.length})");
           decks = value;
-          testAnimation();
         }));
     widget.game.stacks$.listen((value) => setState(() {
           stacks = value.map((e) => StackViewInstance(e)).toList();
-          testAnimation();
         }));
     widget.game.state$.listen((value) => setState(() {
           state = value;
-          testAnimation();
         }));
+    widget.game.animations$.listen((value) {
+      animate();
+    });
   }
 
   bool alreadyCalled = false;
-
-  void testAnimation() {
-    if (currentAnimation != null) return;
-    if (stacks.isEmpty) return;
-    if (decks.isEmpty) return;
-    if (!alreadyCalled) {
-      alreadyCalled = true;
-      return;
-    }
-
-    if (currentAnimation == null) {
-      playAnimation(PushOnTopAnimationData(GameCard(55, 5), stacks.first.stack,
-          decks.first.playerId, GameAnimations.pushOnTop));
-    }
-  }
 
   Widget logDecks(BuildContext context) {
     return Column(
@@ -119,13 +127,14 @@ class _TableComponentState extends State<TableComponent> {
 
   Widget drawAnimation() {
     if (currentAnimation == null) return Container();
-    return Container();
+    return currentAnimation!;
   }
 
   @override
   Widget build(BuildContext context) {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
+    Logger.log("Animation: $currentAnimation");
     return Container(
       color: Colors.black,
       child: Stack(children: [

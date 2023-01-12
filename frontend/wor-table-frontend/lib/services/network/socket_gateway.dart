@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/errors/server_error.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/socket_models/card_played_by_user.dart';
 import 'package:worfrontend/services/network/models/socket_models/initiate_game.dart';
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
@@ -23,16 +24,16 @@ class SocketGateway {
   SocketGateway(this.socket) : onMessage = PublishSubject();
 
   void log(Map<String, dynamic> json) {
-    print(jsonEncode(json));
+    Logger.log(jsonEncode(json));
   }
 
   listenEvents() {
     socket.onConnect((data) {
-      print("Connected");
+      Logger.log("Connected");
       connected.add(true);
     });
     socket.onAny((String topic, data) {
-      print("Data received from $topic: $data");
+      Logger.log("Data received from $topic: $data");
     });
 
     socket.on('exception', (data) {
@@ -62,7 +63,7 @@ class SocketGateway {
   }
 
   emit(String topic, dynamic data) {
-    print("Emitting $topic: $data");
+    Logger.log("Emitting $topic: $data");
     socket.emit(topic, data);
   }
 }

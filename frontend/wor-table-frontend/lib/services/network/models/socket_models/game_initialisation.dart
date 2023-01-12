@@ -1,4 +1,5 @@
 import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 
 class GameInitialisation extends SocketMessage {
@@ -9,7 +10,9 @@ class GameInitialisation extends SocketMessage {
 
   @override
   void execute(SocketGameController game) {
-    print("PlayerIds: \n${potentialPlayers.join("\n")}");
+    Logger.space();
+    Logger.log(">>> PlayerIds: [${potentialPlayers.join(", ")}]");
+    Logger.space();
     game.gameCreated(potentialPlayers);
   }
 }

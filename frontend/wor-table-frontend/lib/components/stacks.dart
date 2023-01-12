@@ -20,7 +20,10 @@ class StacksComponent extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: stacks
-            .map((e) => CardComponent(key: e.key, card: e.stack.stackHead))
+            .map((e) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CardComponent(key: e.key, card: e.stack.stackHead),
+            ))
             .toList(),
       ),
     );

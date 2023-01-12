@@ -11,8 +11,9 @@ import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/errors/incoherent_message_for_state.dart';
 import 'package:worfrontend/errors/player_not_found.dart';
+import 'package:worfrontend/models/animations.dart';
 import 'package:worfrontend/services/error_manager.dart';
-import 'package:worfrontend/services/network/models/action/action_types.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
@@ -38,22 +39,22 @@ class _State {
       BehaviorSubject.seeded(GameStates.waitServer);
 
   Map<String, GameCard> playedCards = {};
-  final animations = Queue<Action>();
+  final animations$ = BehaviorSubject.seeded(Queue<GameAnimation>());
 
   final List<String> players = [];
 
   set decks(List<PositionedPlayerDeckState> decks) {
-    print("Setting deck");
+    Logger.log("Setting deck");
     decks$.add(decks);
   }
 
   set stacks(List<StackCard> stacks) {
-    print("Setting stacks");
+    Logger.log("Setting stacks");
     stacks$.add(stacks);
   }
 
   set state(GameStates state) {
-    print("Setting state");
+    Logger.log("Setting state");
     state$.add(state);
   }
 
@@ -76,11 +77,19 @@ class _State {
     }).toList(growable: false);
   }
 
+  pushAnimation(GameAnimation animation) {
+    animations$.value.add(animation);
+    animations$.add(animations$.value);
+  }
+
   List<PositionedPlayerDeckState> get decks => decks$.value;
 
   List<StackCard> get stacks => stacks$.value;
 
   GameStates get state => state$.value;
+
+  Queue<GameAnimation> get animations => animations$.value;
+
 }
 
 class SocketGameController {
@@ -136,7 +145,7 @@ class SocketGameController {
   }
 
   void playerPlayCard(String playerId, GameCard playedCard) {
-    print("Player play card: $playerId");
+    Logger.log("Player play card: $playerId");
     run(() {
       checkState(GameStates.playing);
       _game.playedCards[playerId] = playedCard;
@@ -146,20 +155,22 @@ class SocketGameController {
   }
 
   void playActions(List<Action> actions) {
-    print("${actions.length} new actions.");
+    Logger.log("${actions.length} new actions.");
 
     for (var action in actions) {
-      if (action.type == ActionTypes.pushOnTop) {
-        _game.stacks[action.stack.stackNumber] = action.stack;
-      }
+      // if (action.type == ActionTypes.pushOnTop) {
+      //   _game.stacks[action.stack.stackNumber] = action.stack;
+      // }
       // _game.animations.add(action);
+
+      _game.pushAnimation(PushOnTopAnimationData(action.stack.stackHead, _game.stacks.singleWhere((element) => element.stackNumber == action.stack.stackNumber), action.playerId, GameAnimations.pushOnTop));
     }
 
-    _game.stacks$.add(_game.stacks);
+    // _game.stacks$.add(_game.stacks);
   }
 
   void nextRound() {
-    print("next round.");
+    Logger.log("next round.");
     run(() {
       _game.changeAllDeckState((_) => DeckPlaying());
     });
@@ -179,12 +190,15 @@ class TableGameController {
   List<StackCard> get stacks => _game.stacks;
 
   GameStates get state => _game.state;
+  Queue<GameAnimation> get animations => _game.animations;
 
   BehaviorSubject<List<PositionedPlayerDeckState>> get decks$ => _game.decks$;
 
   BehaviorSubject<List<StackCard>> get stacks$ => _game.stacks$;
 
   BehaviorSubject<GameStates> get state$ => _game.state$;
+  BehaviorSubject<Queue<GameAnimation>> get animations$ => _game.animations$;
+
 
   TableGameController(this._game, this._socket);
 
@@ -195,12 +209,18 @@ class TableGameController {
   }
 
   createGame() {
-    print("Creating game...");
+    Logger.log("Creating game...");
     _socket.emit("table_create_game", {});
   }
 
   PositionedPlayerDeckState getPlayerDeckState(playerId) {
     return _game.getPlayerDeckState(playerId);
+  }
+
+  pushOnTop(StackCard stack, GameCard card, String playerId) {
+    var newStack = StackCard(stack.stackNumber, card, [...stack.stackCards, card]);
+
+    _game.stacks = [..._game.stacks.where((element) => element.stackNumber != stack.stackNumber), newStack]..sort((a, b) => a.stackNumber.compareTo(b.stackNumber));
   }
 }
 
