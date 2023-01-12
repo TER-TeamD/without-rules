@@ -4,6 +4,7 @@ const String gameInitialisationTopic = "player_initialization";
 const String cardPlayedTopic = "CARD_PLAYED_BY_USER";
 const String newActionsTopic = "NEW_ACTIONS";
 const String nextRoundTopic = "NEXT_ROUND";
+const String resultsTopic = "RESULTS";
 
 enum SocketTopics {
   newPlayerTopic,
@@ -11,7 +12,8 @@ enum SocketTopics {
   gameInitialisationTopic,
   cardPlayedTopic,
   newActionsTopic,
-  nextRoundTopic
+  nextRoundTopic,
+  resultsTopic,
 }
 
 SocketTopics socketTopicsFromString(String socketTopic) {
@@ -26,6 +28,8 @@ SocketTopics socketTopicsFromString(String socketTopic) {
       return SocketTopics.newActionsTopic;
     case nextRoundTopic:
       return SocketTopics.nextRoundTopic;
+    case resultsTopic:
+      return SocketTopics.resultsTopic;
     default:
       throw Exception("Unknown topic: $socketTopic");
   }
@@ -45,6 +49,8 @@ String socketTopicsToString(SocketTopics socketTopic) {
       return newActionsTopic;
     case SocketTopics.nextRoundTopic:
       return nextRoundTopic;
+    case SocketTopics.resultsTopic:
+      return resultsTopic;
     default:
       throw Exception("Unknown topic: $socketTopic");
   }

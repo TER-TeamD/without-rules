@@ -154,7 +154,7 @@ export class GameEngineService implements OnModuleInit {
 
         // We give 10 cards to each player
         game.players.forEach((player) => {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 2; i++) {
                 player.cards.push(game.in_game_property.deck.pop());
             }
         });

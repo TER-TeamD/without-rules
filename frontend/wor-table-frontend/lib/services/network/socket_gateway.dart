@@ -10,6 +10,7 @@ import 'package:worfrontend/services/network/models/socket_models/initiate_game.
 import 'package:worfrontend/services/network/models/socket_models/new_actions.dart';
 import 'package:worfrontend/services/network/models/socket_models/next_round.dart';
 import 'package:worfrontend/services/network/models/socket_models/player_joined.dart';
+import 'package:worfrontend/services/network/models/socket_models/results.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
 
@@ -59,6 +60,9 @@ class SocketGateway {
     });
     socket.on(socketTopicsToString(SocketTopics.nextRoundTopic), (data) {
       onMessage.add(NextRound.fromJson(data));
+    });
+    socket.on(socketTopicsToString(SocketTopics.resultsTopic), (data) {
+      onMessage.add(Results.fromJson(data));
     });
   }
 

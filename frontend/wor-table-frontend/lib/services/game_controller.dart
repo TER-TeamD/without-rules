@@ -14,6 +14,7 @@ import 'package:worfrontend/errors/player_not_found.dart';
 import 'package:worfrontend/models/animations.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/logger.dart';
+import 'package:worfrontend/services/network/models/socket_models/results.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
@@ -43,6 +44,7 @@ class _State {
   final animations$ = BehaviorSubject.seeded(Queue<GameAnimation>());
 
   final List<String> players = [];
+  Results? results;
 
   set decks(List<PositionedPlayerDeckState> decks) {
     Logger.log("Setting deck");
@@ -190,6 +192,7 @@ class SocketGameController {
   }
 
   void showResult(List<Result> results) {
+    _game.results = Results(results);
     _game.state = GameStates.finalPhase;
   }
 }
@@ -204,6 +207,8 @@ class TableGameController {
 
   GameStates get state => _game.state;
   Queue<GameAnimation> get animations => _game.animations;
+
+  Results? get results => _game.results;
 
   BehaviorSubject<List<PositionedPlayerDeckState>> get decks$ => _game.decks$;
 
