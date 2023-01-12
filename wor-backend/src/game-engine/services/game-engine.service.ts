@@ -1,6 +1,6 @@
-import {forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit,} from '@nestjs/common';
-import {NewGameDto} from '../dto/new-game.dto';
-import {InjectModel} from '@nestjs/mongoose';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
+import { NewGameDto } from '../dto/new-game.dto';
+import { InjectModel } from '@nestjs/mongoose';
 import {
     Action, ActionTypeEnum,
     Card,
@@ -11,11 +11,11 @@ import {
     InPlayerGameProperty,
     Player, Result, StackCard,
 } from '../schema/game.schema';
-import {Model} from 'mongoose';
-import {StatusDto} from '../dto/status.dto';
-import {WebsocketGateway} from "./websocket.gateway";
-import {ConnexionStatusEnum} from "../schema/manager.enums";
-import {PlayedCardDto} from "../dto/played-card.dto";
+import { Model } from 'mongoose';
+import { StatusDto } from '../dto/status.dto';
+import { WebsocketGateway } from "./websocket.gateway";
+import { ConnexionStatusEnum } from "../schema/manager.enums";
+import { PlayedCardDto } from "../dto/played-card.dto";
 import {
     sortPlayerByCardsIncreasingOrder,
     sortResultByCattleHead,
@@ -31,9 +31,9 @@ export class GameEngineService implements OnModuleInit {
     constructor(
         @InjectModel(Game.name) private gameModel: Model<GameDocument>,
         @Inject(forwardRef(() => WebsocketGateway)) private readonly webSocketGateway: WebsocketGateway
-    ) {}
+    ) { }
 
-    onModuleInit(): any {}
+    onModuleInit(): any { }
 
 
     public async createNewGame(): Promise<void> {
@@ -68,7 +68,7 @@ export class GameEngineService implements OnModuleInit {
         await this.webSocketGateway.sendInitializationInformationsToTable(newGameDto);
     }
 
-    public async playerJoinGame(playerId: string)  {
+    public async playerJoinGame(playerId: string) {
         const games: Game[] = await this.gameModel.find({});
         if (games == null || games.length === 0) {
             await this.webSocketGateway.sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(ConnexionStatusEnum.ANY_GAME_FOUND, playerId);
@@ -94,7 +94,7 @@ export class GameEngineService implements OnModuleInit {
             return;
         }
 
-        await this.gameModel.findOneAndUpdate({_id: game._id}, {players: game.players});
+        await this.gameModel.findOneAndUpdate({ _id: game._id }, { players: game.players });
         await this.webSocketGateway.sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(ConnexionStatusEnum.USER_IS_LOGGED, playerId);
     }
 
@@ -173,7 +173,7 @@ export class GameEngineService implements OnModuleInit {
     }
 
 
-    public async playerPlayedACard( body: PlayedCardDto,  idPlayer: string): Promise<StatusDto> {
+    public async playerPlayedACard(body: PlayedCardDto, idPlayer: string): Promise<StatusDto> {
         const game: Game = await this.gameModel.findOne({ 'players.id': idPlayer });
 
         if (!game) {

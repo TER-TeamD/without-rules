@@ -11,7 +11,7 @@
     <app-card [card]="selectedCard"></app-card>
 
     <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let card of cardsArray" cdkDrag>
+        <div *ngFor="let card of cards" cdkDrag>
             <app-card [card]="card" (click)="selectCard(card)"></app-card>
         </div>
     </div>
