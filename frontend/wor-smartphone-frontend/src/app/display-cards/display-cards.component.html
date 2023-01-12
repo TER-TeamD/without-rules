@@ -7,7 +7,12 @@
     <p>Results of the round will be on the table !</p>
 </div>
 
-<div *ngIf="!loading && !played" class="content-container">
+<div *ngIf="end" class="loading">
+    <p>Game finished...</p>
+    <p>You are {{this.result.rank}} with {{this.result.cattle_heads}} cattle heads !</p>
+</div>
+
+<div *ngIf="!loading && !played && !end" class="content-container">
     <app-card [card]="selectedCard"></app-card>
 
     <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">

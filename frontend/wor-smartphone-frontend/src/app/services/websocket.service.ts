@@ -1,12 +1,10 @@
-import { Injectable, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { io } from 'socket.io-client';
-import { GameCards } from '../model/gamecards';
 import { Socket } from "socket.io-client/build/esm/socket";
-import { AuthService } from "./auth.service";
-import { GameService } from "./game.service";
 import { Card } from "../model/card.model";
 import { ConnexionStatusMessage } from "../model/connexion-status.model";
+import { Result } from '../model/result.model';
 
 
 @Injectable({
@@ -19,7 +17,9 @@ export class WebsocketService {
 
   private _playerCards$: BehaviorSubject<Card[] | null> = new BehaviorSubject<Card[] | null>(null);
   private _playerAuthentification$: BehaviorSubject<ConnexionStatusMessage | null> = new BehaviorSubject<ConnexionStatusMessage | null>(null);
-  public nextRound$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _nextRound$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _results$: BehaviorSubject<Result[] | null> = new BehaviorSubject<Result[] | null>(null);
+
 
   constructor() { }
 
@@ -40,23 +40,21 @@ export class WebsocketService {
     return this._playerCards$.asObservable();
   }
 
-  public listeningNextRound() {
+  public listeningNextRound(): Observable<boolean> {
     this._socket.on('NEXT_ROUND', (message) => {
-      this.nextRound$.next(true);
+      this._nextRound$.next(true);
     });
 
-    return this.nextRound$.asObservable();
+    return this._nextRound$.asObservable();
   }
 
-  public listeningResults() {
+  public listeningResults(): Observable<Result[] | null> {
     this._socket.on('RESULTS', (message) => {
-      console.log(message);
-
+      console.log(message.results);
+      this._results$.next(message.results);
     });
-  }
 
-  public getNextRound(): Observable<boolean> {
-    return this.nextRound$.asObservable();
+    return this._results$.asObservable();
   }
 
   public async sendNewPlayedCard(playerId: string, cardValue: number): Promise<any> {
