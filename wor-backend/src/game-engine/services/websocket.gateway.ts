@@ -120,10 +120,22 @@ export class WebsocketGateway
             player_id: playerId,
             played_cards: playedCard,
         });
+
+        await this.sendMessageToEntity(playerId, 'CARD_PLAYED_BY_USER', {
+            played_cards: playedCard,
+        });
     }
 
     public async sendActionListToTable(actions: Action[]): Promise<void> {
         await this.sendMessageToEntity('0', 'NEW_ACTIONS', {actions: actions});
+    }
+
+    public async sendEndRoundDetailsToTable(stacks: StackCard[]): Promise<void> {
+        await this.sendMessageToEntity('0', 'END_ROUND_DETAILS', {stacks: stacks});
+    }
+
+    public async sendEndRoundDetailsToPlayers(idPlayer: string, cards: Card[], playerNumberDiscard: number): Promise<void> {
+        await this.sendMessageToEntity(idPlayer, 'END_ROUND_DETAILS', {cards: cards, discardValue: playerNumberDiscard});
     }
 
     public async sendNextRoundToTable(): Promise<void> {

@@ -17,6 +17,8 @@ import { WebsocketGateway } from "./websocket.gateway";
 import { ConnexionStatusEnum } from "../schema/manager.enums";
 import { PlayedCardDto } from "../dto/played-card.dto";
 import {
+    sortCardDecreasingOrder,
+    sortCardIncreasingOrder,
     sortPlayerByCardsIncreasingOrder,
     sortResultByCattleHead,
     sortStackCardsByHeadCardsIncreasingOrder
@@ -256,10 +258,8 @@ export class GameEngineService implements OnModuleInit {
         const game: Game = games[0];
 
         // Send actions to do at the table
-        const playerOrderByIncreasingCardValue: Player[] =
-            sortPlayerByCardsIncreasingOrder(game.players);
-        const stackCardInDecreasingOrder: StackCard[] =
-            sortStackCardsByHeadCardsIncreasingOrder(game.in_game_property.stacks);
+        const playerOrderByIncreasingCardValue: Player[] =  sortPlayerByCardsIncreasingOrder(game.players);
+        const stackCardInDecreasingOrder: StackCard[] = sortStackCardsByHeadCardsIncreasingOrder(game.in_game_property.stacks);
 
         const actions: Action[] = [];
 
@@ -268,8 +268,7 @@ export class GameEngineService implements OnModuleInit {
 
             let lastCard: Card | null = null;
             for (const stack of stackCardInDecreasingOrder) {
-                const playerHeadCardValue: number =
-                    player.in_player_game_property.played_card.value;
+                const playerHeadCardValue: number = player.in_player_game_property.played_card.value;
                 console.log('PlayedCardValue', playerHeadCardValue);
 
                 if (playerHeadCardValue < stack.stackHead.value && lastCard === null) {
@@ -310,9 +309,12 @@ export class GameEngineService implements OnModuleInit {
                     break;
                 }
 
+                stack.stackCards = sortCardDecreasingOrder(stack.stackCards)
                 lastCard = stack.stackHead;
             }
         }
+
+
 
         const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
             { _id: game._id },
@@ -321,6 +323,13 @@ export class GameEngineService implements OnModuleInit {
         );
 
         await this.webSocketGateway.sendActionListToTable(actions);
+        await this.webSocketGateway.sendEndRoundDetailsToTable(gameUpdated.in_game_property.stacks)
+
+        for (const p of gameUpdated.players) {
+            const playerNumberDiscard: number = p.in_player_game_property.player_discard.reduce((a, b) => a + b.cattleHead, 0)
+            await this.webSocketGateway.sendEndRoundDetailsToPlayers(p.id, p.cards, playerNumberDiscard)
+        }
+
 
         // Send results to players dans table or next round
         if (gameUpdated.in_game_property.current_round >= 10) {
@@ -377,95 +386,4 @@ export class GameEngineService implements OnModuleInit {
         }
         await this.gameModel.deleteMany({});
     }
-    //
-    // @SubscribeMessage('newMessage')
-    // onNewMessage(@MessageBody() body: any) {
-    //   console.log(body);
-    //   this.server.emit('newMessage', {
-    //     msg: 'New message',
-    //     content: body,
-    //   });
-    // }
-    //
-    // private async sendNextRound(id: string) {
-    //   this.server.emit('table', {
-    //     type: 'NEXT_ROUND',
-    //   });
-    //
-    //   this.server.emit('player', {
-    //     type: 'NEXT_ROUND',
-    //     value: {
-    //       id_game: id,
-    //     },
-    //   });
-    // }
-    //
-    // private async giveCardsToPlayerAtTheBeginningOfGame(
-    //   idPlayer: string,
-    //   cards: Card[],
-    // ) {
-    //   this.server.emit('player', {
-    //     type: 'INITIATE_GAME',
-    //     value: {
-    //       id_player: idPlayer,
-    //       cards: cards,
-    //     },
-    //   });
-    // }
-    //
-    // private async giveCardsToTableAtTheBeginningOfGame(
-    //   idGame: string,
-    //   stacks: StackCard[],
-    // ) {
-    //   this.server.emit('table', {
-    //     type: 'INITIATE_GAME',
-    //     value: {
-    //       id_game: idGame,
-    //       stacks: stacks,
-    //     },
-    //   });
-    // }
-    //
-    // private async sendToTableCardsPlayedByPlayers(
-    //   idGame: string,
-    //   playerId: string,
-    //   playedCard: Card,
-    // ) {
-    //   this.server.emit('table', {
-    //     type: 'CARD_PLAYED_BY_USER',
-    //     value: {
-    //       id_game: idGame,
-    //       player_id: playerId,
-    //       played_cards: playedCard,
-    //     },
-    //   });
-    // }
-    //
-    // private async sendActionListToTable(idGame: string, actions: Action[]) {
-    //   this.server.emit('table', {
-    //     type: 'NEW_ACTIONS',
-    //     value: {
-    //       id_game: idGame,
-    //       actions: actions,
-    //     },
-    //   });
-    // }
-    //
-    // private async sendResultToAll(idGame: string, results: Result[]) {
-    //   this.server.emit('table', {
-    //     type: 'RESULTS',
-    //     value: {
-    //       id_game: idGame,
-    //       results: results,
-    //     },
-    //   });
-    //
-    //   this.server.emit('player', {
-    //     type: 'RESULTS',
-    //     value: {
-    //       id_game: idGame,
-    //       results: results,
-    //     },
-    //   });
-    // }
 }

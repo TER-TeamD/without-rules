@@ -10,13 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import swaggeruiConfig from "./shared/config/swaggerui.config";
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [appConfig, mongodbConfig, swaggeruiConfig],
-    }),
-    MongooseModule.forRootAsync({
-      useClass: MongooseConfigService,
-    }),
+    MongooseModule.forRoot('mongodb://database:27017'),
     GameEngineModule,
   ],
   controllers: [AppController],

@@ -23,11 +23,19 @@ const createNewGame = async () => {
     await emitMessage('table_create_game', {});
 }
 
+const startGame = async () => {
+    await emitMessage('table_start_game', {});
+}
+
 
 const idGame = new BehaviorSubject("")
 const connexionEstablished$ = new BehaviorSubject(false)
 const tableInitialization$ = new BehaviorSubject(null)
 const playersConnected$ = new BehaviorSubject([])
+const tableDecks$ = new BehaviorSubject(null)
+const newCardPlayedByUser$ = new BehaviorSubject(null)
+const newActions$ = new BehaviorSubject(null);
+const endRoundInfos$ = new BehaviorSubject(null);
 
 
 socket.on('connection_status_server', (message) => {
@@ -45,11 +53,12 @@ socket.on('player_initialization', (message) => {
     }))
 })
 
+socket.on('table_cards_initialization', (message) => {
+    tableDecks$.next(message.stack_cards)
+})
+
 
 socket.on('new_player_connexion', (message) => {
-
-    console.log("TABLE : new player connexion", message)
-
     const current = playersConnected$.value
     const currentIndex = current.findIndex(c => c.id_player === message.player_id)
     if (currentIndex >= 0) {
@@ -58,9 +67,19 @@ socket.on('new_player_connexion', (message) => {
     }
 })
 
+socket.on('CARD_PLAYED_BY_USER', (message) => {
+    newCardPlayedByUser$.next(message);
+})
 
 
 
+socket.on('NEW_ACTIONS', (message) => {
+    newActions$.next(message)
+})
+
+socket.on('END_ROUND_DETAILS', (message) => {
+    endRoundInfos$.next(message)
+})
 
 
 
@@ -85,7 +104,12 @@ const connectToSocket = async () => {
 
 export const TableService = {
     createNewGame,
+    startGame,
     connexionEstablished$,
     tableInitialization$,
-    playersConnected$
+    playersConnected$,
+    tableDecks$,
+    newCardPlayedByUser$,
+    newActions$,
+    endRoundInfos$
 }
