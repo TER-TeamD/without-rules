@@ -49,7 +49,9 @@ export class Player {
   id: string;
   is_logged: boolean;
   cards: Card[];
+  played_cards: Card[];
   in_player_game_property: InPlayerGameProperty | null;
+
 
 
   constructor() {
@@ -57,6 +59,7 @@ export class Player {
     this.is_logged = false;
     this.cards = [];
     this.in_player_game_property = new InPlayerGameProperty()
+    this.played_cards = [];
   }
 }
 

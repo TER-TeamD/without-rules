@@ -22,7 +22,7 @@ export class InitializeGameService {
      */
     public async launchGame(): Promise<Game> {
 
-        const tempCurrentGame: Game | null = await this.__getCurrentGame();
+        const tempCurrentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
 
         if (tempCurrentGame === null) {
             throw new GameNotFoundException();
@@ -80,7 +80,7 @@ export class InitializeGameService {
      */
     public async playerJoinGame(playerId: string): Promise<Game> {
 
-        const tempCurrentGame: Game | null = await this.__getCurrentGame();
+        const tempCurrentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
 
         if (tempCurrentGame === null) {
             throw new GameNotFoundException();
@@ -104,18 +104,6 @@ export class InitializeGameService {
             {_id: currentGame._id},
             {players: currentGame.players},
             {returnDocument: 'after'});
-    }
-
-
-    private async __getCurrentGame(): Promise<Game | null> {
-
-        const games: Game[] = await this.gameModel.find({});
-
-        if (games == null || games.length === 0) {
-            return null;
-        }
-
-        return games[0]
     }
 
 
