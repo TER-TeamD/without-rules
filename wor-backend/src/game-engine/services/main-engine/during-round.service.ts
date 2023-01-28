@@ -46,6 +46,7 @@ export class DuringRoundService {
         if ((await this.isRoundFinished()) === false) throw new RoundIsNotFinishedException();
 
         currentGame.in_game_property.current_round += 1;
+        currentGame.in_game_property.between_round = null;
         currentGame.players.forEach(p => {
             p.cards = p.cards.filter(c => c.value !== p.in_player_game_property.played_card.value)
             p.played_cards.push(p.in_player_game_property.played_card)

@@ -7,6 +7,9 @@ export class InGameProperty {
   deck: Card[] = [];
   stacks: StackCard[] = [];
   current_round = 0;
+  between_round: BetweenRound | null = null;
+
+
 }
 
 export type GameDocument = Game & Document;
@@ -33,6 +36,16 @@ export class Game {
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);
+
+export class Card {
+  value: number;
+  cattleHead: number;
+
+  constructor(value: number, cattleHead: number) {
+    this.value = value;
+    this.cattleHead = cattleHead;
+  }
+}
 
 export class StackCard {
   stackNumber: number;
@@ -71,20 +84,72 @@ export class InPlayerGameProperty {
   constructor() {
     this.played_card = null
     this.had_played_turn = false
-    this.player_discard = []
+    this.player_discard = [];
   }
+}
+
+export class BetweenRound {
+
+  current_player_action: BetweenRoundPlayerAction | null = null;
+  playerOrder: PlayerFlipOrder[];
+
+  constructor() {
+    this.playerOrder = [];
+    this.current_player_action = null;
+  }
+}
+
+
+
+export class Result {
+  id_player: string;
+  cattle_heads: number;
+  rank = 0;
+}
+
+export class PlayerFlipOrder {
+  player: Player;
+  order: number;
+
+  constructor(player: Player, order: number) {
+    this.player = player;
+    this.order = order;
+  }
+}
+
+export class BetweenRoundPlayerAction {
+  player: Player;
+  action: PlayerAction;
+
+  constructor(player: Player, action: PlayerAction) {
+    this.player = player;
+    this.action = action;
+  }
+}
+
+export abstract class PlayerAction {
 
 }
 
-export class Card {
-  value: number;
-  cattleHead: number;
+export class SendCardToDeckPlayerAction extends PlayerAction {
+  deck_number: number;
 
-  constructor(value: number, cattleHead: number) {
-    this.value = value;
-    this.cattleHead = cattleHead;
+  constructor(deck_number: number) {
+    super();
+    this.deck_number = deck_number;
   }
 }
+
+export class ChooseDeckPlayerAction extends PlayerAction {
+
+}
+
+export class NextRoundPlayerAction extends PlayerAction {
+
+}
+
+
+
 
 export enum ActionTypeEnum {
   PUSH_ON_TOP = 'PUSH_ON_TOP',
@@ -103,37 +168,5 @@ export class Action {
   }
 }
 
-export class Result {
-  id_player: string;
-  cattle_heads: number;
-  rank = 0;
-}
 
-export function generateCardDeck(): Card[] {
-  const cards: Card[] = [];
 
-  const sevenCattleHeads: Array<number> = [55];
-  const fiveCattleHeads: Array<number> = [11, 22, 33, 44, 66, 77, 88, 99];
-  const threeCattleHeads: Array<number> = [
-    10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
-  ];
-  const twoCattleHeads: Array<number> = [5, 15, 25, 35, 45, 65, 75, 85, 95];
-  const allSeveralCattleHeads: number[] = [
-    ...sevenCattleHeads,
-    ...fiveCattleHeads,
-    ...threeCattleHeads,
-    ...twoCattleHeads,
-  ];
-  const oneCattleHeads: Array<number> = Array.from(
-    { length: 104 },
-    (_, i) => i + 1,
-  ).filter((e) => !allSeveralCattleHeads.includes(e));
-
-  sevenCattleHeads.forEach((c) => cards.push(new Card(c, 7)));
-  fiveCattleHeads.forEach((c) => cards.push(new Card(c, 5)));
-  threeCattleHeads.forEach((c) => cards.push(new Card(c, 3)));
-  twoCattleHeads.forEach((c) => cards.push(new Card(c, 2)));
-  oneCattleHeads.forEach((c) => cards.push(new Card(c, 1)));
-
-  return shuffle(cards);
-}

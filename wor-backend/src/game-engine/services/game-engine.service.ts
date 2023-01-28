@@ -6,7 +6,6 @@ import {
     Card,
     Game,
     GameDocument,
-    generateCardDeck,
     InGameProperty,
     InPlayerGameProperty,
     Player, Result, StackCard,
@@ -144,7 +143,7 @@ export class GameEngineService implements OnModuleInit {
         }
 
         game.in_game_property = new InGameProperty();
-        game.in_game_property.deck = generateCardDeck();
+        game.in_game_property.deck = [];
         game.in_game_property.current_round = 1;
 
         // We add 4 stackCards
