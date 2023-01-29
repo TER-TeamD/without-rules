@@ -138,13 +138,19 @@ export class BetweenRoundPlayerAction {
   }
 }
 
-export abstract class PlayerAction {}
+export abstract class PlayerAction {
+  type: string;
+
+  constructor(type: string) {
+    this.type = type;
+  }
+}
 
 export class SendCardToStackCardPlayerAction extends PlayerAction {
   stack_number: number;
 
   constructor(stack_number: number) {
-    super();
+    super("SEND_CARD_TO_STACK_CARD");
     this.stack_number = stack_number;
   }
 }
@@ -153,7 +159,7 @@ export class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction extends P
   stack_number: number;
 
   constructor(stack_number: number) {
-    super();
+    super("SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD");
     this.stack_number = stack_number;
   }
 }
@@ -163,12 +169,14 @@ export class ChooseStackCardPlayerAction extends PlayerAction {
 
 
   constructor() {
-    super();
+    super("CHOOSE_STACK_CARD");
   }
 }
 
 export class NextRoundPlayerAction extends PlayerAction {
-
+  constructor() {
+    super("NEXT_ROUND");
+  }
 }
 
 
