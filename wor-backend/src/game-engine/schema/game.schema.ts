@@ -91,6 +91,7 @@ export class InPlayerGameProperty {
 export class BetweenRound {
 
   current_player_action: BetweenRoundPlayerAction | null = null;
+  index_current_player_action_in_player_order: number = 0;
   playerOrder: PlayerFlipOrder[];
 
   constructor() {
@@ -127,21 +128,33 @@ export class BetweenRoundPlayerAction {
   }
 }
 
-export abstract class PlayerAction {
+export abstract class PlayerAction {}
 
-}
+export class SendCardToStackCardPlayerAction extends PlayerAction {
+  stack_number: number;
 
-export class SendCardToDeckPlayerAction extends PlayerAction {
-  deck_number: number;
-
-  constructor(deck_number: number) {
+  constructor(stack_number: number) {
     super();
-    this.deck_number = deck_number;
+    this.stack_number = stack_number;
   }
 }
 
-export class ChooseDeckPlayerAction extends PlayerAction {
+export class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction extends PlayerAction {
+  stack_number: number;
 
+  constructor(stack_number: number) {
+    super();
+    this.stack_number = stack_number;
+  }
+}
+
+export class ChooseStackCardPlayerAction extends PlayerAction {
+  choosen_stack_card_by_player: number | null = null;
+
+
+  constructor() {
+    super();
+  }
 }
 
 export class NextRoundPlayerAction extends PlayerAction {

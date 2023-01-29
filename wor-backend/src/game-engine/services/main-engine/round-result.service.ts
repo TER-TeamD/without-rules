@@ -1,9 +1,23 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {BetweenRound, Card, Game, GameDocument, Player, PlayerFlipOrder} from "../../schema/game.schema";
+import {
+    BetweenRound,
+    Card,
+    ChooseStackCardPlayerAction,
+    Game,
+    GameDocument,
+    Player,
+    PlayerFlipOrder,
+    SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction,
+    SendCardToStackCardPlayerAction,
+    StackCard
+} from "../../schema/game.schema";
 import {Model} from "mongoose";
 import {EngineUtilsService} from "./engine-utils.service";
 import {GameNotFoundException} from "./exceptions/game-not-found.exception";
+import {MAX_CARDS_PER_STACK} from "../../config";
+import {PlayerNotFoundException} from "./exceptions/player-not-found.exception";
+import {StackNotFoundException} from "./exceptions/stack-not-found.exception";
 
 @Injectable()
 export class RoundResultService {
@@ -32,7 +46,9 @@ export class RoundResultService {
 
         playersAndPlayedCard.forEach((p, index) => {
             currentGame.in_game_property.between_round.playerOrder.push(new PlayerFlipOrder(p.player, index))
-        })
+        });
+
+        currentGame.in_game_property.between_round.index_current_player_action_in_player_order = 0;
 
         return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
     }
@@ -43,9 +59,11 @@ export class RoundResultService {
      * sont générées grâce à cette méthode, il est donc nécessaire de la lancer jusqu'à ce que
      * la dernière action NextRoundPlayerAction (situé au niveau de game.between_round.current_player_action.
      * @exception GameNotFoundException()
+     * @exception PlayerNotFoundException()
+     * @exception StackNotFoundException()
      */
     public async generateNextAction(): Promise<Game> {
-        const currentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
+        let currentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
         if (currentGame === null) throw new GameNotFoundException();
 
         /**
@@ -64,17 +82,125 @@ export class RoundResultService {
          *    up all cards of a row of his choice. His card then becomes the first card of the new row.
          */
 
-        const minimumVariation: {deck_number: number, delta: number} = {deck_number: null, delta: 0}
-        currentGame.in_game_property.stacks.forEach(stack => {
+        if (currentGame.in_game_property.between_round.current_player_action !== null
+            && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
 
-        })
+            const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action;
 
+            currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
 
+        }
+        const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
 
+        const currentIndexAction: number = currentGame.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = currentGame.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        if (bestStackCardForPuttingCurrentPlayerCard === null) {
+            // we are in the case 4 (rule 4 of the game)
+            currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+
+        } else {
+
+            // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
+            if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
+                // we are in the case 3
+                currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
+                currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+            } else {
+                // We are in the case 1 and 2
+                currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
+                currentGame = this.__updateGameWhenCase1And2(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+            }
+        }
 
         return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
     }
 
+
+    public __updateGameWhenPlayerCase4(game: Game, currentAction: ChooseStackCardPlayerAction): Game {
+        const currentIndexAction: number = game.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = game.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        const currentIdPlayer: string = game.in_game_property.between_round.playerOrder[currentIndexAction].player.id;
+        const currentPlayerIndex: number = game.players.findIndex(p => p.id === currentIdPlayer);
+        if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
+        const currentPlayer: Player = game.players[currentPlayerIndex];
+
+        const indexStackCardPlayerChoose: number = game.in_game_property.stacks.findIndex(s => s.stackNumber === currentAction.choosen_stack_card_by_player);
+        if (indexStackCardPlayerChoose < 0) throw new StackNotFoundException(currentAction.choosen_stack_card_by_player);
+        const currentStack: StackCard = game.in_game_property.stacks[indexStackCardPlayerChoose];
+
+        currentPlayer.in_player_game_property.player_discard.push(currentStack.stackHead)
+        currentPlayer.in_player_game_property.player_discard.push(...currentStack.stackCards)
+
+        currentStack.stackHead = currentCard;
+        currentStack.stackCards = [];
+
+        currentPlayer.cards = currentPlayer.cards.filter(c => c.value !== currentCard.value);
+        currentPlayer.played_cards.push(currentCard);
+
+        return game;
+    }
+
+    public __updateGameWhenCase1And2(game: Game, bestStackCard: StackCard): Game {
+        const currentIndexAction: number = game.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = game.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        const currentIdPlayer: string = game.in_game_property.between_round.playerOrder[currentIndexAction].player.id;
+        const currentPlayerIndex: number = game.players.findIndex(p => p.id === currentIdPlayer);
+        if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
+        const currentPlayer: Player = game.players[currentPlayerIndex];
+
+        bestStackCard.stackCards.push(bestStackCard.stackHead);
+        bestStackCard.stackHead = currentCard;
+
+        currentPlayer.cards = currentPlayer.cards.filter(c => c.value !== currentCard.value);
+        currentPlayer.played_cards.push(currentCard);
+
+        return game;
+    }
+
+    public __updateGameWhenCase3(game: Game, bestStackCard: StackCard): Game {
+        const currentIndexAction: number = game.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = game.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        const currentIdPlayer: string = game.in_game_property.between_round.playerOrder[currentIndexAction].player.id;
+        const currentPlayerIndex: number = game.players.findIndex(p => p.id === currentIdPlayer);
+        if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
+        const currentPlayer: Player = game.players[currentPlayerIndex];
+
+        currentPlayer.in_player_game_property.player_discard.push(bestStackCard.stackHead);
+        currentPlayer.in_player_game_property.player_discard.push(...bestStackCard.stackCards);
+
+        bestStackCard.stackCards = [];
+        bestStackCard.stackHead = currentCard;
+
+        currentPlayer.cards = currentPlayer.cards.filter(c => c.value !== currentCard.value);
+        currentPlayer.played_cards.push(currentCard);
+
+        return game;
+    }
+
+    /**
+     *
+     * @param game
+     * @return StackCard if one found one, null if anty card have a number > at one stackhead
+     */
+    public __searchGoodStackCardForPlacingCard(game: Game): StackCard | null {
+
+        const currentIndexAction: number = game.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = game.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        const minimumVariation: {stack_card: StackCard, delta: number} = {stack_card: null, delta: 104}
+        game.in_game_property.stacks.forEach(stack => {
+            const currentDelta: number = currentCard.value - stack.stackHead.value;
+            if (currentDelta > 0 && currentDelta <= minimumVariation.delta) {
+                minimumVariation.stack_card = stack;
+            }
+        });
+
+        return minimumVariation.stack_card;
+    }
 
 
 
