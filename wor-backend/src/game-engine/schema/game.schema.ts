@@ -29,6 +29,7 @@ export class Game {
   @Prop()
   public in_game_property: InGameProperty;
 
+
   constructor() {
     this.players = [];
     this.in_game_property = new InGameProperty();
@@ -65,7 +66,7 @@ export class Player {
   played_cards: Card[];
   in_player_game_property: InPlayerGameProperty | null;
 
-
+  gameResult: PlayerGameResult;
 
   constructor() {
     this.id = (Math.random() + 1).toString(36).substring(5);
@@ -73,7 +74,16 @@ export class Player {
     this.cards = [];
     this.in_player_game_property = new InPlayerGameProperty()
     this.played_cards = [];
+    this.gameResult = new PlayerGameResult();
   }
+}
+
+export class PlayerGameResult {
+
+  cattleHeads: number = 0;
+  ranking: number = 0;
+
+  constructor() {}
 }
 
 export class InPlayerGameProperty {

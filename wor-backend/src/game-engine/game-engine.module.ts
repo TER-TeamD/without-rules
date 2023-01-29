@@ -9,6 +9,7 @@ import { InitializeGameService } from './services/main-engine/initialize-game.se
 import { EngineUtilsService } from './services/main-engine/engine-utils.service';
 import { DuringRoundService } from './services/main-engine/during-round.service';
 import { RoundResultService } from './services/main-engine/round-result.service';
+import { GameResultService } from './services/main-engine/game-result.service';
 
 
 @Module({
@@ -16,7 +17,7 @@ import { RoundResultService } from './services/main-engine/round-result.service'
     MongooseModule.forFeature([{ name: Game.name, schema: GameSchema }]),
   ],
   controllers: [GameEngineController],
-  providers: [GameEngineService, WebsocketGateway, StartGameService, InitializeGameService, EngineUtilsService, DuringRoundService, RoundResultService],
+  providers: [GameEngineService, WebsocketGateway, StartGameService, InitializeGameService, EngineUtilsService, DuringRoundService, RoundResultService, GameResultService],
   exports: []
 })
 export class GameEngineModule {}
