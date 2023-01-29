@@ -5,7 +5,7 @@ import {
     Card,
     ChooseStackCardPlayerAction,
     Game,
-    GameDocument,
+    GameDocument, NextRoundPlayerAction,
     Player,
     PlayerFlipOrder,
     SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction,
@@ -82,34 +82,42 @@ export class RoundResultService {
          *    up all cards of a row of his choice. His card then becomes the first card of the new row.
          */
 
-        if (currentGame.in_game_property.between_round.current_player_action !== null
-            && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
-
-            const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action;
-
-            currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
-
-        }
-        const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
-
-        const currentIndexAction: number = currentGame.in_game_property.between_round.index_current_player_action_in_player_order;
-        const currentCard: Card = currentGame.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
-
-        if (bestStackCardForPuttingCurrentPlayerCard === null) {
-            // we are in the case 4 (rule 4 of the game)
-            currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+        if (currentGame.in_game_property.between_round.index_current_player_action_in_player_order === currentGame.in_game_property.between_round.playerOrder.length) {
+            // Nous avons fini le jeu
+            currentGame.in_game_property.between_round.current_player_action.action = new NextRoundPlayerAction();
 
         } else {
+            if (currentGame.in_game_property.between_round.current_player_action !== null
+                && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
 
-            // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
-            if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
-                // we are in the case 3
-                currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
-                currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+                // On reprend l'action actuel suite au choix d'un utilisateur de son tas
+                const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action;
+
+                currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
+                currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+
+            }
+            const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
+
+            if (bestStackCardForPuttingCurrentPlayerCard === null) {
+                // we are in the case 4 (rule 4 of the game)
+                currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+                // L'utilisateur doit aller donner le tas qu'il souhaite
+
             } else {
-                // We are in the case 1 and 2
-                currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
-                currentGame = this.__updateGameWhenCase1And2(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+
+                // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
+                if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
+                    // we are in the case 3
+                    currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
+                    currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+                    currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+                } else {
+                    // We are in the case 1 and 2
+                    currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
+                    currentGame = this.__updateGameWhenCase1And2(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+                    currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+                }
             }
         }
 

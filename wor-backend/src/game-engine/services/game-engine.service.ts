@@ -1,27 +1,22 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
-import { NewGameDto } from '../dto/new-game.dto';
+import { forwardRef, Inject, Injectable, Logger, OnModuleInit, } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-    Action, ActionTypeEnum,
-    Card,
-    Game,
-    GameDocument,
-    InGameProperty,
-    InPlayerGameProperty,
-    Player, Result, StackCard,
-} from '../schema/game.schema';
+import { ChooseStackCardPlayerAction, Game, GameDocument,  NextRoundPlayerAction,} from '../schema/game.schema';
 import { Model } from 'mongoose';
-import { StatusDto } from '../dto/status.dto';
 import { WebsocketGateway } from "./websocket.gateway";
-import { ConnexionStatusEnum } from "../schema/manager.enums";
-import { PlayedCardDto } from "../dto/played-card.dto";
-import {
-    sortCardDecreasingOrder,
-    sortCardIncreasingOrder,
-    sortPlayerByCardsIncreasingOrder,
-    sortResultByCattleHead,
-    sortStackCardsByHeadCardsIncreasingOrder
-} from "../utils/utils";
+import {DuringRoundService} from "./main-engine/during-round.service";
+import {GameResultService} from "./main-engine/game-result.service";
+import {InitializeGameService} from "./main-engine/initialize-game.service";
+import {RoundResultService} from "./main-engine/round-result.service";
+import {StartGameService} from "./main-engine/start-game.service";
+import {PlayerNotFoundException} from "./main-engine/exceptions/player-not-found.exception";
+import {GameNotFoundException} from "./main-engine/exceptions/game-not-found.exception";
+import {UserNotFoundWhenJoinGameException} from "./main-engine/exceptions/user-not-found-when-join-game.exception";
+import { NotEnoughPlayersForStartingGameException } from "./main-engine/exceptions/not-enough-players-for-starting-game.exception";
+import {PlayerAlreadyPlayedCardException} from "./main-engine/exceptions/player-already-played-card.exception";
+import {PlayerDontHaveCardException} from "./main-engine/exceptions/player-dont-have-card.exception";
+import {StackNotFoundException} from "./main-engine/exceptions/stack-not-found.exception";
+import {EngineUtilsService} from "./main-engine/engine-utils.service";
+import {MAX_ROUND_NUMBER} from "../config";
 
 
 @Injectable()
@@ -31,358 +26,174 @@ export class GameEngineService implements OnModuleInit {
 
     constructor(
         @InjectModel(Game.name) private gameModel: Model<GameDocument>,
-        @Inject(forwardRef(() => WebsocketGateway)) private readonly webSocketGateway: WebsocketGateway
+        @Inject(forwardRef(() => WebsocketGateway)) private readonly webSocketGateway: WebsocketGateway,
+        private readonly duringRoundService: DuringRoundService,
+        private readonly gameResultService: GameResultService,
+        private readonly initializeGameService: InitializeGameService,
+        private readonly roundResultService: RoundResultService,
+        private readonly startGameService: StartGameService,
     ) { }
 
     onModuleInit(): any { }
 
 
-    public async createNewGame(): Promise<void> {
-        await this.deleteGame();
-        const existingGames: Game[] = await this.gameModel.find({});
-
-        if (existingGames.length != 0) {
-            throw new HttpException(
-                'A game is existing, please delete game before',
-                HttpStatus.UNPROCESSABLE_ENTITY,
-            );
-        }
-
-        const game: Game = new Game();
-        game.players = [];
-        for (let i = 1; i <= 2; i++) {
-            const player: Player = new Player();
-            player.cards = [];
-            player.id = (Math.random() + 1).toString(36).substring(5);
-            player.is_logged = false;
-            player.in_player_game_property = new InPlayerGameProperty();
-            player.in_player_game_property.had_played_turn = false;
-            game.players.push(player);
-        }
-
-        const gameInDB: Game = await this.gameModel.create(game);
-
-        const newGameDto: NewGameDto = new NewGameDto();
-        newGameDto.id_game = gameInDB._id;
-        newGameDto.potential_players_id = gameInDB.players.map<string>((p) => p.id);
-
-        await this.webSocketGateway.sendInitializationInformationsToTable(newGameDto);
+    public async tableCreateNewGame(): Promise<void> {
+        const game: Game = await this.startGameService.generateNewGame();
+        await this.webSocketGateway.sendNewGameValueToTable(game, "CREATE_NEW_GAME");
     }
 
-    public async playerJoinGame(playerId: string) {
-        const games: Game[] = await this.gameModel.find({});
-        if (games == null || games.length === 0) {
-            await this.webSocketGateway.sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(ConnexionStatusEnum.ANY_GAME_FOUND, playerId);
-            this.logger.error("Any game found")
-            // throw new AnyGameFoundException();
-            return;
-        }
 
-        const game: Game = games[0];
+    public async playerJoinGame(player_id: string): Promise<void> {
 
-        let isPlayerFound: boolean = false;
-        game.players.forEach(p => {
-            if (p.id === playerId) {
-                isPlayerFound = true;
-                p.is_logged = true;
+        try {
+            const game: Game = await this.initializeGameService.playerJoinGame(player_id);
+
+            const indexPlayer: number = game.players.findIndex(p => p.id === player_id);
+            await this.webSocketGateway.sendPlayerInfosToPlayer(game.players[indexPlayer], "PLAYER_LOGGED_IN_GAME");
+
+        } catch (error) {
+            if (error instanceof GameNotFoundException) {
+                this.logger.error("Game not found")
             }
-        })
 
-        if (!isPlayerFound) {
-            await this.webSocketGateway.sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(ConnexionStatusEnum.USER_ID_DOES_NOT_EXIST, playerId);
-            // throw new AnyPlayerFoundException(playerId);
-            this.logger.error(`Any user found with the ID ${playerId}`)
-            return;
-        }
-
-        await this.gameModel.findOneAndUpdate({ _id: game._id }, { players: game.players });
-        await this.webSocketGateway.sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame(ConnexionStatusEnum.USER_IS_LOGGED, playerId);
-    }
-
-    private async deleteGame(): Promise<StatusDto> {
-        await this.gameModel.deleteMany({});
-        return new StatusDto();
-    }
-
-    public async startGame(): Promise<void> {
-        const games: Game[] = await this.gameModel.find({});
-
-        if (games.length === 0) {
-            throw new HttpException(`Any game found`, HttpStatus.NOT_FOUND);
-        }
-
-        const game: Game = games[0];
-
-        game.players = game.players.filter((p) => p.is_logged == true);
-
-        if (game.players.length < 2) {
-            throw new HttpException(
-                `You cannot start a game with less than 2 players`,
-                HttpStatus.UNPROCESSABLE_ENTITY,
-            );
-        }
-
-        const updatedGame: Game = await this.gameModel.findOneAndUpdate(
-            { _id: game._id },
-            { players: game.players },
-            { returnDocument: 'after' },
-        );
-
-        await this.initiateGameCards(updatedGame._id);
-
-        // return updatedGame;
-    }
-
-
-
-    private async initiateGameCards(idGame: string) {
-        const game: Game = await this.gameModel.findOne({ _id: idGame });
-
-        if (!game) {
-            throw new HttpException(`Any game found`, HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        game.in_game_property = new InGameProperty();
-        game.in_game_property.deck = [];
-        game.in_game_property.current_round = 1;
-
-        // We add 4 stackCards
-        for (let i = 0; i < 4; i++) {
-            game.in_game_property.stacks.push(
-                new StackCard(i, game.in_game_property.deck.pop()),
-            );
-        }
-
-        // We give 10 cards to each player
-        game.players.forEach((player) => {
-            for (let i = 0; i < 10; i++) {
-                player.cards.push(game.in_game_property.deck.pop());
+            if (error instanceof UserNotFoundWhenJoinGameException) {
+                this.logger.error("User not found when he tried to join game")
             }
-        });
-
-        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate(
-            { _id: game._id },
-            { in_game_property: game.in_game_property, players: game.players },
-            { returnDocument: 'after' },
-        );
-
-        for (const p of game.players) {
-            await this.webSocketGateway.giveCardsToPlayerAtTheBeginningOfGame(p.id, p.cards);
-        }
-
-        await this.webSocketGateway.giveCardsToTableAtTheBeginningOfGame(game.in_game_property.stacks);
-    }
-
-
-    public async playerPlayedACard(body: PlayedCardDto, idPlayer: string): Promise<StatusDto> {
-        const game: Game = await this.gameModel.findOne({ 'players.id': idPlayer });
-
-        if (!game) {
-            throw new HttpException(
-                `Any game found with this player`,
-                HttpStatus.NOT_ACCEPTABLE,
-            );
-        }
-
-        const index = game.players.findIndex((p) => p.id === idPlayer);
-        if (index < 0) {
-            throw new HttpException(
-                `Error during searching process`,
-                HttpStatus.UNPROCESSABLE_ENTITY,
-            );
-        }
-
-        const player: Player = game.players[index];
-
-        if (player.in_player_game_property.had_played_turn) {
-            throw new HttpException(
-                `played cannot played 2 times in the same turn`,
-                HttpStatus.NOT_ACCEPTABLE,
-            );
-        }
-
-        const cardIndex: number = player.cards.findIndex(
-            (c) => c.value == body.card_value,
-        );
-        if (cardIndex < 0) {
-            throw new HttpException(
-                `Any card with this value for this player`,
-                HttpStatus.NOT_ACCEPTABLE,
-            );
-        }
-
-        const cardPlayed: Card = player.cards[cardIndex];
-        player.in_player_game_property.played_card = cardPlayed;
-        player.in_player_game_property.had_played_turn = true;
-
-        const gameWithDeck: Game = await this.gameModel.findOneAndUpdate(
-            { _id: game._id },
-            { players: game.players },
-            { returnDocument: 'after' },
-        );
-        await this.webSocketGateway.sendToTableCardsPlayedByPlayers(player.id, cardPlayed);
-
-        await this.verifyEndTurn();
-
-        return new StatusDto();
-    }
-    //
-    public async verifyEndTurn() {
-        const games: Game[] = await this.gameModel.find({});
-
-        if (games.length === 0) {
-            throw new HttpException(`Any game found`, HttpStatus.NOT_FOUND);
-        }
-
-        const game: Game = games[0];
-
-        const playersWhoDidntPlayed: Player[] = game.players.filter(
-            (p) => p.in_player_game_property.had_played_turn == false,
-        );
-
-        if (playersWhoDidntPlayed.length === 0) {
-            await this.endTurn();
         }
     }
 
-    private async endTurn() {
-        console.log('end_turn');
+    public async tableStartGame(): Promise<void> {
 
-        const games: Game[] = await this.gameModel.find({});
+        try {
+            const game: Game = await this.initializeGameService.launchGame();
 
-        if (games.length === 0) {
-            throw new HttpException(`Any game found`, HttpStatus.NOT_FOUND);
+            await this.webSocketGateway.sendNewGameValueToTable(game, "START_GAME");
+            for (const p of game.players) {
+                await this.webSocketGateway.sendPlayerInfosToPlayer(p, "START_GAME");
+            }
+
+        } catch (error) {
+            if (error instanceof GameNotFoundException) {
+                this.logger.error("Game not found")
+            }
+
+            if (error instanceof NotEnoughPlayersForStartingGameException) {
+                this.logger.error("Not enough players for starting the game")
+            }
+        }
+    }
+
+    public async playerPlayedCard(player_id: string, card_value: number): Promise<void> {
+
+        try {
+
+            const game: Game = await this.duringRoundService.newPlayerPlayed(player_id, card_value);
+            await this.webSocketGateway.sendNewGameValueToTable(game, "NEW_PLAYER_PLAYED_CARD");
+
+            const indexPlayer: number = game.players.findIndex(p => p.id === player_id);
+            await this.webSocketGateway.sendPlayerInfosToPlayer(game.players[indexPlayer], "CARD_PLAYED");
+
+        } catch (error) {
+            if (error instanceof GameNotFoundException) {
+                this.logger.error("Game not found")
+            }
+
+            if (error instanceof PlayerNotFoundException) {
+                this.logger.error("Player is not found");
+            }
+            if (error instanceof PlayerAlreadyPlayedCardException) {
+                this.logger.error("Player already played a card");
+            }
+            if (error instanceof PlayerDontHaveCardException) {
+                this.logger.error("Played don't have the card he want to play");
+            }
         }
 
-        const game: Game = games[0];
+    }
 
-        // Send actions to do at the table
-        const playerOrderByIncreasingCardValue: Player[] =  sortPlayerByCardsIncreasingOrder(game.players);
-        const stackCardInDecreasingOrder: StackCard[] = sortStackCardsByHeadCardsIncreasingOrder(game.in_game_property.stacks);
+    public async tableAllPlayerPlayed(): Promise<void> {
+        try {
+            if (await this.duringRoundService.isRoundFinished()) {
+                const gameWithFlipCard: Game = await this.roundResultService.flipCardOrder();
 
-        const actions: Action[] = [];
+                await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, "FLIP_CARD_ORDER");
 
-        for (const player of playerOrderByIncreasingCardValue) {
-            console.log(player.id);
+                const game: Game = await this.roundResultService.generateNextAction();
+                await this.webSocketGateway.sendNewGameValueToTable(game, "NEW_RESULT_ACTION");
+            }
 
-            let lastCard: Card | null = null;
-            for (const stack of stackCardInDecreasingOrder) {
-                const playerHeadCardValue: number = player.in_player_game_property.played_card.value;
-                console.log('PlayedCardValue', playerHeadCardValue);
 
-                if (playerHeadCardValue < stack.stackHead.value && lastCard === null) {
-                    console.log('defosse');
-                    // We need to recreate a new stack and add the card to the defosse du player
-                    player.in_player_game_property.player_discard.push(
-                        ...stack.stackCards,
-                    );
-                    stack.stackHead = player.in_player_game_property.played_card;
-                    stack.stackCards = [stack.stackHead];
-                    player.cards = player.cards.filter(
-                        (c) => c.value !== player.in_player_game_property.played_card.value,
-                    );
-                    player.in_player_game_property.played_card = null;
-                    player.in_player_game_property.had_played_turn = false;
+        } catch (error) {
+            if (error instanceof GameNotFoundException) {
+                this.logger.error("Game not found")
+            }
+            if (error instanceof PlayerNotFoundException) {
+                this.logger.error("Player is not found");
+            }
+            if (error instanceof PlayerAlreadyPlayedCardException) {
+                this.logger.error("Player already played a card");
+            }
+            if (error instanceof PlayerDontHaveCardException) {
+                this.logger.error("Played don't have the card he want to play");
+            }
+            if (error instanceof StackNotFoundException) {
+                this.logger.error("Stack not found");
+            }
 
-                    actions.push(new Action(ActionTypeEnum.CLEAR_PUSH, player.id, stack));
-                    lastCard = stack.stackHead;
-                    break;
+        }
+    }
+
+    public async tableNextRoundResultAction(choosen_stack: number | null): Promise<void> {
+        try {
+
+            const currentGame: Game = await EngineUtilsService.getCurrentGame(this.gameModel)
+
+            if (choosen_stack != null
+                && currentGame.in_game_property.between_round.current_player_action != null
+                && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
+                currentGame.in_game_property.between_round.current_player_action.action.choosen_stack_card_by_player = choosen_stack;
+            }
+
+            const game: Game = await this.roundResultService.generateNextAction();
+            await this.webSocketGateway.sendNewGameValueToTable(game, "NEW_RESULT_ACTION");
+
+            if (currentGame.in_game_property.between_round.current_player_action != null
+                && currentGame.in_game_property.between_round.current_player_action.action instanceof NextRoundPlayerAction
+            ) {
+
+                if (currentGame.in_game_property.current_round === MAX_ROUND_NUMBER) {
+                    // Fin du jeu, envoie des resultats
+                    const endGame: Game = await this.gameResultService.getResults();
+                    await this.webSocketGateway.sendNewGameValueToTable(endGame, "END_GAME_RESULTS");
+                    for (const p of endGame.players) {
+                        await this.webSocketGateway.sendPlayerInfosToPlayer(p, "END_GAME_RESULTS");
+                    }
+
+                } else {
+                    const newRoundGame: Game = await this.duringRoundService.nextRound();
+                    await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, "NEW_ROUND");
+                    for (const p of newRoundGame.players) {
+                        await this.webSocketGateway.sendPlayerInfosToPlayer(p, "NEW_ROUND");
+                    }
                 }
-
-                // if (lastCard !== null && playerHeadCardValue > stack.stackHead.value) {
-                if (playerHeadCardValue > stack.stackHead.value) {
-                    // Player put his card here
-                    console.log('Cardd');
-                    stack.stackCards.push(player.in_player_game_property.played_card);
-                    stack.stackHead = player.in_player_game_property.played_card;
-                    player.cards = player.cards.filter(
-                        (c) => c.value !== player.in_player_game_property.played_card.value,
-                    );
-                    player.in_player_game_property.played_card = null;
-                    player.in_player_game_property.had_played_turn = false;
-
-                    actions.push(
-                        new Action(ActionTypeEnum.PUSH_ON_TOP, player.id, stack),
-                    );
-                    lastCard = stack.stackHead;
-                    break;
-                }
-
-                stack.stackCards = sortCardDecreasingOrder(stack.stackCards)
-                lastCard = stack.stackHead;
             }
+        } catch (error) {
+            if (error instanceof GameNotFoundException) {
+                this.logger.error("Game not found")
+            }
+            if (error instanceof PlayerNotFoundException) {
+                this.logger.error("Player is not found");
+            }
+            if (error instanceof PlayerAlreadyPlayedCardException) {
+                this.logger.error("Player already played a card");
+            }
+            if (error instanceof PlayerDontHaveCardException) {
+                this.logger.error("Played don't have the card he want to play");
+            }
+            if (error instanceof StackNotFoundException) {
+                this.logger.error("Stack not found");
+            }
+
         }
-
-
-
-        const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
-            { _id: game._id },
-            { players: game.players, in_game_property: game.in_game_property },
-            { returnDocument: 'after' },
-        );
-
-        await this.webSocketGateway.sendActionListToTable(actions);
-        await this.webSocketGateway.sendEndRoundDetailsToTable(gameUpdated.in_game_property.stacks)
-
-        for (const p of gameUpdated.players) {
-            const playerNumberDiscard: number = p.in_player_game_property.player_discard.reduce((a, b) => a + b.cattleHead, 0)
-            await this.webSocketGateway.sendEndRoundDetailsToPlayers(p.id, p.cards, playerNumberDiscard)
-        }
-
-
-        // Send results to players dans table or next round
-        if (gameUpdated.in_game_property.current_round >= 10) {
-            await this.endGame();
-        } else {
-            await this.launchNextRound(gameUpdated);
-        }
-    }
-
-    private async launchNextRound(game: Game): Promise<void> {
-        game.in_game_property.current_round =
-            game.in_game_property.current_round + 1;
-        const gameUpdated: Game = await this.gameModel.findOneAndUpdate(
-            { _id: game._id },
-            { in_game_property: game.in_game_property },
-            { returnDocument: 'after' },
-        );
-
-        await this.webSocketGateway.sendNextRoundToTable();
-        for (const p of gameUpdated.players) {
-            await this.webSocketGateway.sendNextRoundToPlayer(p.id);
-        }
-    }
-
-    private async endGame() {
-        const games: Game[] = await this.gameModel.find({});
-
-        if (games.length === 0) {
-            throw new HttpException(`Any game found`, HttpStatus.NOT_FOUND);
-        }
-
-        const game: Game = games[0];
-
-        const results: Result[] = [];
-
-        game.players.forEach((p) => {
-            const result: Result = new Result();
-            result.id_player = p.id;
-            result.cattle_heads = p.in_player_game_property.player_discard.reduce(
-                (a, b) => a + b.value,
-                0,
-            );
-            results.push(result);
-        });
-
-        const rankedResults: Result[] = sortResultByCattleHead(results);
-        for (let i = 0; i < rankedResults.length; i++) {
-            rankedResults[i].rank = i + 1;
-        }
-
-        await this.webSocketGateway.sendResultToTable(rankedResults);
-        for (const player of game.players) {
-            await this.webSocketGateway.sendResultToPlayer(rankedResults, player.id);
-        }
-        await this.gameModel.deleteMany({});
     }
 }
