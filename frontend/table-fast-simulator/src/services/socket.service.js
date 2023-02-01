@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { addMessage } from './messages.service';
 
 
 const socket = io('http://localhost:8451', {
@@ -22,16 +23,25 @@ const startGame = () => {
 }
 
 socket.on('connection_status_server', (message) => {
-    console.log(message);
+    console.log('connection_status_server', message);
 });
 
 socket.on('player_initialization', (message) => {
-    console.log(message)
+    console.log('player_initialization', message)
 });
 
 socket.on('table_cards_initialization', (message) => {
-    console.log(message)
+    console.log('table_cards_initialization', message)
 });
+
+socket.on('table_new_player', (message) => {
+    console.log("table_new_player", message)
+})
+
+socket.onAny((...args) => {
+    console.log("Socket message received", args)
+    addMessage({title: args[0], message: args[1]});
+})
 
 export const SocketService = {
     socket,

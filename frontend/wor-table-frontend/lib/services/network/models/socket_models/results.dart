@@ -1,22 +1,24 @@
-import 'package:worfrontend/services/network/socket_message.dart/socket_message.dart';
+import 'package:worfrontend/services/game_controller.dart';
 
+import '../../socket_message.dart';
 import 'result.dart';
-import 'message_types.dart';
 
-class Results extends TableSocketMessage {
-  @override
-  String topic;
-  @override
-  final String idGame;
+//2023-01-12T18:39:40.037 | Data received from RESULTS: {results: [{rank: 1, id_player: blf3109, cattle_heads: 275}, {rank: 2, id_player: nh888vg, cattle_heads: 319}]}
+
+class Results extends SocketMessage {
+
   final List<Result> results;
 
-  Results(this.topic, this.type, this.idGame, this.results);
-  Results.fromJson(this.topic, this.type, Map<String, dynamic> json)
-      : idGame = json["id_game"],
-        results = (json["results"] as List<dynamic>)
+
+  Results(this.results);
+
+  Results.fromJson(Map<String, dynamic> json)
+      : results = (json["results"] as List<dynamic>)
             .map((e) => Result.fromJson(e))
             .toList();
 
   @override
-  SocketMessageTypes type;
+  Future execute(SocketGameController game) async {
+    game.showResult(results);
+  }
 }

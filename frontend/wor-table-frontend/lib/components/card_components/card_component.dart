@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class CardComponent extends StatelessWidget {
   static const Offset size = Offset(100, 150);
 
-  final Card card;
+  final GameCard card;
+
   const CardComponent({super.key, required this.card});
 
   @override

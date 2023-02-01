@@ -3,7 +3,8 @@ enum SocketMessageTypes {
   cardPlayedByUser,
   newActions,
   results,
-  nextRound
+  nextRound,
+  playerJoined
 }
 
 SocketMessageTypes getSocketMessageType(String type) {
@@ -18,6 +19,8 @@ SocketMessageTypes getSocketMessageType(String type) {
       return SocketMessageTypes.results;
     case "NEXT_ROUND":
       return SocketMessageTypes.nextRound;
+    case "PLAYER_JOINED":
+      return SocketMessageTypes.playerJoined;
   }
   throw "Message type not found.";
 }

@@ -7,6 +7,7 @@ class Action {
   final StackCard stack;
 
   Action(this.type, this.playerId, this.stack);
+
   Action.fromJson(Map<String, dynamic> json)
       : type = getActionType(json["type"]),
         playerId = json["player_id"],
