@@ -105,7 +105,7 @@ $ npm run start:prod
 }
 ```
 
-### Player logged in game (player)
+### ⬇️ Player logged in game (player)
 #### Event name: "PLAYER_LOGGED_IN_GAME"
 #### Body
 ```ts
@@ -114,7 +114,7 @@ $ npm run start:prod
 }
 ```
 
-### Start game (table)
+### ⬇️ Start game (table)
 #### Event name: "START_GAME"
 #### Body
 ```ts
@@ -123,7 +123,7 @@ $ npm run start:prod
 }
 ```
 
-### Start game (player)
+### ⬇️ Start game (player)
 #### Event name: "START_GAME"
 #### Body
 ```ts
@@ -132,7 +132,7 @@ $ npm run start:prod
 }
 ```
 
-### Player played card (table)
+### ⬇️ Player played card (table)
 #### Event name: "NEW_PLAYER_PLAYED_CARD"
 #### Body
 ```ts
@@ -141,7 +141,7 @@ $ npm run start:prod
 }
 ```
 
-### Card played (player)
+### ⬇️ Card played (player)
 #### Event name: "CARD_PLAYED"
 #### Body
 ```ts
@@ -150,7 +150,7 @@ $ npm run start:prod
 }
 ```
 
-### Flip card (table)
+### ⬇️ Flip card (table)
 #### Event name: "FLIP_CARD_ORDER"
 #### Body
 ```ts
@@ -160,7 +160,7 @@ $ npm run start:prod
 ```
 
 
-### New action (table)
+### ⬇️ New action (table)
 #### Event name: "NEW_RESULT_ACTION"
 #### Body
 ```ts
@@ -169,7 +169,7 @@ $ npm run start:prod
 }
 ```
 
-### End game (table)
+### ⬇️ End game (table)
 #### Event name: "END_GAME_RESULTS"
 #### Body
 ```ts
@@ -178,7 +178,7 @@ $ npm run start:prod
 }
 ```
 
-### End game (player)
+### ⬇️ End game (player)
 #### Event name: "END_GAME_RESULTS"
 #### Body
 ```ts
@@ -187,7 +187,7 @@ $ npm run start:prod
 }
 ```
 
-### New round (table)
+### ⬇️ New round (table)
 #### Event name: "NEW_ROUND"
 #### Body
 ```ts
@@ -196,7 +196,7 @@ $ npm run start:prod
 }
 ```
 
-### New round (player)
+### ⬇️ New round (player)
 #### Event name: "NEW_ROUND"
 #### Body
 ```ts
