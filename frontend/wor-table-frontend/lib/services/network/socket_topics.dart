@@ -1,57 +1,65 @@
-const String newPlayerTopic = "table_new_player";
-const String initialiseGameTopic = "table_cards_initialization";
-const String gameInitialisationTopic = "player_initialization";
-const String cardPlayedTopic = "CARD_PLAYED_BY_USER";
-const String newActionsTopic = "NEW_ACTIONS";
-const String nextRoundTopic = "NEXT_ROUND";
-const String resultsTopic = "RESULTS";
+const String createNewGame = "CREATE_NEW_GAME";
+const String playerJoin = "TABLE_PLAYER_JOIN";
+const String startGame = "START_GAME";
+const String playerPlayedCard = "NEW_PLAYER_PLAYED_CARD";
+const String flipCard = "FLIP_CARD_ORDER";
+const String newAction = "NEW_RESULT_ACTION";
+const String endGame = "END_GAME_RESULTS";
+const String nextRound = "NEW_ROUND";
 
 enum SocketTopics {
-  newPlayerTopic,
-  initiateGameTopic,
-  gameInitialisationTopic,
-  cardPlayedTopic,
-  newActionsTopic,
-  nextRoundTopic,
-  resultsTopic,
+  createNewGame,
+  playerJoin,
+  startGame,
+  playerPlayedCard,
+  flipCard,
+  newAction,
+  endGame,
+  nextRound,
 }
 
 SocketTopics socketTopicsFromString(String socketTopic) {
   switch (socketTopic) {
-    case newPlayerTopic:
-      return SocketTopics.newPlayerTopic;
-    case initialiseGameTopic:
-      return SocketTopics.initiateGameTopic;
-    case cardPlayedTopic:
-      return SocketTopics.cardPlayedTopic;
-    case newActionsTopic:
-      return SocketTopics.newActionsTopic;
-    case nextRoundTopic:
-      return SocketTopics.nextRoundTopic;
-    case resultsTopic:
-      return SocketTopics.resultsTopic;
+    case createNewGame:
+      return SocketTopics.createNewGame;
+    case playerJoin:
+      return SocketTopics.playerJoin;
+    case startGame:
+      return SocketTopics.startGame;
+    case playerPlayedCard:
+      return SocketTopics.playerPlayedCard;
+    case flipCard:
+      return SocketTopics.flipCard;
+    case newAction:
+      return SocketTopics.newAction;
+    case endGame:
+      return SocketTopics.endGame;
+    case nextRound:
+      return SocketTopics.nextRound;
     default:
-      throw Exception("Unknown topic: $socketTopic");
+      throw Exception("Unknown socket topic: $socketTopic");
   }
 }
 
 String socketTopicsToString(SocketTopics socketTopic) {
   switch (socketTopic) {
-    case SocketTopics.newPlayerTopic:
-      return newPlayerTopic;
-    case SocketTopics.initiateGameTopic:
-      return initialiseGameTopic;
-    case SocketTopics.gameInitialisationTopic:
-      return gameInitialisationTopic;
-    case SocketTopics.cardPlayedTopic:
-      return cardPlayedTopic;
-    case SocketTopics.newActionsTopic:
-      return newActionsTopic;
-    case SocketTopics.nextRoundTopic:
-      return nextRoundTopic;
-    case SocketTopics.resultsTopic:
-      return resultsTopic;
+    case SocketTopics.createNewGame:
+      return createNewGame;
+    case SocketTopics.playerJoin:
+      return playerJoin;
+    case SocketTopics.startGame:
+      return startGame;
+    case SocketTopics.playerPlayedCard:
+      return playerPlayedCard;
+    case SocketTopics.flipCard:
+      return flipCard;
+    case SocketTopics.newAction:
+      return newAction;
+    case SocketTopics.endGame:
+      return endGame;
+    case SocketTopics.nextRound:
+      return nextRound;
     default:
-      throw Exception("Unknown topic: $socketTopic");
+      throw Exception("Unknown socket topic: $socketTopic");
   }
 }

@@ -105,6 +105,14 @@ $ npm run start:prod
 }
 ```
 
+### ⬇️ Player joined the game (table)
+#### Event name: "TABLE_PLAYER_JOIN"
+#### Body
+```ts
+{}
+```
+
+
 ### ⬇️ Player logged in game (player)
 #### Event name: "PLAYER_LOGGED_IN_GAME"
 #### Body

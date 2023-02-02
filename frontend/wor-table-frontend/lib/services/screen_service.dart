@@ -13,7 +13,6 @@ class StackPosition {
 
 class ScreenService {
   Size? _screenSize;
-  List<StackPosition> stacks = [];
 
   void setScreenSize(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
@@ -36,17 +35,9 @@ class ScreenService {
         .toList(growable: false);
   }
 
-  void setStackPositions(List<StackViewInstance> stacks) {
-    this.stacks = stacks.map((stack) {
-      var context = stack.key.currentContext;
-      if(context == null) throw "The context of the stack is null.";
-      var box = context.findRenderObject() as RenderBox;
-
-      return StackPosition(box.localToGlobal(Offset.zero), stack.stack.stackNumber);
-    }).toList(growable: false);
-  }
-
-  Offset getStackPosition(int stack) {
-    return stacks.firstWhere((element) => element.number == stack, orElse: () => throw "Stack not found.").position;
+  Map<String, DeckTransform> getMapPosition(List<String> ids) {
+    if(ids.length > 10) throw "The list of ids is too long (max length: 10).";
+    var positions = getPositions();
+    return Map.fromEntries(Iterable.generate(ids.length).map((i) => MapEntry(ids[i], positions[i])));
   }
 }

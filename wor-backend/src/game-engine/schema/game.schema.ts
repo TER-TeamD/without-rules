@@ -8,8 +8,6 @@ export class InGameProperty {
   stacks: StackCard[] = [];
   current_round = 0;
   between_round: BetweenRound | null = null;
-
-
 }
 
 export type GameDocument = Game & Document;

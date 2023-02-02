@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:worfrontend/services/network/models/socket_models/results.dart';
+import 'package:worfrontend/services/network/models/socket_models/result.dart';
 
 class ResultPage extends StatelessWidget {
-  final Results results;
+  final List<Result> results;
 
   const ResultPage({Key? key, required this.results}) : super(key: key);
 
@@ -23,8 +23,8 @@ class ResultPage extends StatelessWidget {
   }
 
   List<String> getRanking() {
-    results.results.sort((a, b) => a.rank.compareTo(b.rank));
-    return results.results.map((e) => "${e.rank} - ${e.idPlayer} (${e.cattleHeads})").toList();
+    results.sort((a, b) => a.rank.compareTo(b.rank));
+    return results.map((e) => "${e.rank} - ${e.idPlayer} (${e.cattleHeads})").toList();
   }
 
   @override

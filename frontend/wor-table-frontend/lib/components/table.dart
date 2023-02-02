@@ -4,6 +4,7 @@ import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/round_animations/push_on_top.dart';
 import 'package:worfrontend/components/stacks.dart';
 import 'package:worfrontend/models/animations.dart';
+import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
@@ -11,45 +12,41 @@ import 'package:worfrontend/services/screen_service.dart';
 import '../services/error_manager.dart';
 
 class TableComponent extends StatefulWidget {
-  final TableGameController game;
+  final TableGameController controller;
 
-  const TableComponent({Key? key, required this.game}) : super(key: key);
+  const TableComponent({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<TableComponent> createState() => _TableComponentState();
 }
 
 class _TableComponentState extends State<TableComponent> {
-  late List<PositionedPlayerDeckState> decks;
+  late Map<String, PositionedPlayerDeckState> decks;
   late List<StackViewInstance> stacks;
-  late GameStates state;
-
-  Widget? currentAnimation;
-
-  Widget? buildPlayable(GameAnimation animation) {
-    Logger.log("Playing animation");
-    if (animation is PushOnTopAnimationData) {
-
-      Logger.log("Push on top animation");
-
-      var departureDeck = widget.game.getPlayerDeckState(animation.playerId);
-      var departure = departureDeck.transform;
-
-      return PushOnTop(
-          destination: stacks.firstWhere((element) => element.stack.stackNumber == animation.stack.stackNumber).key,
-          departure: departure,
-          card: animation.card,
-          onComplete: () => widget.game.animationComplete(animation));
-    }
-    return null;
-  }
+  bool isGameStarted = false;
+  PlayerActionPlayer? playerActionPlayer;
 
   @override
   void initState() {
     super.initState();
-    decks = widget.game.decks;
-    stacks = widget.game.stacks.map((e) => StackViewInstance(e)).toList();
-    state = widget.game.state;
+    decks = widget.controller.getDecks();
+    stacks = widget.controller
+        .getStacks()
+        .map((e) => StackViewInstance(e))
+        .toList(growable: false);
+    isGameStarted = widget.controller.isGameStarted();
+
+    widget.controller.gameChanged$.listen((value) {
+      setState(() {
+        decks = widget.controller.getDecks();
+        stacks = widget.controller
+            .getStacks()
+            .map((e) => StackViewInstance(e))
+            .toList(growable: false);
+        isGameStarted = widget.controller.isGameStarted();
+        playerActionPlayer = widget.controller.getCurrentPlayerActionPlayer();
+      });
+    });
 
     GetIt.I.get<ErrorManager>().onError.listen((event) {
       Logger.log("Error: $event");
@@ -58,36 +55,14 @@ class _TableComponentState extends State<TableComponent> {
           builder: (context) =>
               AlertDialog(content: Text(event.screenMessage())));
     });
-
-    widget.game.decks$.listen((value) => setState(() {
-          Logger.log("Decks changed (count: ${value.length})");
-          decks = value;
-        }));
-    widget.game.stacks$.listen((value) => setState(() {
-      stacks = value.map((e) => StackViewInstance(e)).toList();
-    }));
-    widget.game.state$.listen((value) => setState(() {
-          state = value;
-        }));
-    widget.game.currentAnimation$.listen((value) {
-      if (value == null) {
-        setState(() {
-          currentAnimation = null;
-        });
-      } else {
-        setState(() {
-          currentAnimation = buildPlayable(value);
-        });
-      }
-    });
   }
-
 
   bool alreadyCalled = false;
 
   Widget logDecks(BuildContext context) {
     return Column(
-      children: decks
+      children: decks.entries
+          .map((e) => e.value)
           .map((e) =>
               Text(e.playerId, style: const TextStyle(color: Colors.white)))
           .toList(),
@@ -95,24 +70,16 @@ class _TableComponentState extends State<TableComponent> {
   }
 
   Widget startButton() {
-    if (state == GameStates.waitPlayers) {
+    if (!isGameStarted) {
       return Center(
         child: ElevatedButton(
-          onPressed: () => widget.game.startGame(),
+          onPressed: () => widget.controller.startGame(),
           child: const Text("Start game"),
         ),
       );
     } else {
       return const SizedBox.shrink();
     }
-  }
-
-  Widget drawAnimation() {
-    if (currentAnimation == null) {
-      Logger.log("No animation");
-      return Container();
-    }
-    return currentAnimation!;
   }
 
   @override
@@ -123,10 +90,16 @@ class _TableComponentState extends State<TableComponent> {
       color: Colors.black,
       child: Stack(children: [
         logDecks(context),
-        Decks(states: decks),
+        Decks(
+            states: decks.entries.map((e) => e.value).toList(growable: false)),
         StacksComponent(stacks: stacks),
         startButton(),
-        drawAnimation(),
+        ...(playerActionPlayer?.buildWidget(
+                context,
+                SceneData(
+                    stacks,
+                    Map.fromEntries(decks.entries
+                        .map((e) => MapEntry(e.key, e.value.transform))))) ?? [])
       ]),
     );
 

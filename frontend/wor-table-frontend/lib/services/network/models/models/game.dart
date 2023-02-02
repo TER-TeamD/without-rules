@@ -1,4 +1,4 @@
-import 'package:worfrontend/services/network/models/http_dtos/player.dart';
+import 'package:worfrontend/services/network/models/models/player.dart';
 
 import 'in_game_property.dart';
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
+import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 
 class DeckNoPlayer extends PlayerDeckState {
   final String id;
@@ -32,7 +33,7 @@ class _AddPlayerWizardState extends State<AddPlayerWizard> {
   @override
   Widget build(BuildContext context) {
     if (opened) {
-      return Text(widget.id, style: const TextStyle(color: Colors.white));
+      return DeckWaitPlayer(widget.id).build(context);
     } else {
       return ElevatedButton(
           onPressed: () => setState(() {
