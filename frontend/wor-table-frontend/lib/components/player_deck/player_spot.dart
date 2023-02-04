@@ -38,9 +38,13 @@ class _PlayerSpotState extends State<PlayerSpot> {
 
   Widget content() {
     return Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        decoration: BoxDecoration(
           color: Color.fromRGBO(153, 153, 153, 1.0),
+          border: Border.all(
+            color: Color.fromRGBO(59, 59, 59, 1.0),
+            width: 4.0,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
         child: SizedBox(
             width: CardComponent.size.dx,

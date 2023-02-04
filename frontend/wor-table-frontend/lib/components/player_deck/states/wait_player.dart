@@ -15,8 +15,18 @@ class DeckWaitPlayer extends PlayerDeckState {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text("ID"),
-            Text(id)
+            const Text(
+                "Identifiant",
+              style: const TextStyle(
+                fontSize: 10.0
+              ),
+            ),
+            Text(
+              id,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold
+              ),
+            )
           ],
         )
       );

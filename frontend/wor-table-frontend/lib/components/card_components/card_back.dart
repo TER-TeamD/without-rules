@@ -10,7 +10,7 @@ class CardBack extends StatelessWidget {
       child: const SizedBox(
         child: Icon(
           CupertinoIcons.check_mark_circled_solid,
-          color: Color.fromRGBO(51, 171, 85, 1.0),
+          color: Color.fromRGBO(204, 255, 205, 1.0),
           size: 60.0,
         ),
       )
