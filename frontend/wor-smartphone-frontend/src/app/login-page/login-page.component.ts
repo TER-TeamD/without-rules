@@ -1,32 +1,39 @@
-import { Component } from '@angular/core';
-import { GameService } from '../services/game.service';
-import { Router } from '@angular/router';
-import { WebsocketService } from "../services/websocket.service";
-import { AuthService } from "../services/auth.service";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {GameService} from '../services/game.service';
+import {Router} from '@angular/router';
+import {LastMessageEnum} from "../model/last-message.enum";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
-export class LoginPageComponent {
+export class LoginPageComponent implements OnInit, OnDestroy{
 
   public playerId: string = "";
+  private lastMessageSubscription: Subscription | null = null;
 
-  constructor(private gameService: GameService, private router: Router) { }
+  constructor(
+    private gameService: GameService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
+   this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(lastMessage => {
+     if (lastMessage === LastMessageEnum.PLAYER_LOGGED_IN_GAME) {
+       console.log("Player joined game")
+     }
+   })
   }
 
-  public login() {
+  public async login() {
     if (this.playerId.length > 0) {
-      this.gameService.joinGame(this.playerId);
-      this.gameService.isConnected().subscribe(isConnected => {
-        if (isConnected) {
-          this.router.navigate(['/cards/' + this.playerId]);
-        }
-      });
-
+      await this.gameService.joinGame(this.playerId);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.lastMessageSubscription?.unsubscribe();
   }
 }
