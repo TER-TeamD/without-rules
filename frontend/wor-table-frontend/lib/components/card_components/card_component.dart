@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:worfrontend/services/network/models/card.dart';
 
 class CardComponent extends StatelessWidget {
-  static const Offset size = Offset(100, 150);
+  static const Offset size = Offset(100, 170);
 
   final GameCard card;
 

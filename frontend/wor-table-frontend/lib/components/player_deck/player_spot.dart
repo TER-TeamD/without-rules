@@ -38,11 +38,18 @@ class _PlayerSpotState extends State<PlayerSpot> {
 
   Widget content() {
     return Container(
-        color: Colors.grey,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          color: Color.fromRGBO(153, 153, 153, 1.0),
+        ),
         child: SizedBox(
             width: CardComponent.size.dx,
             height: CardComponent.size.dy,
-            child: Center(child: widget.child)));
+            child: Center(
+                child: widget.child
+            )
+        )
+    );
   }
 
   Widget rotationHandler() {

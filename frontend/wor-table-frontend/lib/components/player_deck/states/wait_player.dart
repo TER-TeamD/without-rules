@@ -10,28 +10,15 @@ class DeckWaitPlayer extends PlayerDeckState {
 
   @override
   build(BuildContext context) {
-    return SizedBox(
-      width: 200,
-      height: 110,
-      child: Container(
-        decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 161, 161, 161),
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: Row(
+    return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              children: [
-                QrImage(
-                  data: id,
-                  size: 90,
-                ),
-                Text("Id: $id")
-              ],
-            )
+            const Text("ID"),
+            Text(id)
           ],
-        ),
-      ),
-    );
+        )
+      );
   }
 }

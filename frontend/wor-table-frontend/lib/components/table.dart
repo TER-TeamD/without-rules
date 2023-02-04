@@ -103,8 +103,7 @@ class _TableComponentState extends State<TableComponent> {
 
       child: Stack(children: [
         logDecks(context),
-        Decks(
-            states: decks.entries.map((e) => e.value).toList(growable: false)),
+        Decks(states: decks.entries.map((e) => e.value).toList(growable: false)),
         StacksComponent(stacks: stacks),
         startButton(),
         ...(playerActionPlayer?.buildWidget(

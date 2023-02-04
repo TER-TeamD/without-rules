@@ -24,7 +24,12 @@ class RotationHandler extends StatelessWidget {
       child: const SizedBox(
         width: 20,
         height: 20,
-        child: Icon(Icons.rotate_left, size: 20, color: Colors.white),
+        child: Icon(
+            Icons.rotate_left,
+            size: 20,
+
+            color: Color.fromRGBO(26, 26, 26, 1.0)
+        ),
       ),
     );
   }
