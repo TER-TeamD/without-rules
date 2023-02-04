@@ -9,7 +9,7 @@ import {Card} from "../../model/player.model";
 export class CardComponent {
 
   @Input()
-  public card?: Card;
+  public card?: Card | null;
 
   public cattleHeadsLine1: string = "";
   public cattleHeadsLine2: string = "";

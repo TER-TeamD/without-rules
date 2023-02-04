@@ -20,9 +20,10 @@ export class LoginPageComponent implements OnInit, OnDestroy{
   ) {}
 
   ngOnInit(): void {
-   this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(lastMessage => {
+   this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
      if (lastMessage === LastMessageEnum.PLAYER_LOGGED_IN_GAME) {
        console.log("Player joined game")
+       await this.router.navigate(['/cards/' + this.playerId]);
      }
    })
   }

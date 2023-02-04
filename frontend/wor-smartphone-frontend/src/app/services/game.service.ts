@@ -18,9 +18,23 @@ export class GameService {
 
   constructor(private webSocketService: WebsocketService) {
     this.webSocketService.playerLoggedInGame$.subscribe(p => {
-      console.log("wesh")
       this.updatePlayer(p);
       this.updateLastMessage(LastMessageEnum.PLAYER_LOGGED_IN_GAME);
+    });
+
+    this.webSocketService.startGame$.subscribe(p => {
+      this.updatePlayer(p);
+      this.updateLastMessage(LastMessageEnum.START_GAME);
+    });
+
+    this.webSocketService.cardPlayed$.subscribe(p => {
+      this.updatePlayer(p);
+      this.updateLastMessage(LastMessageEnum.CARD_PLAYED);
+    });
+
+    this.webSocketService.endGameResult$.subscribe(p => {
+      this.updatePlayer(p);
+      this.updateLastMessage(LastMessageEnum.END_GAME_RESULTS);
     });
   }
 
@@ -29,6 +43,11 @@ export class GameService {
   public async joinGame(playerId: string): Promise<void> {
     await this.webSocketService.joinGame(playerId);
   }
+
+  public async playerPlayedCard(playerId: string, cardValue: number): Promise<void> {
+    await this.webSocketService.playerPlayedCard(playerId, cardValue)
+  }
+
 
 
   private updatePlayer(player: Player | null): void {

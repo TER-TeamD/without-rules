@@ -68,7 +68,6 @@ export class GameEngineService implements OnModuleInit {
         'PLAYER_LOGGED_IN_GAME',
       );
 
-      console.log('Player joined game: ', game);
       await this.webSocketGateway.sendNewGameValueToTable(
         game,
         'TABLE_PLAYER_JOIN',
