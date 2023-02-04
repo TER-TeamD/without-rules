@@ -29,6 +29,8 @@ class _TableLoaderState extends State<TableLoader> {
   Widget build(BuildContext context) {
     return ScreenInitializer(child: controllers == null
         ? const Center(child: CircularProgressIndicator())
-        : TableComponent(controller: controllers!.tableGameController));
+        : TableComponent(controller: controllers!.tableGameController),
+      
+    );
   }
 }

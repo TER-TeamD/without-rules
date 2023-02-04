@@ -73,6 +73,11 @@ class _TableComponentState extends State<TableComponent> {
     if (!isGameStarted) {
       return Center(
         child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.all(50.0),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            backgroundColor: Colors.green
+          ),
           onPressed: () => widget.controller.startGame(),
           child: const Text("Start game"),
         ),
@@ -87,7 +92,15 @@ class _TableComponentState extends State<TableComponent> {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
     var result = Container(
-      color: Colors.black,
+
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color.fromRGBO(253, 251, 251, 1), Color.fromRGBO(235, 237, 238, 1)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+
       child: Stack(children: [
         logDecks(context),
         Decks(
