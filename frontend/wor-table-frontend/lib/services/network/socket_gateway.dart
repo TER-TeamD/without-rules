@@ -35,7 +35,7 @@ class SocketGateway {
       if(topic == "disconnect") return;
       if(data != null && topic != socketTopicsToString(SocketTopics.createNewGame) && data is Map<String, dynamic> && data['game'] != null) {
         var game = _decodeJson(data);
-        onMessage.add(GameUpdate(game));
+        onMessage.add(GameUpdate(game, topic));
       }
     });
 
@@ -80,7 +80,17 @@ class SocketGateway {
 
   void nextRoundResultAction() {
     var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
+    emit(event, {
+      'choosen_stack': null
+    });
   }
+  void nextRoundResultActionChoosingStack(int stackNumber) {
+    var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
+    emit(event, {
+      'choosen_stack': stackNumber
+    });
+  }
+
 
 
 
@@ -88,4 +98,5 @@ class SocketGateway {
     Logger.log("Emitting $topic: $data");
     socket.emit(topic, data);
   }
+
 }

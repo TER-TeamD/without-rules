@@ -21,7 +21,7 @@ class TableComponent extends StatefulWidget {
 }
 
 class _TableComponentState extends State<TableComponent> {
-  late Map<String, PositionedPlayerDeckState> decks;
+  Map<String, PositionedPlayerDeckState> decks = {};
   late List<StackViewInstance> stacks;
   bool isGameStarted = false;
   PlayerActionPlayer? playerActionPlayer;
@@ -29,16 +29,15 @@ class _TableComponentState extends State<TableComponent> {
   @override
   void initState() {
     super.initState();
-    decks = widget.controller.getDecks();
     stacks = widget.controller
         .getStacks()
         .map((e) => StackViewInstance(e))
         .toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
-    widget.controller.gameChanged$.listen((value) {
+    widget.controller.gameChanged$.listen((game) {
       setState(() {
-        decks = widget.controller.getDecks();
+        decks = getDecks(game, widget.controller.getDeckTransforms());
         stacks = widget.controller
             .getStacks()
             .map((e) => StackViewInstance(e))
@@ -74,10 +73,9 @@ class _TableComponentState extends State<TableComponent> {
       return Center(
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(50.0),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            backgroundColor: Colors.green
-          ),
+              padding: const EdgeInsets.all(50.0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              backgroundColor: Colors.green),
           onPressed: () => widget.controller.startGame(),
           child: const Text("Start game"),
         ),
@@ -92,18 +90,20 @@ class _TableComponentState extends State<TableComponent> {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
     var result = Container(
-
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color.fromRGBO(253, 251, 251, 1), Color.fromRGBO(235, 237, 238, 1)],
+          colors: [
+            Color.fromRGBO(253, 251, 251, 1),
+            Color.fromRGBO(235, 237, 238, 1)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-
       child: Stack(children: [
         logDecks(context),
-        Decks(states: decks.entries.map((e) => e.value).toList(growable: false)),
+        Decks(
+            states: decks.entries.map((e) => e.value).toList(growable: false)),
         StacksComponent(stacks: stacks),
         startButton(),
         ...(playerActionPlayer?.buildWidget(
@@ -111,7 +111,8 @@ class _TableComponentState extends State<TableComponent> {
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform))))) ?? [])
+                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
+            [])
       ]),
     );
 

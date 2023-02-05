@@ -10,11 +10,12 @@ abstract class SocketMessage {
 
 class GameUpdate extends SocketMessage {
   final Game receivedGame;
+  final String topic;
 
-  GameUpdate(this.receivedGame);
+  GameUpdate(this.receivedGame, this.topic);
 
   @override
   void execute(SocketGameController controller) {
-    controller.gameChanged(receivedGame);
+    controller.gameChanged(receivedGame, topic);
   }
 }
