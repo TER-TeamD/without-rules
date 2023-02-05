@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'dart:math' as math;
 import 'package:worfrontend/services/network/models/card.dart';
 
 class CardComponent extends StatelessWidget {
@@ -19,13 +20,39 @@ class CardComponent extends StatelessWidget {
           height: size.dy,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text(card.value.toString()),
-                Text(card.value.toString())
-              ])
-            ]),
-          )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(card.value.toString()),
+                        Text(card.value.toString())
+                      ]
+                  ),
+
+                  Text(
+                    "🐮" * card.cattleHead,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Transform.rotate(
+                          angle: math.pi,
+                          child: Text(card.value.toString()),
+                        ),
+                        Transform.rotate(
+                          angle: math.pi,
+                          child: Text(card.value.toString()),
+                        )
+                      ]
+                  )
+                ]
+            ),
+          )
+      ),
     );
   }
 }

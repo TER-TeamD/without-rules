@@ -5,6 +5,8 @@ import 'package:worfrontend/components/card_components/card_component.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/player_deck/rotation_handler.dart';
 
+import '../../constants.dart';
+
 class PlayerSpot extends StatefulWidget {
   final Widget child;
   final Offset position;
@@ -39,9 +41,9 @@ class _PlayerSpotState extends State<PlayerSpot> {
   Widget content() {
     return Container(
         decoration: BoxDecoration(
-          color: Color.fromRGBO(153, 153, 153, 1.0),
+          color: CARD_BACKGROUND_COLOR,
           border: Border.all(
-            color: Color.fromRGBO(59, 59, 59, 1.0),
+            color: CARD_BORDER_COLOR,
             width: 4.0,
           ),
           borderRadius: BorderRadius.all(Radius.circular(5.0)),

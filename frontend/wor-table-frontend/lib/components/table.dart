@@ -9,6 +9,7 @@ import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
+import '../constants.dart';
 import '../services/error_manager.dart';
 
 class TableComponent extends StatefulWidget {
@@ -95,7 +96,7 @@ class _TableComponentState extends State<TableComponent> {
 
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color.fromRGBO(253, 251, 251, 1), Color.fromRGBO(235, 237, 238, 1)],
+          colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
