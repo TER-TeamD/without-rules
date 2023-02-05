@@ -234,20 +234,30 @@ export class GameEngineService implements OnModuleInit {
         }
       }
     } catch (error) {
+      let raised = false;
       if (error instanceof GameNotFoundException) {
         this.logger.error('Game not found');
+        raised = true;
       }
       if (error instanceof PlayerNotFoundException) {
         this.logger.error('Player is not found');
+        raised = true;
       }
       if (error instanceof PlayerAlreadyPlayedCardException) {
         this.logger.error('Player already played a card');
+        raised = true;
       }
       if (error instanceof PlayerDontHaveCardException) {
         this.logger.error("Played don't have the card he want to play");
+        raised = true;
       }
       if (error instanceof StackNotFoundException) {
         this.logger.error('Stack not found');
+        raised = true;
+      }
+
+      if(!raised) {
+        this.logger.error("Unexpected error: ", error);
       }
     }
   }
