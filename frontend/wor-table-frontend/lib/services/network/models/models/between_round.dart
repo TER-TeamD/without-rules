@@ -13,7 +13,7 @@ class BetweenRound {
           ? null
           : BetweenRoundPlayerAction.fromJson(json['current_player_action']),
       indexCurrentPlayerActionInPlayerOrder = json['index_current_player_action_in_player_order'],
-      playerOrder = (json['playerOrder'] as List<Map<String, dynamic>>)
+      playerOrder = (json['playerOrder'] as List<dynamic>)
           .map((e) => PlayerFlipOrder.fromJson(e)).toList(growable: false);
 }
 

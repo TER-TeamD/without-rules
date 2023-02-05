@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
@@ -9,7 +7,9 @@ import 'package:worfrontend/components/player_deck/states/played.dart';
 import 'package:worfrontend/components/player_deck/states/playing.dart';
 import 'package:worfrontend/components/player_deck/states/wait_other_players.dart';
 import 'package:worfrontend/components/player_deck/states/wait_player.dart';
+import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
+import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/models/between_round.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
@@ -17,6 +17,7 @@ import 'package:worfrontend/services/network/models/stack_card.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
+import 'logger.dart';
 import 'network/models/card.dart';
 
 enum GameStates {
@@ -54,6 +55,7 @@ class _State {
   Map<String, PositionedPlayerDeckState> getDecks() {
     var gameStarted = (game$.value.inGameProperty?.currentRound ?? 0) > 0;
     var betweenRound = game$.value.inGameProperty?.betweenRound;
+    var playerOrder = betweenRound?.playerOrder;
 
     return Map.fromEntries(game$.value.players.map((p) {
       if (!p.isLogged && !gameStarted) {
@@ -69,13 +71,25 @@ class _State {
       }
 
       if (betweenRound != null) {
-        var playerOrder = betweenRound.playerOrder
+
+        if(!betweenRound.playerOrder.map((e) => e.player.id).contains(p.id)) {
+          GetIt.I.get<ErrorManager>().throwError(UnexpectedError("Player could not be found ni PlayerFlipOrder"));
+          throw "Player could not be found in PlayerFlipOrder";
+        }
+
+        /* var playerOrder = betweenRound.playerOrder
             .singleWhere((element) => element.player.id == p.id,
                 orElse: () =>
                     throw "Player could not be found in PlayerFlipOrder")
-            .order;
+            .order; */
+        var playerOrder = betweenRound.playerOrder.where((e) => e.player.id == p.id);
+        if(playerOrder.isEmpty) {
+          var error = UnexpectedError("No matching player in player order.");
+          GetIt.I.get<ErrorManager>().throwError(error);
+          throw error.screenMessage();
+        }
 
-        if (betweenRound.indexCurrentPlayerActionInPlayerOrder >= playerOrder) {
+        if (true /* betweenRound.indexCurrentPlayerActionInPlayerOrder >= playerOrder */) {
           return MapEntry(p.id, DeckPlayed(p.playedCards.last));
         } else {
           return MapEntry(p.id, DeckWaitOtherPlayers());
@@ -98,6 +112,8 @@ class _State {
 
 class SocketGameController {
   final _State _state;
+  int playingRound = 0;
+  bool allPlayerPlayedForRound = false;
 
   SocketGameController(this._state);
 
@@ -108,6 +124,21 @@ class SocketGameController {
       _state.currentPlayerActionPlayer =
           PlayerActionPlayer(action.player, action.action);
     }
+
+    if((game.inGameProperty?.currentRound ?? 0) > playingRound) {
+      playingRound = (game.inGameProperty?.currentRound ?? 0);
+      allPlayerPlayedForRound = false;
+    }
+
+    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
+    Logger.log("Everyone had played: $everyoneHadPlayed");
+    if(everyoneHadPlayed && !allPlayerPlayedForRound) {
+      GetIt.I.get<SocketGateway>().allPlayerPlayed();
+      allPlayerPlayedForRound = true;
+    }
+
+
+
     _state.game$.add(game);
   }
 }

@@ -32,7 +32,7 @@ class SocketGateway {
     });
     socket.onAny((String topic, data) {
       Logger.log("Data received from $topic: $data");
-
+      if(topic == "disconnect") return;
       if(data != null && topic != socketTopicsToString(SocketTopics.createNewGame) && data['game'] != null) {
         var game = _decodeJson(data);
         onMessage.add(GameUpdate(game));
@@ -69,11 +69,13 @@ class SocketGateway {
 
   void startGame() {
     var event = "TABLE_START_GAME";
-    socket.emit(event, {});
+    emit(event, {});
   }
 
   void allPlayerPlayed() {
-    var event = "TABLE_ALL_PLAYERS_PLAYED";
+
+    var event = "TABLE_ALL_PLAYER_PLAYED";
+    emit(event, {});
   }
 
   void nextRoundResultAction() {
