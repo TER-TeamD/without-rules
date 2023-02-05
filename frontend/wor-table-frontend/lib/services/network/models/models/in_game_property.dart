@@ -22,4 +22,11 @@ class InGameProperty {
         betweenRound = json['between_round'] == null
             ? null
             : BetweenRound.fromJson(json['between_round']);
+
+  toJson() => {
+        'deck': deck.map((e) => e.toJson()).toList(),
+        'stacks': stacks.map((e) => e.toJson()).toList(),
+        'current_round': currentRound,
+        'between_round': betweenRound?.toJson(),
+      };
 }

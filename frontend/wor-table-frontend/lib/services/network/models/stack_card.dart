@@ -13,4 +13,10 @@ class StackCard {
         stackCards = (json["stackCards"] as List<dynamic>)
             .map((e) => GameCard.fromJson(e))
             .toList();
+
+  toJson() => {
+        'stackNumber': stackNumber,
+        'stackHead': stackHead.toJson(),
+        'stackCards': stackCards.map((e) => e.toJson()).toList(),
+      };
 }

@@ -15,6 +15,12 @@ class BetweenRound {
       indexCurrentPlayerActionInPlayerOrder = json['index_current_player_action_in_player_order'],
       playerOrder = (json['playerOrder'] as List<dynamic>)
           .map((e) => PlayerFlipOrder.fromJson(e)).toList(growable: false);
+
+  Map<String, dynamic> toJson() => {
+    'current_player_action': currentPlayerAction?.toJson(),
+    'index_current_player_action_in_player_order': indexCurrentPlayerActionInPlayerOrder,
+    'playerOrder': playerOrder.map((e) => e.toJson()).toList(growable: false),
+  };
 }
 
 class BetweenRoundPlayerAction {
@@ -25,4 +31,9 @@ class BetweenRoundPlayerAction {
   BetweenRoundPlayerAction.fromJson(Map<String, dynamic> json)
       : player = Player.fromJson(json["player"]),
         action = PlayerAction.fromJson(json["action"]);
+
+  toJson() => {
+    'player': player.toJson(),
+    'action': action.toJson(),
+  };
 }

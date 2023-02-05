@@ -27,4 +27,13 @@ class Player {
             ? null
             : InPlayerGameProperty.fromJson(json["in_player_game_property"]),
         gameResult = PlayerGameResult.fromJson(json["gameResult"]);
+
+  toJson() => {
+    'id': id,
+    'is_logged': isLogged,
+    'cards': cards.map((e) => e.toJson()).toList(growable: false),
+    'played_cards': playedCards.map((e) => e.toJson()).toList(growable: false),
+    'in_player_game_property': playerGameProperty?.toJson(),
+    'gameResult': gameResult.toJson(),
+  };
 }

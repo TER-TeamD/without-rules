@@ -7,4 +7,9 @@ class GameCard {
   GameCard.fromJson(Map<String, dynamic> json)
       : value = json["value"],
         cattleHead = json["cattleHead"];
+
+  toJson() => {
+        'value': value,
+        'cattleHead': cattleHead,
+      };
 }

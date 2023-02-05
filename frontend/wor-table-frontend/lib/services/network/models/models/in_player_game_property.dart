@@ -12,4 +12,9 @@ class InPlayerGameProperty {
         playerDiscard = (json["player_discard"] as List<dynamic>)
             .map((e) => GameCard.fromJson(e))
             .toList();
+
+  toJson() => {
+        'had_played_turn': hadPlayedTurn,
+        'player_discard': playerDiscard.map((e) => e.toJson()).toList(),
+      };
 }
