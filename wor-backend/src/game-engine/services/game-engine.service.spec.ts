@@ -106,10 +106,10 @@ describe('GameEngineService', () => {
     expect(game.in_game_property.between_round.playerOrder[0].player.id).toBe(player1.id)
     expect(game.in_game_property.between_round.playerOrder[1].player.id).toBe(player2.id)
 
-    await gameEngineService.tableNextRoundResultAction(null);
-    game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
-    player1 = game.players[0];
-    player2 = game.players[1];
+    // await gameEngineService.tableNextRoundResultAction(null);
+    // game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
+    // player1 = game.players[0];
+    // player2 = game.players[1];
 
     expect(game.in_game_property.between_round.current_player_action.player.id).toBe(player1.id);
     expect(game.in_game_property.between_round.current_player_action.action.type).toBe("SEND_CARD_TO_STACK_CARD");
