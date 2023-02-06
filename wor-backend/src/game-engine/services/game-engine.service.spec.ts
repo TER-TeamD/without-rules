@@ -106,10 +106,10 @@ describe('GameEngineService', () => {
     expect(game.in_game_property.between_round.playerOrder[0].player.id).toBe(player1.id)
     expect(game.in_game_property.between_round.playerOrder[1].player.id).toBe(player2.id)
 
-    await gameEngineService.tableNextRoundResultAction(null);
-    game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
-    player1 = game.players[0];
-    player2 = game.players[1];
+    // await gameEngineService.tableNextRoundResultAction(null);
+    // game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
+    // player1 = game.players[0];
+    // player2 = game.players[1];
 
     expect(game.in_game_property.between_round.current_player_action.player.id).toBe(player1.id);
     expect(game.in_game_property.between_round.current_player_action.action.type).toBe("SEND_CARD_TO_STACK_CARD");
@@ -122,6 +122,26 @@ describe('GameEngineService', () => {
     expect(game.in_game_property.between_round.index_current_player_action_in_player_order).toBe(2);
     expect(game.in_game_property.between_round.current_player_action.player.id).toBe(player2.id);
     expect(game.in_game_property.between_round.current_player_action.action.type).toBe("SEND_CARD_TO_STACK_CARD");
+
+
+    await gameEngineService.tableNextRoundResultAction(null);
+    game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
+    player1 = game.players[0];
+    player2 = game.players[1];
+    expect(game.in_game_property.between_round.index_current_player_action_in_player_order).toBe(2);
+    expect(game.in_game_property.between_round.current_player_action.action.type).toBe("NEXT_ROUND");
+
+    await gameEngineService.tableNextRoundResultAction(null);
+    game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
+    player1 = game.players[0];
+    player2 = game.players[1];
+    expect(player1.cards.length).toBe(9);
+    expect(player2.cards.length).toBe(9);
+    expect(game.in_game_property.stacks[0].stackCards.length).toBe(2);
+    expect(game.in_game_property.stacks[0].stackHead.value).toBe(12)
+    expect(game.in_game_property.stacks[1].stackCards.length).toBe(0);
+    expect(game.in_game_property.stacks[2].stackCards.length).toBe(0);
+    expect(game.in_game_property.stacks[3].stackCards.length).toBe(0);
 
 
   });

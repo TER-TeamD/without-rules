@@ -140,8 +140,8 @@ export class GameEngineService implements OnModuleInit {
 
         await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, 'FLIP_CARD_ORDER',);
 
-        // const game: Game = await this.roundResultService.generateNextAction();
-        // await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
+        const game: Game = await this.roundResultService.generateNextAction();
+        await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
       }
     } catch (error) {
       if (error instanceof GameNotFoundException) {
