@@ -81,8 +81,15 @@ class SocketGameController {
       allPlayerPlayedForRound = true;
     }
 
-    if (topic == "FLIP_CARD_ORDER") {
-      GetIt.I.get<SocketGateway>().newResultAction();
+    if(topic == "NEW_RESULT_ACTION") {
+      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+
+      if(d != null && d is ChooseStackCardPlayerAction) {
+        GetIt.I.get<SocketGateway>().nextRoundResultActionChoosingStack(1);
+      } else if(d != null && d is NextRoundPlayerAction) {}
+      else {
+        GetIt.I.get<SocketGateway>().nextRoundResultAction();
+      }
     }
 
     _state.game$.add(game);
