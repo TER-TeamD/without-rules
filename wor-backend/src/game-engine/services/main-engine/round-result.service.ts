@@ -124,7 +124,8 @@ export class RoundResultService {
             }
         }
 
-        return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
+        this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
+        return currentGame;
     }
 
 
