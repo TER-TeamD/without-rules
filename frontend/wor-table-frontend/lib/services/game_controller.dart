@@ -40,10 +40,15 @@ class GameController {
         deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(game.players.map((e) => e.id).toList(growable: false))
   {
     deckTransforms$.add(deckTransforms);
+    _socketGateway.onMessage.listen((value) {
+      value.execute(this);
+    });
   }
 
 
   void gameChanged(Game game, String topic) {
+    Logger.log("Game changed.");
+
     BetweenRoundPlayerAction? action = game.inGameProperty?.betweenRound?.currentPlayerAction;
 
     if (action != null) {
@@ -59,6 +64,17 @@ class GameController {
     if (everyoneHadPlayed && !allPlayerPlayedForRound) {
       _socketGateway.allPlayerPlayed();
       allPlayerPlayedForRound = true;
+    }
+
+    if(topic == "FLIP_CARD_ORDER") {
+      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+
+      if(d != null && d is ChooseStackCardPlayerAction) {
+        _socketGateway.nextRoundResultActionChoosingStack(1);
+      } else if(d != null && d is NextRoundPlayerAction) {}
+      else {
+        _socketGateway.nextRoundResultAction();
+      }
     }
 
     if(topic == "NEW_RESULT_ACTION") {
@@ -82,7 +98,7 @@ class GameController {
   chooseCard(GameCard card) {}
 
   void startGame() {
-    GetIt.I.get<SocketGateway>().startGame();
+    _socketGateway.startGame();
   }
 
   void deckTransformChanged(String playerId, DeckTransform transform) {
