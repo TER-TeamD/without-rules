@@ -21,15 +21,90 @@ import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
 import 'logger.dart';
 import 'network/models/card.dart';
-import 'network/models/models/player_game_result.dart';
 
-enum GameStates {
-  waitServer,
-  waitPlayers,
-  playing,
-  animatingCards,
-  choosingCard,
-  finalPhase,
+
+class GameController {
+  final BehaviorSubject<Game> game$;
+  Map<String, DeckTransform> deckTransforms = {};
+  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ = BehaviorSubject.seeded({});
+  PlayerActionPlayer? currentPlayerActionPlayer;
+  final SocketGateway _socketGateway;
+
+  final BehaviorSubject<bool> gameEnded$ = BehaviorSubject.seeded(false);
+
+  int playingRound = 0;
+  bool allPlayerPlayedForRound = false;
+
+  GameController(Game game, this._socketGateway)
+      : game$ = BehaviorSubject.seeded(game),
+        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(game.players.map((e) => e.id).toList(growable: false))
+  {
+    deckTransforms$.add(deckTransforms);
+  }
+
+
+  void gameChanged(Game game, String topic) {
+    BetweenRoundPlayerAction? action = game.inGameProperty?.betweenRound?.currentPlayerAction;
+
+    if (action != null) {
+      currentPlayerActionPlayer = PlayerActionPlayer(action.player, action.action);
+    }
+
+    if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
+      playingRound = (game.inGameProperty?.currentRound ?? 0);
+      allPlayerPlayedForRound = false;
+    }
+
+    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
+    if (everyoneHadPlayed && !allPlayerPlayedForRound) {
+      _socketGateway.allPlayerPlayed();
+      allPlayerPlayedForRound = true;
+    }
+
+    if(topic == "NEW_RESULT_ACTION") {
+      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+
+      if(d != null && d is ChooseStackCardPlayerAction) {
+        _socketGateway.nextRoundResultActionChoosingStack(1);
+      } else if(d != null && d is NextRoundPlayerAction) {}
+      else {
+        _socketGateway.nextRoundResultAction();
+      }
+    }
+
+    if(topic == "END_GAME_RESULTS") {
+      gameEnded$.add(true);
+    }
+
+    game$.add(game);
+  }
+
+  chooseCard(GameCard card) {}
+
+  void startGame() {
+    GetIt.I.get<SocketGateway>().startGame();
+  }
+
+  void deckTransformChanged(String playerId, DeckTransform transform) {
+    deckTransforms[playerId] = transform;
+    deckTransforms$.add(deckTransforms);
+  }
+
+  List<StackCard> getStacks() {
+    return game$.value.inGameProperty?.stacks ?? [];
+  }
+
+  bool isGameStarted() {
+    return (game$.value.inGameProperty?.currentRound ?? 0) > 0;
+  }
+
+  PlayerActionPlayer? getCurrentPlayerActionPlayer() {
+    return currentPlayerActionPlayer;
+  }
+
+  Map<String, DeckTransform> getDeckTransforms() {
+    return deckTransforms;
+  }
 }
 
 class PlayerActionPlayer {
@@ -43,117 +118,6 @@ class PlayerActionPlayer {
   }
 }
 
-class _State {
-  final BehaviorSubject<Game> game$;
-  Map<String, DeckTransform> deckTransforms = {};
-  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ = BehaviorSubject.seeded({});
-  PlayerActionPlayer? currentPlayerActionPlayer;
-
-  final BehaviorSubject<bool> gameEnded = BehaviorSubject.seeded(false);
-
-  _State(Game game)
-      : game$ = BehaviorSubject.seeded(game),
-        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(game.players.map((e) => e.id).toList(growable: false))
-  {
-    deckTransforms$.add(deckTransforms);
-  }
-}
-
-class SocketGameController {
-  final _State _state;
-  int playingRound = 0;
-  bool allPlayerPlayedForRound = false;
-
-  SocketGameController(this._state);
-
-  void gameChanged(Game game, String topic) {
-    BetweenRoundPlayerAction? action = game.inGameProperty?.betweenRound?.currentPlayerAction;
-
-    if (action != null) {
-      _state.currentPlayerActionPlayer = PlayerActionPlayer(action.player, action.action);
-    }
-
-    if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
-      playingRound = (game.inGameProperty?.currentRound ?? 0);
-      allPlayerPlayedForRound = false;
-    }
-
-    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
-    if (everyoneHadPlayed && !allPlayerPlayedForRound) {
-      GetIt.I.get<SocketGateway>().allPlayerPlayed();
-      allPlayerPlayedForRound = true;
-    }
-
-    if(topic == "NEW_RESULT_ACTION") {
-      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
-
-      if(d != null && d is ChooseStackCardPlayerAction) {
-        GetIt.I.get<SocketGateway>().nextRoundResultActionChoosingStack(1);
-      } else if(d != null && d is NextRoundPlayerAction) {}
-      else {
-        GetIt.I.get<SocketGateway>().nextRoundResultAction();
-      }
-    }
-
-    if(topic == "END_GAME_RESULTS") {
-      _state.gameEnded.add(true);
-    }
-
-    _state.game$.add(game);
-  }
-}
-
-class TableGameController {
-  final _State _state;
-
-  BehaviorSubject<Game> get gameChanged$ => _state.game$;
-  BehaviorSubject<bool> get gameEnded$ => _state.gameEnded;
-
-  TableGameController(this._state);
-
-  chooseCard(GameCard card) {}
-
-  void startGame() {
-    GetIt.I.get<SocketGateway>().startGame();
-  }
-
-  void deckTransformChanged(String playerId, DeckTransform transform) {
-    _state.deckTransforms[playerId] = transform;
-    _state.deckTransforms$.add(_state.deckTransforms);
-  }
-
-  List<StackCard> getStacks() {
-    return _state.game$.value.inGameProperty?.stacks ?? [];
-  }
-
-  bool isGameStarted() {
-    return (_state.game$.value.inGameProperty?.currentRound ?? 0) > 0;
-  }
-
-  PlayerActionPlayer? getCurrentPlayerActionPlayer() {
-    return _state.currentPlayerActionPlayer;
-  }
-
-  Map<String, DeckTransform> getDeckTransforms() {
-    return _state.deckTransforms;
-  }
-}
-
-class GameControllers {
-  late final _State _state;
-  late final TableGameController tableGameController;
-  late final SocketGameController socketGameController;
-
-  GameControllers(Game game, SocketGateway gateway) {
-    _state = _State(game);
-    tableGameController = TableGameController(_state);
-    socketGameController = SocketGameController(_state);
-
-    gateway.onMessage.listen((event) {
-      event.execute(socketGameController);
-    });
-  }
-}
 
 Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
@@ -182,11 +146,6 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
         throw "Player could not be found in PlayerFlipOrder";
       }
 
-      /* var playerOrder = betweenRound.playerOrder
-            .singleWhere((element) => element.player.id == p.id,
-                orElse: () =>
-                    throw "Player could not be found in PlayerFlipOrder")
-            .order; */
       var playerOrder = playerOrders.where((e) => e.player.id == p.id);
       if (playerOrder.isEmpty) {
         var error = UnexpectedError("No matching player in player order.");
@@ -196,7 +155,6 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
 
       if (betweenRound.indexCurrentPlayerActionInPlayerOrder >=
           playerOrder.first.order) {
-        //return MapEntry(p.id, DeckPlayed(p.playedCards.last));
         return MapEntry(p.id, DeckPlayed(p.cards.first));
       } else {
         return MapEntry(p.id, DeckWaitOtherPlayers());

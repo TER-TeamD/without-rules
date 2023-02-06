@@ -35,7 +35,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  GameControllers? controllers;
+  GameController? controller;
   final ErrorManager _errorManager = ErrorManager();
 
   @override
