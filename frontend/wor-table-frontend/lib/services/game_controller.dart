@@ -21,6 +21,7 @@ import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
 import 'logger.dart';
 import 'network/models/card.dart';
+import 'network/models/models/player_game_result.dart';
 
 enum GameStates {
   waitServer,
@@ -47,6 +48,8 @@ class _State {
   Map<String, DeckTransform> deckTransforms = {};
   final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ = BehaviorSubject.seeded({});
   PlayerActionPlayer? currentPlayerActionPlayer;
+
+  final BehaviorSubject<bool> gameEnded = BehaviorSubject.seeded(false);
 
   _State(Game game)
       : game$ = BehaviorSubject.seeded(game),
@@ -92,6 +95,10 @@ class SocketGameController {
       }
     }
 
+    if(topic == "END_GAME_RESULTS") {
+      _state.gameEnded.add(true);
+    }
+
     _state.game$.add(game);
   }
 }
@@ -100,6 +107,7 @@ class TableGameController {
   final _State _state;
 
   BehaviorSubject<Game> get gameChanged$ => _state.game$;
+  BehaviorSubject<bool> get gameEnded$ => _state.gameEnded;
 
   TableGameController(this._state);
 

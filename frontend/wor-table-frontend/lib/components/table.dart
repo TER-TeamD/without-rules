@@ -25,6 +25,7 @@ class _TableComponentState extends State<TableComponent> {
   Map<String, PositionedPlayerDeckState> decks = {};
   late List<StackViewInstance> stacks;
   bool isGameStarted = false;
+  bool isGameEnded = false;
   PlayerActionPlayer? playerActionPlayer;
 
   @override
@@ -45,6 +46,11 @@ class _TableComponentState extends State<TableComponent> {
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
         playerActionPlayer = widget.controller.getCurrentPlayerActionPlayer();
+      });
+    });
+    widget.controller.gameEnded$.listen((event) {
+      setState(() {
+        isGameEnded = true;
       });
     });
 
@@ -90,6 +96,15 @@ class _TableComponentState extends State<TableComponent> {
   Widget build(BuildContext context) {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
+    if (isGameEnded) {
+      return Center(
+        child: Text(
+          "Game ended",
+          style: const TextStyle(color: Colors.white, fontSize: 50),
+        ),
+      );
+    }
+
     var result = Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -98,7 +113,6 @@ class _TableComponentState extends State<TableComponent> {
           end: Alignment.bottomRight,
         ),
       ),
-
       child: Stack(children: [
         logDecks(context),
         Decks(
