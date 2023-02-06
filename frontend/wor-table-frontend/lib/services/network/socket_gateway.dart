@@ -90,6 +90,11 @@ class SocketGateway {
     });
   }
 
+  void newResultAction() {
+    var event = "NEW_RESULT_ACTION";
+    emit(event, {});
+  }
+
   void emit(String topic, dynamic data) {
     Logger.log("Emitting $topic: $data");
     socket.emit(topic, data);

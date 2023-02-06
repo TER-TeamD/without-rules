@@ -82,15 +82,7 @@ class SocketGameController {
     }
 
     if (topic == "FLIP_CARD_ORDER") {
-      var currentAction = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
-
-      Future.delayed(const Duration(milliseconds: 500)).then((value) {
-        if (currentAction is ChooseStackCardPlayerAction) {
-          GetIt.I.get<SocketGateway>().nextRoundResultActionChoosingStack(1);
-        } else {
-          GetIt.I.get<SocketGateway>().nextRoundResultAction();
-        }
-      });
+      GetIt.I.get<SocketGateway>().newResultAction();
     }
 
     _state.game$.add(game);
