@@ -13,7 +13,7 @@ import '../constants.dart';
 import '../services/error_manager.dart';
 
 class TableComponent extends StatefulWidget {
-  final TableGameController controller;
+  final GameController controller;
 
   const TableComponent({Key? key, required this.controller}) : super(key: key);
 
@@ -37,7 +37,7 @@ class _TableComponentState extends State<TableComponent> {
         .toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
-    widget.controller.gameChanged$.listen((game) {
+    widget.controller.game$.listen((game) {
       setState(() {
         decks = getDecks(game, widget.controller.getDeckTransforms());
         stacks = widget.controller
