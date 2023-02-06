@@ -33,7 +33,7 @@ import { PlayedCardDto } from '../dto/played-card.dto';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-  private readonly DEBUG: boolean = false;
+  private readonly DEBUG: boolean = true;
 
   @WebSocketServer()
   server: Server;

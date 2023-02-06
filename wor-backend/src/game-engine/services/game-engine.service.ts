@@ -140,9 +140,8 @@ export class GameEngineService implements OnModuleInit {
 
         await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, 'FLIP_CARD_ORDER',);
 
-        const game: Game = await this.roundResultService.generateNextAction();
-
-        await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
+        // const game: Game = await this.roundResultService.generateNextAction();
+        // await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
       }
     } catch (error) {
       if (error instanceof GameNotFoundException) {
@@ -169,21 +168,22 @@ export class GameEngineService implements OnModuleInit {
       // Si la précédente action est une action du type ChooseStackCardPlayerAction, on donne le choosen stack
       if (choosen_stack != null
           && currentGame.in_game_property.between_round.current_player_action != null
-          && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction
+          && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD"
       ) {
-        currentGame.in_game_property.between_round.current_player_action.action.choosen_stack_card_by_player = choosen_stack;
+        console.log("173 : ChooseStackCardPlayerAction")
+        const choosenStackCardPlayerAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action as ChooseStackCardPlayerAction;
+        choosenStackCardPlayerAction.choosen_stack_card_by_player = choosen_stack;
       }
 
       const game: Game = await this.roundResultService.generateNextAction();
       await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
 
-      if (
-        currentGame.in_game_property.between_round.current_player_action != null
-          && currentGame.in_game_property.between_round.current_player_action.action instanceof NextRoundPlayerAction
+      if (currentGame.in_game_property.between_round.current_player_action != null
+          && currentGame.in_game_property.between_round.current_player_action.action.type === "NEXT_ROUND"
       ) {
         if (currentGame.in_game_property.current_round === MAX_ROUND_NUMBER) {
           // Fin du jeu, envoie des resultats
-
+          console.log("END game result")
           const endGame: Game = await this.gameResultService.getResults();
           await this.webSocketGateway.sendNewGameValueToTable(endGame, 'END_GAME_RESULTS',);
           for (const p of endGame.players) {
@@ -191,6 +191,7 @@ export class GameEngineService implements OnModuleInit {
           }
         } else {
 
+          console.log("New round game")
           const newRoundGame: Game = await this.duringRoundService.nextRound();
           await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
           for (const p of newRoundGame.players) {
@@ -223,7 +224,7 @@ export class GameEngineService implements OnModuleInit {
       }
 
       if(!raised) {
-        this.logger.error("Unexpected error: ", error);
+        console.log("Unexpected error: ", error);
       }
     }
   }

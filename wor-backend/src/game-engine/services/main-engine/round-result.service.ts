@@ -82,41 +82,41 @@ export class RoundResultService {
          *    up all cards of a row of his choice. His card then becomes the first card of the new row.
          */
 
+
         if (currentGame.in_game_property.between_round.index_current_player_action_in_player_order === currentGame.in_game_property.between_round.playerOrder.length) {
             // Nous avons fini le jeu
+            console.log("Nous avons fini le jeu")
             currentGame.in_game_property.between_round.current_player_action.action = new NextRoundPlayerAction();
-            this.logger.log("Oui")
         } else {
-            this.logger.log("Oui2")
-            if (currentGame.in_game_property.between_round.current_player_action !== null
-                && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
+            console.log("Nous n'avons pas fini le jeu")
 
-                this.logger.log("Oui3")
+            if (currentGame.in_game_property.between_round.current_player_action !== null && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
+                console.log("Nous sommes dans le cas ou la précédente action est une CHOOSE_STACK_CARD, donc le player a du donner son stackcard")
                 // On reprend l'action actuel suite au choix d'un utilisateur de son tas
-                const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action;
+                const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action as ChooseStackCardPlayerAction;
 
                 currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
                 currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
             }
-            const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
 
-            this.logger.log("Oui4")
+            const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
+            console.log("Voici le meilleur stack card ou poser la carte ", bestStackCardForPuttingCurrentPlayerCard)
+
             if (bestStackCardForPuttingCurrentPlayerCard === null) {
-                this.logger.log("Oui5")
+                console.log("L'utilisateur peut choisir le tas de cate qu'il souhaite")
                 // we are in the case 4 (rule 4 of the game)
                 currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
                 // L'utilisateur doit aller donner le tas qu'il souhaite
-
             } else {
-                this.logger.log("Oui6")
+                console.log("L'utilisateur n'a pas le choix du tas ou poser sa carte")
                 // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
                 if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
-                    this.logger.log("Oui7")
+                    console.log("La stack card centrale est full, une partie va dans la defausse du user")
                     // we are in the case 3
                     currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
                     currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
                 } else {
-                    this.logger.log("Oui8")
+                    console.log("Pas de stackCard max, pas le choix de la position")
                     // We are in the case 1 and 2
                     currentGame = this.__updateGameWhenCase1And2(currentGame, bestStackCardForPuttingCurrentPlayerCard);
                     currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
@@ -124,8 +124,7 @@ export class RoundResultService {
             }
         }
 
-        this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
-        return currentGame;
+        return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
     }
 
 
@@ -167,6 +166,7 @@ export class RoundResultService {
             game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
         }
         game.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCard.stackNumber);
+        game.in_game_property.between_round.current_player_action.player = currentPlayer;
 
         bestStackCard.stackCards.push(bestStackCard.stackHead);
         bestStackCard.stackHead = currentCard;
@@ -190,7 +190,7 @@ export class RoundResultService {
             game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
         }
         game.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCard.stackNumber);
-
+        game.in_game_property.between_round.current_player_action.player = currentPlayer;
 
         currentPlayer.in_player_game_property.player_discard.push(bestStackCard.stackHead);
         currentPlayer.in_player_game_property.player_discard.push(...bestStackCard.stackCards);
