@@ -4,8 +4,7 @@ import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK_CARD";
-const String sendCardToStackAndAddCardToPlayerDiscard =
-    "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
+const String sendCardToStackAndAddCardToPlayerDiscard = "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
 const String chooseCardStack = "CHOOSE_STACK_CARD";
 const String nextRound = "NEXT_ROUND";
 
@@ -21,8 +20,7 @@ abstract class PlayerAction {
       case sendCardToStack:
         return SendCardToStackPlayerAction.fromJson(json);
       case sendCardToStackAndAddCardToPlayerDiscard:
-        return SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
-            .fromJson(json);
+        return SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction.fromJson(json);
       case chooseCardStack:
         return ChooseStackCardPlayerAction.fromJson(json);
       case nextRound:
@@ -36,8 +34,7 @@ abstract class PlayerAction {
     this.onComplete.add(null);
   }
 
-  Iterable<Widget> buildWidget(
-      BuildContext context, SceneData sceneData, Player player) {
+  Iterable<Widget> buildWidget(BuildContext context, SceneData sceneData, Player player) {
     return [];
   }
 

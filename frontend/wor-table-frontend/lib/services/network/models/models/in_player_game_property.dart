@@ -1,4 +1,6 @@
-import '../card.dart';
+
+
+import 'package:worfrontend/services/network/models/game_card.dart';
 
 class InPlayerGameProperty {
   //final Card? playedCard;

@@ -18,6 +18,7 @@ export class WebsocketService {
   public startGame$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null)
   public cardPlayed$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null)
   public endGameResult$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null)
+  public newRound$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null)
 
   constructor() { }
 
@@ -47,6 +48,10 @@ export class WebsocketService {
 
     this._socket.on('END_GAME_RESULTS', async (message: { player: Player }) => {
       this.endGameResult$.next(message.player);
+    });
+
+    this._socket.on('NEW_ROUND', async (message: { player: Player }) => {
+      this.newRound$.next(message.player);
     });
   }
 

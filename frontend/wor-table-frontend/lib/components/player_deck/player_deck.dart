@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
-import 'package:worfrontend/services/network/models/card.dart' as card_model;
+import 'package:worfrontend/services/network/models/game_card.dart' as card_model;
 
 enum PlayerState { waiting, playing, revealCard, waitingAfterPlaying }
 

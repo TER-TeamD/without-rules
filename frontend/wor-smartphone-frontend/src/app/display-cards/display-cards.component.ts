@@ -46,6 +46,14 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
         console.log("End result");
         this.end = true;
       }
+
+      if (lastMessage === LastMessageEnum.NEW_ROUND) {
+        console.log("New Round");
+        this.end = false;
+        this.loading = false;
+        this.played = false;
+      }
+
     });
 
     this.playerSubscription = this.gameService.player$.subscribe(async player => {

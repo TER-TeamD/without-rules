@@ -142,7 +142,5 @@ describe('GameEngineService', () => {
     expect(game.in_game_property.stacks[1].stackCards.length).toBe(0);
     expect(game.in_game_property.stacks[2].stackCards.length).toBe(0);
     expect(game.in_game_property.stacks[3].stackCards.length).toBe(0);
-
-
   });
 });

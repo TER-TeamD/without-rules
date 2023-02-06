@@ -5,4 +5,5 @@ export enum LastMessageEnum {
   START_GAME,
   CARD_PLAYED,
   END_GAME_RESULTS,
+  NEW_ROUND,
 }

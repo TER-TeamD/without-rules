@@ -1,6 +1,6 @@
 import 'package:worfrontend/services/network/models/models/between_round.dart';
 
-import '../card.dart';
+import 'package:worfrontend/services/network/models/game_card.dart';
 import '../stack_card.dart';
 
 class InGameProperty {

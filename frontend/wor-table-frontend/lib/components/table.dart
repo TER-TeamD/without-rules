@@ -31,10 +31,7 @@ class _TableComponentState extends State<TableComponent> {
   @override
   void initState() {
     super.initState();
-    stacks = widget.controller
-        .getStacks()
-        .map((e) => StackViewInstance(e))
-        .toList(growable: false);
+    stacks = widget.controller.getStacks().map((e) => StackViewInstance(e)).toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
     widget.controller.game$.listen((game) {
@@ -114,7 +111,7 @@ class _TableComponentState extends State<TableComponent> {
         ),
       ),
       child: Stack(children: [
-        logDecks(context),
+        // logDecks(context),
         Decks(
             states: decks.entries.map((e) => e.value).toList(growable: false)),
         StacksComponent(stacks: stacks),

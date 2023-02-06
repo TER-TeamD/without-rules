@@ -32,6 +32,12 @@ class SocketGateway {
     socket.onAny((String topic, data) {
       Logger.log("Data received from $topic: $data");
       if(topic == "disconnect") return;
+
+      if (data != null && data['game'] != null) {
+        var game = _decodeJson(data);
+        Logger.log(game.players.map((e) => e.id).toString());
+      }
+
       if(data != null && topic != socketTopicsToString(SocketTopics.createNewGame) && data is Map<String, dynamic> && data['game'] != null) {
         var game = _decodeJson(data);
         onMessage.add(GameUpdate(game, topic));

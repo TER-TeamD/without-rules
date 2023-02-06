@@ -50,7 +50,8 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body: ErrorHandler(
             errorManager: _errorManager,
-            child: TableLoader()),
+            child: TableLoader()
+        ),
       ),
     );
   }

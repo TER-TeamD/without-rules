@@ -12,6 +12,7 @@ import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/error_manager.dart';
+import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/between_round.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
@@ -20,7 +21,6 @@ import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
 import 'logger.dart';
-import 'network/models/card.dart';
 
 
 class GameController {
@@ -82,7 +82,9 @@ class GameController {
 
       if(d != null && d is ChooseStackCardPlayerAction) {
         _socketGateway.nextRoundResultActionChoosingStack(1);
-      } else if(d != null && d is NextRoundPlayerAction) {}
+      } else if(d != null && d is NextRoundPlayerAction) {
+        // _socketGateway.nextRoundResultAction();
+      }
       else {
         _socketGateway.nextRoundResultAction();
       }

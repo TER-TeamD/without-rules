@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
-import 'package:worfrontend/services/network/models/card.dart';
+import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
 
 import 'card_components/card_holder.dart';

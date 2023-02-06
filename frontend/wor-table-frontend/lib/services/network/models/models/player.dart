@@ -1,6 +1,7 @@
+import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/player_game_result.dart';
 
-import '../card.dart';
+
 import 'in_player_game_property.dart';
 
 class Player {
