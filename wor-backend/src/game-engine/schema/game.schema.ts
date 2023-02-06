@@ -6,7 +6,7 @@ import { shuffle } from '../utils/utils';
 export class InGameProperty {
   deck: Card[] = [];
   stacks: StackCard[] = [];
-  current_round = 1;
+  current_round = 0;
   between_round: BetweenRound | null = null;
 }
 
