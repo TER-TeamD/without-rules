@@ -50,7 +50,7 @@ class _TableComponentState extends State<TableComponent> {
     });
     widget.controller.gameEnded$.listen((event) {
       setState(() {
-        isGameEnded = true;
+        isGameEnded = event;
       });
     });
 
