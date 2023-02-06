@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
 
+import '../../../constants.dart';
+
 class DeckWaitPlayer extends PlayerDeckState {
   final String id;
 
@@ -24,7 +26,8 @@ class DeckWaitPlayer extends PlayerDeckState {
             Text(
               id,
               style: const TextStyle(
-                fontWeight: FontWeight.bold
+                fontWeight: FontWeight.bold,
+                color: ID_ON_CARD_WHEN_INIT_COLOR,
               ),
             )
           ],

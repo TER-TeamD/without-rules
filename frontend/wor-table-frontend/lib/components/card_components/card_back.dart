@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../constants.dart';
+
 class CardBack extends StatelessWidget {
   const CardBack({super.key});
 
@@ -10,7 +12,7 @@ class CardBack extends StatelessWidget {
       child: const SizedBox(
         child: Icon(
           CupertinoIcons.check_mark_circled_solid,
-          color: Color.fromRGBO(204, 255, 205, 1.0),
+          color: VALIDATE_ACTION_ON_CARD_ICON_COLOR,
           size: 60.0,
         ),
       )

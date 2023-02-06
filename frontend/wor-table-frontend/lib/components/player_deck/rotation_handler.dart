@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../constants.dart';
+
 class RotationHandler extends StatelessWidget {
   final void Function(Offset delta)? rotationUpdate;
   final void Function()? rotationStart;
@@ -26,9 +28,8 @@ class RotationHandler extends StatelessWidget {
         height: 20,
         child: Icon(
             Icons.rotate_left,
-            size: 20,
-
-            color: Color.fromRGBO(26, 26, 26, 1.0)
+            size: ROTATION_CARD_HANDLER_ICON_SIZE,
+            color: ROTATION_CARD_HANDLER_ICON_COLOR,
         ),
       ),
     );
