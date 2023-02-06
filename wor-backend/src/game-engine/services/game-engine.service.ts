@@ -153,6 +153,7 @@ export class GameEngineService implements OnModuleInit {
           'FLIP_CARD_ORDER',
         );
 
+
         const game: Game = await this.roundResultService.generateNextAction();
         await this.webSocketGateway.sendNewGameValueToTable(
           game,
@@ -162,18 +163,16 @@ export class GameEngineService implements OnModuleInit {
     } catch (error) {
       if (error instanceof GameNotFoundException) {
         this.logger.error('Game not found');
-      }
-      if (error instanceof PlayerNotFoundException) {
+      } else if (error instanceof PlayerNotFoundException) {
         this.logger.error('Player is not found');
-      }
-      if (error instanceof PlayerAlreadyPlayedCardException) {
+      } else if (error instanceof PlayerAlreadyPlayedCardException) {
         this.logger.error('Player already played a card');
-      }
-      if (error instanceof PlayerDontHaveCardException) {
+      }else if (error instanceof PlayerDontHaveCardException) {
         this.logger.error("Played don't have the card he want to play");
-      }
-      if (error instanceof StackNotFoundException) {
+      } else if (error instanceof StackNotFoundException) {
         this.logger.error('Stack not found');
+      } else {
+        this.logger.error(error)
       }
     }
   }
@@ -186,51 +185,36 @@ export class GameEngineService implements OnModuleInit {
         this.gameModel,
       );
 
-      if (
-        choosen_stack != null &&
-        currentGame.in_game_property.between_round.current_player_action !=
-          null &&
-        currentGame.in_game_property.between_round.current_player_action
-          .action instanceof ChooseStackCardPlayerAction
+      if (choosen_stack != null
+          && currentGame.in_game_property.between_round.current_player_action != null
+          && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction
       ) {
-        currentGame.in_game_property.between_round.current_player_action.action.choosen_stack_card_by_player =
-          choosen_stack;
+        currentGame.in_game_property.between_round.current_player_action.action.choosen_stack_card_by_player = choosen_stack;
       }
 
       const game: Game = await this.roundResultService.generateNextAction();
-      await this.webSocketGateway.sendNewGameValueToTable(
-        game,
-        'NEW_RESULT_ACTION',
-      );
+      await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
 
       if (
-        currentGame.in_game_property.between_round.current_player_action !=
-          null &&
-        currentGame.in_game_property.between_round.current_player_action
-          .action instanceof NextRoundPlayerAction
+        currentGame.in_game_property.between_round.current_player_action != null
+          && currentGame.in_game_property.between_round.current_player_action.action instanceof NextRoundPlayerAction
       ) {
         if (currentGame.in_game_property.current_round === MAX_ROUND_NUMBER) {
           // Fin du jeu, envoie des resultats
+
           const endGame: Game = await this.gameResultService.getResults();
-          await this.webSocketGateway.sendNewGameValueToTable(
-            endGame,
-            'END_GAME_RESULTS',
-          );
+          await this.webSocketGateway.sendNewGameValueToTable(endGame, 'END_GAME_RESULTS',);
           for (const p of endGame.players) {
-            await this.webSocketGateway.sendPlayerInfosToPlayer(
-              p,
-              'END_GAME_RESULTS',
-            );
+            await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'END_GAME_RESULTS',);
           }
         } else {
+
           const newRoundGame: Game = await this.duringRoundService.nextRound();
-          await this.webSocketGateway.sendNewGameValueToTable(
-            newRoundGame,
-            'NEW_ROUND',
-          );
+          await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
           for (const p of newRoundGame.players) {
             await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'NEW_ROUND');
           }
+
         }
       }
     } catch (error) {

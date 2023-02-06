@@ -4,10 +4,10 @@ import 'package:worfrontend/services/network/models/models/game.dart';
 
 import '../../socket_message.dart';
 
-class PlayerJoin extends SocketMessage {
+class PlayerJoinSocketMessage extends SocketMessage {
   final Game receivedGame;
 
-  PlayerJoin(this.receivedGame);
+  PlayerJoinSocketMessage(this.receivedGame);
 
   @override
   void execute(SocketGameController controller) {

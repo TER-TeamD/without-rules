@@ -12,7 +12,6 @@ import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
 
 import '../error_manager.dart';
-import 'models/socket_models/create_new_game.dart';
 
 class SocketGateway {
   final Socket socket;
@@ -90,9 +89,6 @@ class SocketGateway {
       'choosen_stack': stackNumber
     });
   }
-
-
-
 
   void emit(String topic, dynamic data) {
     Logger.log("Emitting $topic: $data");

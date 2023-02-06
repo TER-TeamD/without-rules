@@ -45,14 +45,13 @@ class PlayerActionPlayer {
 class _State {
   final BehaviorSubject<Game> game$;
   Map<String, DeckTransform> deckTransforms = {};
-  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ =
-      BehaviorSubject.seeded({});
+  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ = BehaviorSubject.seeded({});
   PlayerActionPlayer? currentPlayerActionPlayer;
 
   _State(Game game)
       : game$ = BehaviorSubject.seeded(game),
-        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(
-            game.players.map((e) => e.id).toList(growable: false)) {
+        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(game.players.map((e) => e.id).toList(growable: false))
+  {
     deckTransforms$.add(deckTransforms);
   }
 }
@@ -65,11 +64,10 @@ class SocketGameController {
   SocketGameController(this._state);
 
   void gameChanged(Game game, String topic) {
-    BetweenRoundPlayerAction? action =
-        game.inGameProperty?.betweenRound?.currentPlayerAction;
+    BetweenRoundPlayerAction? action = game.inGameProperty?.betweenRound?.currentPlayerAction;
+
     if (action != null) {
-      _state.currentPlayerActionPlayer =
-          PlayerActionPlayer(action.player, action.action);
+      _state.currentPlayerActionPlayer = PlayerActionPlayer(action.player, action.action);
     }
 
     if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
@@ -77,16 +75,14 @@ class SocketGameController {
       allPlayerPlayedForRound = false;
     }
 
-    var everyoneHadPlayed = game.players
-        .every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
+    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
     if (everyoneHadPlayed && !allPlayerPlayedForRound) {
       GetIt.I.get<SocketGateway>().allPlayerPlayed();
       allPlayerPlayedForRound = true;
     }
 
     if (topic == "FLIP_CARD_ORDER") {
-      var currentAction =
-          game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+      var currentAction = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
       Future.delayed(const Duration(milliseconds: 500)).then((value) {
         if (currentAction is ChooseStackCardPlayerAction) {
@@ -152,8 +148,7 @@ class GameControllers {
   }
 }
 
-Map<String, PositionedPlayerDeckState> getDecks(
-    Game game, Map<String, DeckTransform> deckTransforms) {
+Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
   var betweenRound = game.inGameProperty?.betweenRound;
 
@@ -211,5 +206,6 @@ Map<String, PositionedPlayerDeckState> getDecks(
   }).map((state) => MapEntry(
       state.key,
       PositionedPlayerDeckState(
-          state.key, state.value, deckTransforms[state.key]!))));
+          state.key, state.value, deckTransforms[state.key]!)
+  )));
 }

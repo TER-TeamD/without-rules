@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
-import 'package:worfrontend/services/network/models/socket_models/create_new_game.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK";
 const String sendCardToStackAndAddCardToPlayerDiscard =

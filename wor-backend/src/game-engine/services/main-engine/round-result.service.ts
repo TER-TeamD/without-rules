@@ -1,7 +1,7 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {
-    BetweenRound,
+    BetweenRound, BetweenRoundPlayerAction,
     Card,
     ChooseStackCardPlayerAction,
     Game,
@@ -85,11 +85,13 @@ export class RoundResultService {
         if (currentGame.in_game_property.between_round.index_current_player_action_in_player_order === currentGame.in_game_property.between_round.playerOrder.length) {
             // Nous avons fini le jeu
             currentGame.in_game_property.between_round.current_player_action.action = new NextRoundPlayerAction();
-
+            this.logger.log("Oui")
         } else {
+            this.logger.log("Oui2")
             if (currentGame.in_game_property.between_round.current_player_action !== null
                 && currentGame.in_game_property.between_round.current_player_action.action instanceof ChooseStackCardPlayerAction) {
 
+                this.logger.log("Oui3")
                 // On reprend l'action actuel suite au choix d'un utilisateur de son tas
                 const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action;
 
@@ -99,22 +101,24 @@ export class RoundResultService {
             }
             const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
 
+            this.logger.log("Oui4")
             if (bestStackCardForPuttingCurrentPlayerCard === null) {
+                this.logger.log("Oui5")
                 // we are in the case 4 (rule 4 of the game)
                 currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
                 // L'utilisateur doit aller donner le tas qu'il souhaite
 
             } else {
-
+                this.logger.log("Oui6")
                 // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
                 if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
+                    this.logger.log("Oui7")
                     // we are in the case 3
-                    currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
                     currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
                     currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
                 } else {
+                    this.logger.log("Oui8")
                     // We are in the case 1 and 2
-                    currentGame.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCardForPuttingCurrentPlayerCard.stackNumber);
                     currentGame = this.__updateGameWhenCase1And2(currentGame, bestStackCardForPuttingCurrentPlayerCard);
                     currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
                 }
@@ -159,6 +163,11 @@ export class RoundResultService {
         if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
         const currentPlayer: Player = game.players[currentPlayerIndex];
 
+        if ( game.in_game_property.between_round.current_player_action === null) {
+            game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
+        }
+        game.in_game_property.between_round.current_player_action.action = new SendCardToStackCardPlayerAction(bestStackCard.stackNumber);
+
         bestStackCard.stackCards.push(bestStackCard.stackHead);
         bestStackCard.stackHead = currentCard;
 
@@ -176,6 +185,12 @@ export class RoundResultService {
         const currentPlayerIndex: number = game.players.findIndex(p => p.id === currentIdPlayer);
         if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
         const currentPlayer: Player = game.players[currentPlayerIndex];
+
+        if ( game.in_game_property.between_round.current_player_action === null) {
+            game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
+        }
+        game.in_game_property.between_round.current_player_action.action = new SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(bestStackCard.stackNumber);
+
 
         currentPlayer.in_player_game_property.player_discard.push(bestStackCard.stackHead);
         currentPlayer.in_player_game_property.player_discard.push(...bestStackCard.stackCards);

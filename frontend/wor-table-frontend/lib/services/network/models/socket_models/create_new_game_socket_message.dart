@@ -2,11 +2,11 @@ import 'package:worfrontend/services/game_controller.dart';
 import '../../socket_message.dart';
 import '../models/game.dart';
 
-class CreateNewGame extends SocketMessage {
+class CreateNewGameSocketMessage extends SocketMessage {
 
   final Game receivedGame;
 
-  CreateNewGame(this.receivedGame);
+  CreateNewGameSocketMessage(this.receivedGame);
 
   @override
   void execute(SocketGameController controller) {

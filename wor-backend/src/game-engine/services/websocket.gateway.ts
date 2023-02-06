@@ -74,9 +74,7 @@ export class WebsocketGateway
   @SubscribeMessage('TABLE_NEW_GAME')
   public async tableCreateNewGame(client: Socket, payload: {}): Promise<void> {
     this.logger.log(
-      `Creation new game by a table -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)}`,
+      `TABLE | TABLE_NEW_GAME : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableCreateNewGame();
@@ -89,9 +87,7 @@ export class WebsocketGateway
   public async playerJoinGame(client: Socket, payload: any): Promise<void> {
     const message: { player_id: string } = payload;
     this.logger.log(
-      `Player join game -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)} `,
+      `PLAYER ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_JOIN_GAME : ${JSON.stringify(payload)} `,
     );
 
     await this.gameEngineService.playerJoinGame(message.player_id);
@@ -103,9 +99,7 @@ export class WebsocketGateway
   @SubscribeMessage('TABLE_START_GAME')
   public async tableStartGame(client: Socket, payload: any): Promise<void> {
     this.logger.log(
-      `Start new game -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)}`,
+      `TABLE | TABLE_START_GAME : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableStartGame();
@@ -118,9 +112,7 @@ export class WebsocketGateway
   public async playerPlayedCard(client: Socket, payload: any): Promise<void> {
     const message: { player_id: string; card_value: number } = payload;
     this.logger.log(
-      `Player played card -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)} `,
+      `PLAYER ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_PLAYED_CARD : ${JSON.stringify(payload)} `,
     );
 
     await this.gameEngineService.playerPlayedCard(
@@ -139,9 +131,7 @@ export class WebsocketGateway
     payload: any,
   ): Promise<void> {
     this.logger.log(
-      `Table all player played -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)}`,
+      `TABLE | TABLE_ALL_PLAYER_PLAYED : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableAllPlayerPlayed();
@@ -154,9 +144,7 @@ export class WebsocketGateway
   ): Promise<void> {
     const message: { choosen_stack: number | null } = payload;
     this.logger.log(
-      `Table all player played -> ID : ${JSON.stringify(
-        this.entitiesConnected[client.handshake.auth.id],
-      )} : ${JSON.stringify(payload)}`,
+      `TABLE | TABLE_NEXT_ROUND_RESULT_ACTION : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableNextRoundResultAction(
