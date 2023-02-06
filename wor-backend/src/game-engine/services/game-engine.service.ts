@@ -145,17 +145,17 @@ export class GameEngineService implements OnModuleInit {
       }
     } catch (error) {
       if (error instanceof GameNotFoundException) {
-        this.logger.error('Game not found');
+        console.error('Game not found');
       } else if (error instanceof PlayerNotFoundException) {
-        this.logger.error('Player is not found');
+        console.error('Player is not found');
       } else if (error instanceof PlayerAlreadyPlayedCardException) {
-        this.logger.error('Player already played a card');
+        console.error('Player already played a card');
       }else if (error instanceof PlayerDontHaveCardException) {
-        this.logger.error("Played don't have the card he want to play");
+        console.error("Played don't have the card he want to play");
       } else if (error instanceof StackNotFoundException) {
-        this.logger.error('Stack not found');
+        console.error('Stack not found');
       } else {
-        this.logger.error(error)
+        console.error(error)
       }
     }
   }
@@ -170,9 +170,7 @@ export class GameEngineService implements OnModuleInit {
           && currentGame.in_game_property.between_round.current_player_action != null
           && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD"
       ) {
-        console.log("173 : ChooseStackCardPlayerAction")
-        const choosenStackCardPlayerAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action as ChooseStackCardPlayerAction;
-        choosenStackCardPlayerAction.choosen_stack_card_by_player = choosen_stack;
+        const newRoundGame: Game = await this.roundResultService.updateActionWhenChooseStackCard(choosen_stack);
       }
 
       const game: Game = await this.roundResultService.generateNextAction();

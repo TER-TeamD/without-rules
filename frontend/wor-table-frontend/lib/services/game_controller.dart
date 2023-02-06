@@ -68,8 +68,12 @@ class GameController {
 
     if(topic == "FLIP_CARD_ORDER") {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+      Logger.log("Envoyer qqch");
 
-      if(d != null && d is ChooseStackCardPlayerAction) {
+
+      // if(d != null && d is ChooseStackCardPlayerAction) {
+      if(d != null && d.type == "CHOOSE_STACK_CARD") {
+        Logger.log("Envojer CHOOSE_STACK_CARD");
         _socketGateway.nextRoundResultActionChoosingStack(1);
       } else if(d != null && d is NextRoundPlayerAction) {}
       else {
@@ -79,8 +83,11 @@ class GameController {
 
     if(topic == "NEW_RESULT_ACTION") {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
+      Logger.log("Envoyer qqch");
 
-      if(d != null && d is ChooseStackCardPlayerAction) {
+      // if(d != null && d is ChooseStackCardPlayerAction) {
+      if(d != null && d != null && d.type == "CHOOSE_STACK_CARD") {
+        Logger.log("Envojer CHOOSE_STACK_CARD");
         _socketGateway.nextRoundResultActionChoosingStack(1);
       } else if(d != null && d is NextRoundPlayerAction) {
         // _socketGateway.nextRoundResultAction();

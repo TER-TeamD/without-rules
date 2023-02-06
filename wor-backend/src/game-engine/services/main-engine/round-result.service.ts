@@ -92,8 +92,11 @@ export class RoundResultService {
 
             if (currentGame.in_game_property.between_round.current_player_action !== null && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
                 console.log("Nous sommes dans le cas ou la précédente action est une CHOOSE_STACK_CARD, donc le player a du donner son stackcard")
+
                 // On reprend l'action actuel suite au choix d'un utilisateur de son tas
                 const currentAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action as ChooseStackCardPlayerAction;
+
+                console.log(currentAction)
 
                 currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
                 currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
@@ -105,16 +108,34 @@ export class RoundResultService {
             if (bestStackCardForPuttingCurrentPlayerCard === null) {
                 console.log("L'utilisateur peut choisir le tas de cate qu'il souhaite")
                 // we are in the case 4 (rule 4 of the game)
-                currentGame.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+                currentGame = this.__updateGameWhenPlayerHaveToClickOnStackCard(currentGame);
                 // L'utilisateur doit aller donner le tas qu'il souhaite
             } else {
                 console.log("L'utilisateur n'a pas le choix du tas ou poser sa carte")
                 // stackCards doesn't include the StackHead card, so in the stack, we have the card stackHead + stackCards[]
-                if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1)) {
-                    console.log("La stack card centrale est full, une partie va dans la defausse du user")
-                    // we are in the case 3
-                    currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
-                    currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+                if (bestStackCardForPuttingCurrentPlayerCard.stackCards.length === (MAX_CARDS_PER_STACK - 1) || currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
+
+                    console.log("Il faut d'abord check que l'ancien roundResult n'est pas un ChooseStackCard, car si ca en est un, il faut le mettre dans la défausse");
+                    if (currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
+                        console.log("Comme CHOOSE_STACK_CARD, on doit déplacer dans la discard");
+                        const choosenStackCardPlayerAction: ChooseStackCardPlayerAction = currentGame.in_game_property.between_round.current_player_action.action as ChooseStackCardPlayerAction;
+                        if (choosenStackCardPlayerAction.choosen_stack_card_by_player != null) {
+                            const stackCardChoose: StackCard | null = await EngineUtilsService.getStackCardById(this.gameModel, choosenStackCardPlayerAction.choosen_stack_card_by_player);
+                            if (stackCardChoose != null) {
+                                currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+                                // currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+                            } else {
+                                throw new StackNotFoundException(choosenStackCardPlayerAction.choosen_stack_card_by_player)
+                            }
+
+                        }
+                    } else {
+                        console.log("La stack card centrale est full, une partie va dans la defausse du user")
+                        // we are in the case 3
+                        currentGame = this.__updateGameWhenCase3(currentGame, bestStackCardForPuttingCurrentPlayerCard);
+                        currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
+                    }
+
                 } else {
                     console.log("Pas de stackCard max, pas le choix de la position")
                     // We are in the case 1 and 2
@@ -125,6 +146,23 @@ export class RoundResultService {
         }
 
         return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
+    }
+
+    public __updateGameWhenPlayerHaveToClickOnStackCard(game: Game): Game {
+        const currentIndexAction: number = game.in_game_property.between_round.index_current_player_action_in_player_order;
+        const currentCard: Card = game.in_game_property.between_round.playerOrder[currentIndexAction].player.in_player_game_property.played_card;
+
+        const currentIdPlayer: string = game.in_game_property.between_round.playerOrder[currentIndexAction].player.id;
+        const currentPlayerIndex: number = game.players.findIndex(p => p.id === currentIdPlayer);
+        if (currentPlayerIndex < 0) throw new PlayerNotFoundException(currentIdPlayer);
+        const currentPlayer: Player = game.players[currentPlayerIndex];
+
+        if ( game.in_game_property.between_round.current_player_action === null) {
+            game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
+        }
+        game.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+
+        return game;
     }
 
 
@@ -223,5 +261,18 @@ export class RoundResultService {
         });
 
         return minimumVariation.stack_card;
+    }
+
+    public async updateActionWhenChooseStackCard(choosen_stack: number): Promise<Game> {
+        const currentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
+        if (currentGame === null) throw new GameNotFoundException();
+
+        const choosenStackCardPlayerAction: ChooseStackCardPlayerAction = new ChooseStackCardPlayerAction();
+        choosenStackCardPlayerAction.choosen_stack_card_by_player = choosen_stack
+        choosenStackCardPlayerAction.choosen_stack_card_by_player = choosen_stack;
+
+        currentGame.in_game_property.between_round.current_player_action.action = choosenStackCardPlayerAction;
+
+        return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
     }
 }
