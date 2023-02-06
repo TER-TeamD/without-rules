@@ -97,7 +97,6 @@ export class RoundResultService {
 
                 currentGame = this.__updateGameWhenPlayerCase4(currentGame, currentAction)
                 currentGame.in_game_property.between_round.index_current_player_action_in_player_order += 1;
-
             }
             const bestStackCardForPuttingCurrentPlayerCard: StackCard | null = this.__searchGoodStackCardForPlacingCard(currentGame);
 
@@ -224,7 +223,4 @@ export class RoundResultService {
 
         return minimumVariation.stack_card;
     }
-
-
-
 }

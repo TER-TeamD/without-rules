@@ -31,9 +31,10 @@ import {
 import { PlayedCardDto } from '../dto/played-card.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class WebsocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+
+  private readonly DEBUG: boolean = false;
+
   @WebSocketServer()
   server: Server;
 
@@ -152,10 +153,7 @@ export class WebsocketGateway
     );
   }
 
-  public async sendNewGameValueToTable(
-    game: Game,
-    topic: string,
-  ): Promise<void> {
+  public async sendNewGameValueToTable(game: Game, topic: string,): Promise<void> {
     await this.sendMessageToEntity('0', topic, {
       game,
     });
@@ -170,131 +168,17 @@ export class WebsocketGateway
     });
   }
 
-  private async sendMessageToEntity(
-    id: string,
-    topic: string,
-    message: any,
-  ): Promise<void> {
-    const idUser = this.entitiesConnected[id].socket_id;
+  private async sendMessageToEntity(id: string, topic: string, message: any,): Promise<void> {
 
-    if (idUser != null) {
-      this.server.to(idUser).emit(topic, message);
-    } else {
-      this.logger.error(`The entity ${id} is not connected`);
+    if (!this.DEBUG) {
+      const idUser = this.entitiesConnected[id].socket_id;
+
+      if (idUser != null) {
+        this.server.to(idUser).emit(topic, message);
+      } else {
+        this.logger.error(`The entity ${id} is not connected`);
+      }
     }
+
   }
-
-  /*
-
-    @SubscribeMessage('table_create_game')
-    public async tableCreateGame(client: Socket, payload: any): Promise<void> {
-        this.logger.log(
-            `Creation new game by a table -> ID : ${JSON.stringify(
-                this.entitiesConnected[client.handshake.auth.id],
-            )} : ${JSON.stringify(payload)}`,
-        );
-        await this.gameEngineService.createNewGame();
-    }
-
-    @SubscribeMessage('player_join_game')
-    public async playerJoinGame(client: Socket, payload: any): Promise<void> {
-        const message: { player_id: string } = payload;
-        this.logger.log(
-            `Player join game -> ID : ${JSON.stringify(
-                this.entitiesConnected[client.handshake.auth.id],
-            )} : ${JSON.stringify(payload)} `,
-        );
-        await this.gameEngineService.playerJoinGame(message.player_id);
-    }
-
-    @SubscribeMessage('table_start_game')
-    public async tableStartGame(client: Socket, payload: any): Promise<void> {
-        this.logger.log(
-            `Table start game -> ID : ${JSON.stringify(
-                this.entitiesConnected[client.handshake.auth.id],
-            )} : ${JSON.stringify(payload)} `,
-        );
-        await this.gameEngineService.startGame();
-    }
-
-    @SubscribeMessage('player_play_card')
-    public async playerPlayCard(client: Socket, payload: any): Promise<void> {
-        const message: { player_id: string; body: PlayedCardDto } = payload;
-        this.logger.log(
-            `Player play card -> ID : ${JSON.stringify(
-                this.entitiesConnected[client.handshake.auth.id],
-            )} : ${JSON.stringify(payload)} `,
-        );
-        await this.gameEngineService.playerPlayedACard(
-            message.body,
-            message.player_id,
-        );
-    }
-
-    public async sendInitializationInformationsToTable(newGameDto: NewGameDto): Promise<void> {
-        await this.sendMessageToEntity('0', 'player_initialization', newGameDto);
-    }
-
-    public async sendConfirmationMessageToPlayerWhenPlayerTriedToConnectToGame( status: ConnexionStatusEnum,  playerId: string): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'new_player_connexion', {
-            status: status,
-            message: '',
-        });
-
-        await this.sendMessageToEntity('0', 'new_player_connexion', {
-            player_id: playerId,
-        });
-    }
-
-    public async giveCardsToPlayerAtTheBeginningOfGame(playerId: string, cards: Card[]): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'player_cards_initialization', {
-            cards,
-        });
-    }
-
-    public async giveCardsToTableAtTheBeginningOfGame(stackCards: StackCard[]): Promise<void> {
-        await this.sendMessageToEntity('0', 'table_cards_initialization', {
-            stack_cards: stackCards,
-        });
-    }
-
-    public async sendToTableCardsPlayedByPlayers(playerId: string, playedCard: Card): Promise<void> {
-        await this.sendMessageToEntity('0', 'CARD_PLAYED_BY_USER', {
-            player_id: playerId,
-            played_cards: playedCard,
-        });
-
-        await this.sendMessageToEntity(playerId, 'CARD_PLAYED_BY_USER', {
-            played_cards: playedCard,
-        });
-    }
-
-    public async sendActionListToTable(actions: Action[]): Promise<void> {
-        await this.sendMessageToEntity('0', 'NEW_ACTIONS', {actions: actions});
-    }
-
-    public async sendEndRoundDetailsToTable(stacks: StackCard[]): Promise<void> {
-        await this.sendMessageToEntity('0', 'END_ROUND_DETAILS', {stacks: stacks});
-    }
-
-    public async sendEndRoundDetailsToPlayers(idPlayer: string, cards: Card[], playerNumberDiscard: number): Promise<void> {
-        await this.sendMessageToEntity(idPlayer, 'END_ROUND_DETAILS', {cards: cards, discardValue: playerNumberDiscard});
-    }
-
-    public async sendNextRoundToTable(): Promise<void> {
-        await this.sendMessageToEntity('0', 'NEXT_ROUND', {});
-    }
-
-    public async sendNextRoundToPlayer(playerId: string): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'NEXT_ROUND', {});
-    }
-
-    public async sendResultToTable(results: Result[]): Promise<void> {
-        await this.sendMessageToEntity('0', 'RESULTS', {results: results});
-    }
-
-    public async sendResultToPlayer(results: Result[], playerId: string,): Promise<void> {
-        await this.sendMessageToEntity(playerId, 'RESULTS', {results: results});
-    }
-    */
 }

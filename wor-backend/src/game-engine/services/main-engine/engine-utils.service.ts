@@ -23,4 +23,8 @@ export class EngineUtilsService {
 
         return games[0]
     }
+
+    static async setCurrentGame(gameModel: Model<GameDocument>, game: Game): Promise<Game | null> {
+        return gameModel.findOneAndUpdate({}, game, {returnDocument: "after"});
+    }
 }
