@@ -70,7 +70,7 @@ class GameController {
 
     }
 
-    if(topic == "NEW_RESULT_ACTION") {
+    if(topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
       Future.delayed(Duration(milliseconds: 500), () {
