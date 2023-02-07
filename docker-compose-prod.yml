@@ -25,9 +25,6 @@ services:
     environment:
       - APP_PORT=3000
       - DATABASE_URI=mongodb://database:27017
-    volumes:
-      - ./wor-backend:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - ter-network-prod
 
