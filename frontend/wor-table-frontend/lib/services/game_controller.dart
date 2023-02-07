@@ -78,7 +78,9 @@ class GameController {
       Future.delayed(Duration(milliseconds: 200), () {
         if (d != null && d.type == "CHOOSE_STACK_CARD") {
         } else if (d != null && d.type == "NEXT_ROUND") {
-          _socketGateway.nextRoundResultAction();
+          if (gameIsFinished == false) {
+            _socketGateway.nextRoundResultAction();
+          }
         } else {
           if (gameIsFinished == false) {
             _socketGateway.nextRoundResultAction();
