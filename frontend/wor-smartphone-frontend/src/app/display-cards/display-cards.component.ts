@@ -22,7 +22,6 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
-  public result: PlayerGameResult | null = null;
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 

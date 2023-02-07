@@ -8,9 +8,10 @@
 </div>
 
 
-<div *ngIf="end && this.result" class="loading">
+
+<div *ngIf="end" class="loading">
     <p>Game finished...</p>
-    <p>You are {{this.ranks[this.result.ranking - 1] || ""}} of the game with {{this.result.cattleHeads || ""}} cattle heads !</p>
+    <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}} cattle heads !</p>
 </div>
 
 <div *ngIf="!loading && !played && !end && player !== null" class="content-container">

@@ -195,7 +195,6 @@ export class GameEngineService implements OnModuleInit {
           for (const p of newRoundGame.players) {
             await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'NEW_ROUND');
           }
-
         }
       }
     } catch (error) {

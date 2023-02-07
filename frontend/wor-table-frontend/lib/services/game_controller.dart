@@ -30,10 +30,12 @@ class GameController {
   PlayerActionPlayer? currentPlayerActionPlayer;
   final SocketGateway _socketGateway;
 
+
   final BehaviorSubject<bool> gameEnded$ = BehaviorSubject.seeded(false);
 
   int playingRound = 0;
   bool allPlayerPlayedForRound = false;
+  bool gameIsFinished = false;
 
   GameController(Game game, this._socketGateway)
       : game$ = BehaviorSubject.seeded(game),
@@ -73,20 +75,24 @@ class GameController {
     if(topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
-      Future.delayed(Duration(milliseconds: 500), () {
+      Future.delayed(Duration(milliseconds: 100), () {
         if(d != null && d.type == "CHOOSE_STACK_CARD") {
           _socketGateway.nextRoundResultActionChoosingStack(1);
         } else if(d != null && d.type == "NEXT_ROUND") {
           _socketGateway.nextRoundResultAction();
-        }
-        else {
-          _socketGateway.nextRoundResultAction();
+        } else {
+
+          if (gameIsFinished == false) {
+            _socketGateway.nextRoundResultAction();
+          }
+
         }
       });
 
     }
 
     if(topic == "END_GAME_RESULTS") {
+      gameIsFinished = true;
       gameEnded$.add(true);
     }
 
