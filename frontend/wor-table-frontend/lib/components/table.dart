@@ -122,7 +122,7 @@ class _TableComponentState extends State<TableComponent> {
         // logDecks(context),
         Decks(
             states: decks.entries.map((e) => e.value).toList(growable: false)),
-        StacksComponent(stacks: stacks),
+        StacksComponent(stacks: stacks, shouldChoose: widget.controller.doUserShouldChoose(), onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)),
         startButton(),
         ...(playerActionPlayer?.buildWidget(
                 context,

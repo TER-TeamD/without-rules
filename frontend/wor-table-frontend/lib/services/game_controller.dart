@@ -77,7 +77,6 @@ class GameController {
 
       Future.delayed(Duration(milliseconds: 200), () {
         if (d != null && d.type == "CHOOSE_STACK_CARD") {
-          _socketGateway.nextRoundResultActionChoosingStack(1);
         } else if (d != null && d.type == "NEXT_ROUND") {
           _socketGateway.nextRoundResultAction();
         } else {
@@ -113,6 +112,15 @@ class GameController {
 
   bool isGameStarted() {
     return (game$.value.inGameProperty?.currentRound ?? 0) > 0;
+  }
+
+  bool doUserShouldChoose() {
+    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action.type == "CHOOSE_STACK_CARD";
+  }
+
+  void chooseStack(int stackNumber) {
+    if(!doUserShouldChoose()) return;
+    _socketGateway.nextRoundResultActionChoosingStack(stackNumber);
   }
 
   PlayerActionPlayer? getCurrentPlayerActionPlayer() {
