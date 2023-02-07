@@ -16,4 +16,4 @@ const Color CIRCULAR_PROGRESS_ON_CARD_COLOR = Color.fromRGBO(218, 218, 218, 1.0)
 const Color ROTATION_CARD_HANDLER_ICON_COLOR = Color.fromRGBO(218, 218, 218, 1.0);
 const double ROTATION_CARD_HANDLER_ICON_SIZE = 20.0;
 
-const bool PROD = false;
+const bool PROD = true;
