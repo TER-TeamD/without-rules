@@ -17,6 +17,7 @@ services:
     networks:
       - ter-network-prod
 
+
   backend:
     build:
       context: wor-backend
