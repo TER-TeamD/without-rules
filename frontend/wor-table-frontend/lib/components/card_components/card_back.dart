@@ -1,6 +1,7 @@
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+
+import '../../constants.dart';
 
 class CardBack extends StatelessWidget {
   const CardBack({super.key});
@@ -8,13 +9,13 @@ class CardBack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 226, 226, 226),
-            borderRadius: BorderRadius.all(Radius.circular(5))),
-        child: SizedBox(
-          width: 100,
-          height: 150,
-          child: Container(),
-        ));
+      child: const SizedBox(
+        child: Icon(
+          CupertinoIcons.check_mark_circled_solid,
+          color: VALIDATE_ACTION_ON_CARD_ICON_COLOR,
+          size: 60.0,
+        ),
+      )
+    );
   }
 }

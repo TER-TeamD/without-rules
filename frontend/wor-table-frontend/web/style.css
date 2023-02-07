@@ -1,0 +1,41 @@
+.activity-indicator.container {
+    overflow: hidden;
+    height: 8px;
+    width: 200px;
+    background: #b6b6b6;
+    border-radius: 4px;
+
+}
+.activity-indicator>.indicator {
+    position: relative;
+    height: 100%;
+    width: 30px;
+    background: #797979;
+    border-radius: 4px;
+
+    animation: linear activity 2s infinite;
+}
+
+@keyframes activity {
+    0% {
+        left: -30px;
+    }
+    100% {
+        left: 200px;
+    }
+}
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    font-family: Roboto, sans-serif;
+    color: #797979;
+}
+
+

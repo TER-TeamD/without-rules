@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Card } from 'src/app/model/card.model';
+import {Card} from "../../model/player.model";
 
 @Component({
   selector: 'app-card',
@@ -9,9 +9,10 @@ import { Card } from 'src/app/model/card.model';
 export class CardComponent {
 
   @Input()
-  public card?: Card;
+  public card?: Card | null;
 
-  public cattleHeads: string = "";
+  public cattleHeadsLine1: string = "";
+  public cattleHeadsLine2: string = "";
 
   constructor() { }
 
@@ -19,7 +20,17 @@ export class CardComponent {
   }
 
   ngOnChanges(): void {
-    this.cattleHeads = "🐮".repeat(this.card?.cattleHead || 0);
+    let cattleHeads = this.card?.cattleHead || 0;
+
+    if (cattleHeads == 5) {
+      this.cattleHeadsLine1 = "🐮🐮🐮";
+      this.cattleHeadsLine2 = "🐮🐮";
+    } else if (cattleHeads == 7) {
+      this.cattleHeadsLine1 = "🐮🐮🐮🐮";
+      this.cattleHeadsLine2 = "🐮🐮🐮";
+    } else {
+      this.cattleHeadsLine1 = "🐮".repeat(cattleHeads);
+    }
   }
 
 }

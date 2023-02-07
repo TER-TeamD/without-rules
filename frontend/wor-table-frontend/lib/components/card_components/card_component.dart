@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:worfrontend/services/network/models/card.dart';
+import 'dart:math' as math;
+import 'package:worfrontend/services/network/models/game_card.dart';
 
 class CardComponent extends StatelessWidget {
-  final Card card;
+  static const Offset size = Offset(100, 170);
+
+  final GameCard card;
+
   const CardComponent({super.key, required this.card});
 
   @override
@@ -14,17 +16,43 @@ class CardComponent extends StatelessWidget {
           color: Color.fromARGB(255, 226, 226, 226),
           borderRadius: BorderRadius.all(Radius.circular(5))),
       child: SizedBox(
-          width: 100,
-          height: 150,
+          width: size.dx,
+          height: size.dy,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text(card.value.toString()),
-                Text(card.value.toString())
-              ])
-            ]),
-          )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(card.value.toString()),
+                        Text(card.value.toString())
+                      ]
+                  ),
+
+                  Text(
+                    "🐮" * card.cattleHead,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Transform.rotate(
+                          angle: math.pi,
+                          child: Text(card.value.toString()),
+                        ),
+                        Transform.rotate(
+                          angle: math.pi,
+                          child: Text(card.value.toString()),
+                        )
+                      ]
+                  )
+                ]
+            ),
+          )
+      ),
     );
   }
 }

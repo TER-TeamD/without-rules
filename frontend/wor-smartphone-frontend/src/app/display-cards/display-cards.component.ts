@@ -1,67 +1,92 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Card } from '../model/card.model';
-import { GameCards } from '../model/gamecards';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {Card, Player, PlayerGameResult} from "../model/player.model";
+import {Subscription} from "rxjs";
+import {LastMessageEnum} from "../model/last-message.enum";
 
 @Component({
   selector: 'app-display-cards',
   templateUrl: './display-cards.component.html',
   styleUrls: ['./display-cards.component.css']
 })
-export class DisplayCardsComponent {
+export class DisplayCardsComponent implements OnInit, OnDestroy {
 
-  public gameCards?: GameCards;
-  public select: boolean = false;
+  private lastMessageSubscription: Subscription | null = null;
+  private playerSubscription: Subscription | null = null;
+
+  public player: Player | null = null;
   public loading: boolean = true;
-  public cardsArray: Card[] = [];
-  public selectedCard: Card = this.cardsArray[0];
+  public end: boolean = false;
+  public played: boolean = false;
+  public selectedCard: Card | null = null;
+
+  public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    // this.loading = false;
 
-    // this.cardsArray = [
-    //   { value: 1, cattleHead: 1 },
-    //   { value: 2, cattleHead: 2 },
-    //   { value: 3, cattleHead: 3 },
-    //   { value: 4, cattleHead: 4 }
-    // ];
+    this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
+      if (lastMessage === LastMessageEnum.START_GAME) {
+        console.log("Start game")
+        this.loading = false;
+      }
 
-    this.route.params.subscribe(params => {
-      this.wsService.connect(params["playerId"]).subscribe(
-        (data) => {
-          console.log('data', data);
-          this.gameCards = data;
-          this.loading = false;
-          this.cardsArray = this.gameCards?.value?.cards;
-        }
-      );
+      if (lastMessage === LastMessageEnum.CARD_PLAYED) {
+        console.log("Card played")
+        this.played = true;
+      }
+
+      if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
+        console.log("End result");
+        this.end = true;
+        this.played = false;
+      }
+
+      if (lastMessage === LastMessageEnum.NEW_ROUND) {
+        console.log("New Round");
+        this.end = false;
+        this.loading = false;
+        this.played = false;
+      }
+
     });
+
+    this.playerSubscription = this.gameService.player$.subscribe(async player => {
+      console.log("New player value", player)
+      this.player = player;
+
+      if (this.player) {
+        this.selectedCard = this.player.cards[0] ? this.player.cards[0] : null;
+      }
+    })
+
   }
 
   public selectCard(card: Card) {
-    console.log('Carte sélectionnée', card);
     this.selectedCard = card;
-    this.select = true;
   }
 
-  public play() {
-    let playerId = this.gameCards?.value?.id_player;
-    let cardValue = this.gameCards?.value?.cards[0].value;
-    this.gameService.playCard(playerId!, cardValue!).subscribe(
-      () => {
-        console.log('Carte jouée', this.selectedCard);
-      }
-    );
+  public async play(): Promise<void> {
+    if (this.player && this.selectedCard) {
+      console.log("play card")
+      await this.gameService.playerPlayedCard(this.player.id, this.selectedCard.value)
+    }
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.cardsArray, event.previousIndex, event.currentIndex);
+    if (this.player) {
+      moveItemInArray(this.player.cards, event.previousIndex, event.currentIndex);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.lastMessageSubscription?.unsubscribe();
+    this.playerSubscription?.unsubscribe();
   }
 
 }

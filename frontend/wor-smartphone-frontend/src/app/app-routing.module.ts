@@ -11,7 +11,8 @@ const routes: Routes = [
   {
     path: "cards/:playerId",
     component: DisplayCardsComponent
-  }
+  },
+
 ];
 
 @NgModule({
