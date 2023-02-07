@@ -122,6 +122,12 @@ class GameController {
   Map<String, DeckTransform> getDeckTransforms() {
     return deckTransforms;
   }
+
+  List<Player> getRank() {
+    var result = game$.value.players.toList(growable: false);
+    result.sort((a, b) => a.gameResult.ranking.compareTo(b.gameResult.ranking));
+    return result;
+  }
 }
 
 class PlayerActionPlayer {

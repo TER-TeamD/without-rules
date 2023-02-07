@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/decks.dart';
-import 'package:worfrontend/components/round_animations/push_on_top.dart';
 import 'package:worfrontend/components/stacks.dart';
-import 'package:worfrontend/models/animations.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
-import '../constants.dart';
 import '../services/error_manager.dart';
 
 class TableComponent extends StatefulWidget {
@@ -89,28 +86,39 @@ class _TableComponentState extends State<TableComponent> {
     }
   }
 
+  Widget gameEnd() {
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+      Text(
+        "Game ended",
+        style: const TextStyle(color: Colors.white, fontSize: 50),
+      ),
+      Text(
+        widget.controller.getRank().map((p) => "${p.gameResult.ranking} - ${p.id}").join("\n"),
+        style: const TextStyle(color: Colors.white),
+      ),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
     if (isGameEnded) {
       return Center(
-        child: Text(
-          "Game ended",
-          style: const TextStyle(color: Colors.white, fontSize: 50),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            gameEnd(),
+            const SizedBox(width: 50),
+            RotatedBox(quarterTurns: 2, child: gameEnd())
+          ],
         ),
       );
     }
 
-    var result = Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Stack(children: [
+    var result = Stack(children: [
         // logDecks(context),
         Decks(
             states: decks.entries.map((e) => e.value).toList(growable: false)),
@@ -123,7 +131,7 @@ class _TableComponentState extends State<TableComponent> {
                     Map.fromEntries(decks.entries
                         .map((e) => MapEntry(e.key, e.value.transform))))) ??
             [])
-      ]),
+      ],
     );
 
     return result;
