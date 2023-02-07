@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/services/network/models/socket_models/result.dart';
 
+import '../constants.dart';
+
 class ResultPage extends StatelessWidget {
   final List<Result> results;
 
@@ -30,7 +32,7 @@ class ResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
+      color: BACKGROUND_TABLE_COLOR_1,
       child: Center(
         child: renderBothDirection(Container(), Column(
           mainAxisSize: MainAxisSize.min,
