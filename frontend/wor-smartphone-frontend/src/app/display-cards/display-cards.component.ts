@@ -22,6 +22,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
+  public urlAvatar: string = "";
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
@@ -31,6 +32,8 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
+
+
       if (lastMessage === LastMessageEnum.START_GAME) {
         console.log("Start game")
         this.loading = false;
@@ -59,6 +62,8 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+      this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
+
 
       if (this.player) {
         this.selectedCard = this.player.cards[0] ? this.player.cards[0] : null;

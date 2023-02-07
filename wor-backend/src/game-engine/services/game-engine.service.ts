@@ -54,11 +54,9 @@ export class GameEngineService implements OnModuleInit {
     );
   }
 
-  public async playerJoinGame(player_id: string): Promise<void> {
+  public async playerJoinGame(player_id: string, username: string): Promise<void> {
     try {
-      const game: Game = await this.initializeGameService.playerJoinGame(
-        player_id,
-      );
+      const game: Game = await this.initializeGameService.playerJoinGame(player_id, username);
 
       const indexPlayer: number = game.players.findIndex(
         (p) => p.id === player_id,

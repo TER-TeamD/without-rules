@@ -146,7 +146,7 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
     }
 
     if (p.isLogged && !gameStarted) {
-      return MapEntry(p.id, DeckWaitOtherPlayers());
+      return MapEntry(p.id, DeckWaitOtherPlayers(p));
     }
 
     if (!p.isLogged && gameStarted) {
@@ -174,12 +174,12 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
           playerOrder.first.order) {
         return MapEntry(p.id, DeckPlayed(p.playerGameProperty!.playedCard!));
       } else {
-        return MapEntry(p.id, DeckWaitOtherPlayers());
+        return MapEntry(p.id, DeckWaitOtherPlayers(p));
       }
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {
-      return MapEntry(p.id, DeckWaitOtherPlayers());
+      return MapEntry(p.id, DeckWaitOtherPlayers(p));
     }
 
     return MapEntry(p.id, DeckPlaying());

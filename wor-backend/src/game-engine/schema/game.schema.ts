@@ -60,6 +60,8 @@ export class StackCard {
 export class Player {
   id: string;
   is_logged: boolean;
+  username: string;
+  avatar: string;
   cards: Card[];
   played_cards: Card[];
   in_player_game_property: InPlayerGameProperty | null;
@@ -109,12 +111,6 @@ export class BetweenRound {
 }
 
 
-
-export class Result {
-  id_player: string;
-  cattle_heads: number;
-  rank = 0;
-}
 
 export class PlayerFlipOrder {
   player: Player;

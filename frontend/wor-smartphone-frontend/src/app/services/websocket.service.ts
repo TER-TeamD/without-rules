@@ -26,9 +26,9 @@ export class WebsocketService {
   constructor() { }
 
 
-  public async joinGame(playerId: string): Promise<void> {
+  public async joinGame(playerId: string, username: string): Promise<void> {
     await this.connectPlayer(playerId);
-    await this._socket.emit('PLAYER_JOIN_GAME', {player_id: playerId})
+    await this._socket.emit('PLAYER_JOIN_GAME', {player_id: playerId, username: username})
   }
 
   public async playerPlayedCard(playerId: string, cardValue: number): Promise<void> {

@@ -78,7 +78,7 @@ export class InitializeGameService {
      * @exception GameNotFoundException()
      * @exception UserNotFoundWhenJoinGameException()
      */
-    public async playerJoinGame(playerId: string): Promise<Game> {
+    public async playerJoinGame(playerId: string, username: string): Promise<Game> {
 
         const tempCurrentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
 
@@ -93,6 +93,7 @@ export class InitializeGameService {
             if (p.id === playerId) {
                 isPlayerFound = true;
                 p.is_logged = true;
+                p.username = username;
             }
         }
 

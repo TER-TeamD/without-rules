@@ -12,6 +12,7 @@ import {Subscription} from "rxjs";
 export class LoginPageComponent implements OnInit, OnDestroy{
 
   public playerId: string = "";
+  public username: string = "";
   private lastMessageSubscription: Subscription | null = null;
 
   constructor(
@@ -29,8 +30,8 @@ export class LoginPageComponent implements OnInit, OnDestroy{
   }
 
   public async login() {
-    if (this.playerId.length > 0) {
-      await this.gameService.joinGame(this.playerId);
+    if (this.playerId.length > 0 && this.username.length > 0) {
+      await this.gameService.joinGame(this.playerId, this.username);
     }
   }
 

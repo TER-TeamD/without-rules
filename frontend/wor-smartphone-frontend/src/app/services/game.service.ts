@@ -44,8 +44,8 @@ export class GameService {
   }
 
 
-  public async joinGame(playerId: string): Promise<void> {
-    await this.webSocketService.joinGame(playerId);
+  public async joinGame(playerId: string, username: string): Promise<void> {
+    await this.webSocketService.joinGame(playerId, username);
   }
 
   public async playerPlayedCard(playerId: string, cardValue: number): Promise<void> {
