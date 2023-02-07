@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/components/error_handler.dart';
-import 'package:worfrontend/components/result_page.dart';
-import 'package:worfrontend/components/table.dart';
 import 'package:worfrontend/components/table_loader.dart';
 import 'package:worfrontend/constants.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
+
+import 'constants.dart';
 
 void main() {
 
@@ -51,12 +51,17 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: ErrorHandler(
-            errorManager: _errorManager,
-            child: TableLoader()
+        home: Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
+        child: ErrorHandler(errorManager: _errorManager, child: TableLoader()),
       ),
-    );
+    ));
   }
 }

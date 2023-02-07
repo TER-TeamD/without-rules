@@ -77,7 +77,6 @@ class GameController {
 
       Future.delayed(Duration(milliseconds: 200), () {
         if (d != null && d.type == "CHOOSE_STACK_CARD") {
-          _socketGateway.nextRoundResultActionChoosingStack(1);
         } else if (d != null && d.type == "NEXT_ROUND") {
           _socketGateway.nextRoundResultAction();
         } else {
@@ -115,12 +114,27 @@ class GameController {
     return (game$.value.inGameProperty?.currentRound ?? 0) > 0;
   }
 
+  bool doUserShouldChoose() {
+    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action.type == "CHOOSE_STACK_CARD";
+  }
+
+  void chooseStack(int stackNumber) {
+    if(!doUserShouldChoose()) return;
+    _socketGateway.nextRoundResultActionChoosingStack(stackNumber);
+  }
+
   PlayerActionPlayer? getCurrentPlayerActionPlayer() {
     return currentPlayerActionPlayer;
   }
 
   Map<String, DeckTransform> getDeckTransforms() {
     return deckTransforms;
+  }
+
+  List<Player> getRank() {
+    var result = game$.value.players.toList(growable: false);
+    result.sort((a, b) => a.gameResult.ranking.compareTo(b.gameResult.ranking));
+    return result;
   }
 }
 
