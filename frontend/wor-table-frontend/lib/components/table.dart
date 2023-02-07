@@ -13,7 +13,7 @@ import '../constants.dart';
 import '../services/error_manager.dart';
 
 class TableComponent extends StatefulWidget {
-  final TableGameController controller;
+  final GameController controller;
 
   const TableComponent({Key? key, required this.controller}) : super(key: key);
 
@@ -22,30 +22,32 @@ class TableComponent extends StatefulWidget {
 }
 
 class _TableComponentState extends State<TableComponent> {
-  late Map<String, PositionedPlayerDeckState> decks;
+  Map<String, PositionedPlayerDeckState> decks = {};
   late List<StackViewInstance> stacks;
   bool isGameStarted = false;
+  bool isGameEnded = false;
   PlayerActionPlayer? playerActionPlayer;
 
   @override
   void initState() {
     super.initState();
-    decks = widget.controller.getDecks();
-    stacks = widget.controller
-        .getStacks()
-        .map((e) => StackViewInstance(e))
-        .toList(growable: false);
+    stacks = widget.controller.getStacks().map((e) => StackViewInstance(e)).toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
-    widget.controller.gameChanged$.listen((value) {
+    widget.controller.game$.listen((game) {
       setState(() {
-        decks = widget.controller.getDecks();
+        decks = getDecks(game, widget.controller.getDeckTransforms());
         stacks = widget.controller
             .getStacks()
             .map((e) => StackViewInstance(e))
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
         playerActionPlayer = widget.controller.getCurrentPlayerActionPlayer();
+      });
+    });
+    widget.controller.gameEnded$.listen((event) {
+      setState(() {
+        isGameEnded = event;
       });
     });
 
@@ -75,10 +77,9 @@ class _TableComponentState extends State<TableComponent> {
       return Center(
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(50.0),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            backgroundColor: Colors.green
-          ),
+              padding: const EdgeInsets.all(50.0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              backgroundColor: Colors.green),
           onPressed: () => widget.controller.startGame(),
           child: const Text("Start game"),
         ),
@@ -92,8 +93,16 @@ class _TableComponentState extends State<TableComponent> {
   Widget build(BuildContext context) {
     GetIt.I.get<ScreenService>().setScreenSize(context);
 
-    var result = Container(
+    if (isGameEnded) {
+      return Center(
+        child: Text(
+          "Game ended",
+          style: const TextStyle(color: Colors.white, fontSize: 50),
+        ),
+      );
+    }
 
+    var result = Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
@@ -101,10 +110,10 @@ class _TableComponentState extends State<TableComponent> {
           end: Alignment.bottomRight,
         ),
       ),
-
       child: Stack(children: [
-        logDecks(context),
-        Decks(states: decks.entries.map((e) => e.value).toList(growable: false)),
+        // logDecks(context),
+        Decks(
+            states: decks.entries.map((e) => e.value).toList(growable: false)),
         StacksComponent(stacks: stacks),
         startButton(),
         ...(playerActionPlayer?.buildWidget(
@@ -112,7 +121,8 @@ class _TableComponentState extends State<TableComponent> {
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform))))) ?? [])
+                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
+            [])
       ]),
     );
 

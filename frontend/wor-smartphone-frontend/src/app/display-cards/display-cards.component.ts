@@ -22,7 +22,6 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
-  public result: PlayerGameResult | null = null;
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
@@ -45,7 +44,16 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
         console.log("End result");
         this.end = true;
+        this.played = false;
       }
+
+      if (lastMessage === LastMessageEnum.NEW_ROUND) {
+        console.log("New Round");
+        this.end = false;
+        this.loading = false;
+        this.played = false;
+      }
+
     });
 
     this.playerSubscription = this.gameService.player$.subscribe(async player => {

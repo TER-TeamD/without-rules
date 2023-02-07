@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/screen_initializer.dart';
 import 'package:worfrontend/components/table.dart';
@@ -15,22 +14,21 @@ class TableLoader extends StatefulWidget {
 }
 
 class _TableLoaderState extends State<TableLoader> {
-  GameControllers? controllers;
+  GameController? controller;
 
   @override
   void initState() {
     super.initState();
     GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
-          controllers = GameControllers(game, GetIt.I.get<SocketGateway>());
+          controller = GameController(game, GetIt.I.get<SocketGateway>());
         }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScreenInitializer(child: controllers == null
+    return ScreenInitializer(child: controller == null
         ? const Center(child: CircularProgressIndicator())
-        : TableComponent(controller: controllers!.tableGameController),
-      
+        : TableComponent(controller: controller!),
     );
   }
 }

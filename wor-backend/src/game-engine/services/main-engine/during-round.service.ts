@@ -1,6 +1,6 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Card, Game, GameDocument, Player} from "../../schema/game.schema";
+import {Card, ChooseStackCardPlayerAction, Game, GameDocument, Player} from "../../schema/game.schema";
 import {Model} from "mongoose";
 import {EngineUtilsService} from "./engine-utils.service";
 import {PlayerNotFoundException} from "./exceptions/player-not-found.exception";

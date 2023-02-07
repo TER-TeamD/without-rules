@@ -104,27 +104,18 @@ export class GameEngineService implements OnModuleInit {
     }
   }
 
-  public async playerPlayedCard(
-    player_id: string,
-    card_value: number,
-  ): Promise<void> {
+  public async playerPlayedCard(player_id: string, card_value: number,): Promise<void> {
+
     try {
-      const game: Game = await this.duringRoundService.newPlayerPlayed(
-        player_id,
-        card_value,
-      );
-      await this.webSocketGateway.sendNewGameValueToTable(
-        game,
-        'NEW_PLAYER_PLAYED_CARD',
-      );
+      const game: Game = await this.duringRoundService.newPlayerPlayed(player_id, card_value);
+      await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_PLAYER_PLAYED_CARD',);
 
       const indexPlayer: number = game.players.findIndex(
         (p) => p.id === player_id,
       );
-      await this.webSocketGateway.sendPlayerInfosToPlayer(
-        game.players[indexPlayer],
-        'CARD_PLAYED',
-      );
+
+      await this.webSocketGateway.sendPlayerInfosToPlayer(game.players[indexPlayer], 'CARD_PLAYED');
+
     } catch (error) {
       if (error instanceof GameNotFoundException) {
         this.logger.error('Game not found');
@@ -145,109 +136,92 @@ export class GameEngineService implements OnModuleInit {
   public async tableAllPlayerPlayed(): Promise<void> {
     try {
       if (await this.duringRoundService.isRoundFinished()) {
-        const gameWithFlipCard: Game =
-          await this.roundResultService.flipCardOrder();
+        const gameWithFlipCard: Game = await this.roundResultService.flipCardOrder();
 
-        await this.webSocketGateway.sendNewGameValueToTable(
-          gameWithFlipCard,
-          'FLIP_CARD_ORDER',
-        );
+        await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, 'FLIP_CARD_ORDER',);
 
         const game: Game = await this.roundResultService.generateNextAction();
-        await this.webSocketGateway.sendNewGameValueToTable(
-          game,
-          'NEW_RESULT_ACTION',
-        );
+        await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
       }
     } catch (error) {
       if (error instanceof GameNotFoundException) {
-        this.logger.error('Game not found');
-      }
-      if (error instanceof PlayerNotFoundException) {
-        this.logger.error('Player is not found');
-      }
-      if (error instanceof PlayerAlreadyPlayedCardException) {
-        this.logger.error('Player already played a card');
-      }
-      if (error instanceof PlayerDontHaveCardException) {
-        this.logger.error("Played don't have the card he want to play");
-      }
-      if (error instanceof StackNotFoundException) {
-        this.logger.error('Stack not found');
+        console.error('Game not found');
+      } else if (error instanceof PlayerNotFoundException) {
+        console.error('Player is not found');
+      } else if (error instanceof PlayerAlreadyPlayedCardException) {
+        console.error('Player already played a card');
+      }else if (error instanceof PlayerDontHaveCardException) {
+        console.error("Played don't have the card he want to play");
+      } else if (error instanceof StackNotFoundException) {
+        console.error('Stack not found');
+      } else {
+        console.error(error)
       }
     }
   }
 
-  public async tableNextRoundResultAction(
-    choosen_stack: number | null,
-  ): Promise<void> {
-    try {
-      const currentGame: Game = await EngineUtilsService.getCurrentGame(
-        this.gameModel,
-      );
+  public async tableNextRoundResultAction(choosen_stack: number | null,): Promise<void> {
 
-      if (
-        choosen_stack != null &&
-        currentGame.in_game_property.between_round.current_player_action !=
-          null &&
-        currentGame.in_game_property.between_round.current_player_action
-          .action instanceof ChooseStackCardPlayerAction
+    try {
+      const currentGame: Game = await EngineUtilsService.getCurrentGame(this.gameModel,);
+
+      // Si la précédente action est une action du type ChooseStackCardPlayerAction, on donne le choosen stack
+      if (choosen_stack != null
+          && currentGame.in_game_property.between_round.current_player_action != null
+          && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD"
       ) {
-        currentGame.in_game_property.between_round.current_player_action.action.choosen_stack_card_by_player =
-          choosen_stack;
+        const newRoundGame: Game = await this.roundResultService.updateActionWhenChooseStackCard(choosen_stack);
       }
 
       const game: Game = await this.roundResultService.generateNextAction();
-      await this.webSocketGateway.sendNewGameValueToTable(
-        game,
-        'NEW_RESULT_ACTION',
-      );
+      await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
 
-      if (
-        currentGame.in_game_property.between_round.current_player_action !=
-          null &&
-        currentGame.in_game_property.between_round.current_player_action
-          .action instanceof NextRoundPlayerAction
+      if (currentGame.in_game_property.between_round.current_player_action != null
+          && currentGame.in_game_property.between_round.current_player_action.action.type === "NEXT_ROUND"
       ) {
         if (currentGame.in_game_property.current_round === MAX_ROUND_NUMBER) {
           // Fin du jeu, envoie des resultats
+          this.logger.log("END game result")
           const endGame: Game = await this.gameResultService.getResults();
-          await this.webSocketGateway.sendNewGameValueToTable(
-            endGame,
-            'END_GAME_RESULTS',
-          );
+          await this.webSocketGateway.sendNewGameValueToTable(endGame, 'END_GAME_RESULTS',);
           for (const p of endGame.players) {
-            await this.webSocketGateway.sendPlayerInfosToPlayer(
-              p,
-              'END_GAME_RESULTS',
-            );
+            await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'END_GAME_RESULTS',);
           }
         } else {
+
+          this.logger.log("New round game")
           const newRoundGame: Game = await this.duringRoundService.nextRound();
-          await this.webSocketGateway.sendNewGameValueToTable(
-            newRoundGame,
-            'NEW_ROUND',
-          );
+          await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
           for (const p of newRoundGame.players) {
             await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'NEW_ROUND');
           }
         }
       }
     } catch (error) {
+      let raised = false;
       if (error instanceof GameNotFoundException) {
         this.logger.error('Game not found');
+        raised = true;
       }
       if (error instanceof PlayerNotFoundException) {
         this.logger.error('Player is not found');
+        raised = true;
       }
       if (error instanceof PlayerAlreadyPlayedCardException) {
         this.logger.error('Player already played a card');
+        raised = true;
       }
       if (error instanceof PlayerDontHaveCardException) {
         this.logger.error("Played don't have the card he want to play");
+        raised = true;
       }
       if (error instanceof StackNotFoundException) {
         this.logger.error('Stack not found');
+        raised = true;
+      }
+
+      if(!raised) {
+        this.logger.error("Unexpected error: ", error);
       }
     }
   }

@@ -1,6 +1,7 @@
+import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/player_game_result.dart';
 
-import '../card.dart';
+
 import 'in_player_game_property.dart';
 
 class Player {
@@ -27,4 +28,13 @@ class Player {
             ? null
             : InPlayerGameProperty.fromJson(json["in_player_game_property"]),
         gameResult = PlayerGameResult.fromJson(json["gameResult"]);
+
+  toJson() => {
+    'id': id,
+    'is_logged': isLogged,
+    'cards': cards.map((e) => e.toJson()).toList(growable: false),
+    'played_cards': playedCards.map((e) => e.toJson()).toList(growable: false),
+    'in_player_game_property': playerGameProperty?.toJson(),
+    'gameResult': gameResult.toJson(),
+  };
 }

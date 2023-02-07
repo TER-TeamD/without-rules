@@ -1,6 +1,6 @@
 import 'package:worfrontend/services/network/models/models/between_round.dart';
 
-import '../card.dart';
+import 'package:worfrontend/services/network/models/game_card.dart';
 import '../stack_card.dart';
 
 class InGameProperty {
@@ -22,4 +22,11 @@ class InGameProperty {
         betweenRound = json['between_round'] == null
             ? null
             : BetweenRound.fromJson(json['between_round']);
+
+  toJson() => {
+        'deck': deck.map((e) => e.toJson()).toList(),
+        'stacks': stacks.map((e) => e.toJson()).toList(),
+        'current_round': currentRound,
+        'between_round': betweenRound?.toJson(),
+      };
 }

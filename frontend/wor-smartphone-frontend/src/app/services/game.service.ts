@@ -36,8 +36,12 @@ export class GameService {
       this.updatePlayer(p);
       this.updateLastMessage(LastMessageEnum.END_GAME_RESULTS);
     });
-  }
 
+    this.webSocketService.newRound$.subscribe(p => {
+      this.updatePlayer(p);
+      this.updateLastMessage(LastMessageEnum.NEW_ROUND);
+    });
+  }
 
 
   public async joinGame(playerId: string): Promise<void> {
@@ -47,7 +51,6 @@ export class GameService {
   public async playerPlayedCard(playerId: string, cardValue: number): Promise<void> {
     await this.webSocketService.playerPlayedCard(playerId, cardValue)
   }
-
 
 
   private updatePlayer(player: Player | null): void {

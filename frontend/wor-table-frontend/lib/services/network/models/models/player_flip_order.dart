@@ -8,4 +8,9 @@ class PlayerFlipOrder {
   PlayerFlipOrder.fromJson(Map<String, dynamic> json)
       : player = Player.fromJson(json["player"]),
         order = json["order"];
+
+  toJson() => {
+    'player': player.toJson(),
+    'order': order,
+  };
 }

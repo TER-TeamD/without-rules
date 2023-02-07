@@ -15,4 +15,9 @@ class Game {
         inGameProperty = json["in_game_property"] == null
             ? null
             : InGameProperty.fromJson(json["in_game_property"]);
+
+  toJson() => {
+    'players': players.map((e) => e.toJson()).toList(growable: false),
+    'in_game_property': inGameProperty?.toJson(),
+  };
 }
