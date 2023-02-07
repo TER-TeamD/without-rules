@@ -122,7 +122,8 @@ export class RoundResultService {
 
                     console.log("Il faut d'abord check que l'ancien roundResult n'est pas un ChooseStackCard, car si ca en est un, il faut le mettre dans la défausse");
 
-                    if (currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
+                    if (currentGame.in_game_property.between_round.current_player_action
+                        && currentGame.in_game_property.between_round.current_player_action.action && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
                         console.log("Comme CHOOSE_STACK_CARD, on doit déplacer dans la discard");
                         currentGame = await this.__updateWhenAfterChosseStackCard(currentGame);
 

@@ -75,7 +75,7 @@ class GameController {
     if(topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
-      Future.delayed(Duration(milliseconds: 100), () {
+      Future.delayed(Duration(milliseconds: 200), () {
         if(d != null && d.type == "CHOOSE_STACK_CARD") {
           _socketGateway.nextRoundResultActionChoosingStack(1);
         } else if(d != null && d.type == "NEXT_ROUND") {

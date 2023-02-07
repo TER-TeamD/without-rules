@@ -44,6 +44,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
         console.log("End result");
         this.end = true;
+        this.played = false;
       }
 
       if (lastMessage === LastMessageEnum.NEW_ROUND) {
