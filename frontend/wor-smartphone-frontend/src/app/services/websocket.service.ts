@@ -12,7 +12,7 @@ import {PROD} from "../config";
 })
 export class WebsocketService {
 
-  private URL: string = PROD ? "https://backend-ter.cryptoservice.tech/" : "http://localhost:8451"
+  private URL: string = PROD ? "http://198.244.233.161:8451" : "http://localhost:8451"
 
   // @ts-ignore
   private _socket: Socket;

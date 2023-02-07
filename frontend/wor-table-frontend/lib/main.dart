@@ -13,7 +13,7 @@ import 'package:worfrontend/services/screen_service.dart';
 
 void main() {
 
-  String urlSocket = PROD ? "ws://backend-ter.cryptoservice.tech/" : "ws://localhost:8451";
+  String urlSocket = PROD ? "ws://198.244.233.161:8451/" : "ws://localhost:8451";
 
   var socket = io(urlSocket, <String, dynamic>{
     'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
