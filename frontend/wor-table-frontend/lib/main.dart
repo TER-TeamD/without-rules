@@ -5,13 +5,17 @@ import 'package:worfrontend/components/error_handler.dart';
 import 'package:worfrontend/components/result_page.dart';
 import 'package:worfrontend/components/table.dart';
 import 'package:worfrontend/components/table_loader.dart';
+import 'package:worfrontend/constants.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 
 void main() {
-  var socket = io("ws://localhost:8451", <String, dynamic>{
+
+  String urlSocket = PROD ? "https://backend-ter.cryptoservice.tech/" : "ws://localhost:8451";
+
+  var socket = io(urlSocket, <String, dynamic>{
     'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
   });
 

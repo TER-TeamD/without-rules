@@ -1,0 +1,52 @@
+version: "3.8"
+
+networks:
+  ter-network-prod:
+    driver: bridge
+
+services:
+  database:
+    image: "mongo:6.0"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=iamadmin
+    networks:
+      - ter-network-prod
+
+
+  backend:
+    build:
+      context: wor-backend
+      dockerfile: ./Dockerfile
+      target: production
+    restart: always
+    ports:
+      - "8451:3000"
+    environment:
+      - APP_PORT=3000
+      - DATABASE_URI=mongodb://admin:iamadmin@database:27017
+    networks:
+      - ter-network-prod
+
+
+  frontend-table:
+    build:
+      context: frontend/wor-table-frontend
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "8453:80"
+    networks:
+      - ter-network-prod
+
+  frontend-smartphone:
+    build:
+      context: frontend/wor-smartphone-frontend
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "8452:80"
+    networks:
+      - ter-network-prod
