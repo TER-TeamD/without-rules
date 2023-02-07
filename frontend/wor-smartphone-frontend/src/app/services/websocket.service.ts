@@ -4,12 +4,15 @@ import { io } from 'socket.io-client';
 import { Socket } from "socket.io-client/build/esm/socket";
 import {Player} from "../model/player.model";
 import {GameService} from "./game.service";
+import {PROD} from "../config";
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class WebsocketService {
+
+  private URL: string = PROD ? "https://backend-ter.cryptoservice.tech/" : "http://localhost:8451"
 
   // @ts-ignore
   private _socket: Socket;
@@ -61,7 +64,7 @@ export class WebsocketService {
 
 
   private async connectPlayer(playerId: string): Promise<void> {
-    this._socket = io('http://localhost:8451', {
+    this._socket = io(this.URL, {
       autoConnect: false,
       auth: {
         id: playerId,

@@ -68,30 +68,27 @@ class GameController {
       allPlayerPlayedForRound = true;
     }
 
-    if(topic == "FLIP_CARD_ORDER") {
+    if (topic == "FLIP_CARD_ORDER") {
 
     }
 
-    if(topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
+    if (topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
       Future.delayed(Duration(milliseconds: 200), () {
-        if(d != null && d.type == "CHOOSE_STACK_CARD") {
+        if (d != null && d.type == "CHOOSE_STACK_CARD") {
           _socketGateway.nextRoundResultActionChoosingStack(1);
-        } else if(d != null && d.type == "NEXT_ROUND") {
+        } else if (d != null && d.type == "NEXT_ROUND") {
           _socketGateway.nextRoundResultAction();
         } else {
-
           if (gameIsFinished == false) {
             _socketGateway.nextRoundResultAction();
           }
-
         }
       });
-
     }
 
-    if(topic == "END_GAME_RESULTS") {
+    if (topic == "END_GAME_RESULTS") {
       gameIsFinished = true;
       gameEnded$.add(true);
     }
@@ -175,7 +172,7 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
 
       if (betweenRound.indexCurrentPlayerActionInPlayerOrder >=
           playerOrder.first.order) {
-        return MapEntry(p.id, DeckPlayed(p.playedCards.last));
+        return MapEntry(p.id, DeckPlayed(p.playerGameProperty!.playedCard!));
       } else {
         return MapEntry(p.id, DeckWaitOtherPlayers());
       }
@@ -188,9 +185,10 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
     return MapEntry(p.id, DeckPlaying());
 
     throw "Case not handled.";
-  }).map((state) => MapEntry(
-      state.key,
-      PositionedPlayerDeckState(
-          state.key, state.value, deckTransforms[state.key]!)
-  )));
+  }).map((state) =>
+      MapEntry(
+          state.key,
+          PositionedPlayerDeckState(
+              state.key, state.value, deckTransforms[state.key]!)
+      )));
 }
