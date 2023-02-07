@@ -7,8 +7,6 @@ networks:
 services:
   database:
     image: "mongo:6.0"
-    volumes:
-      - ./cache/database:/data/db
     ports:
       - "27017:27017"
     environment:
