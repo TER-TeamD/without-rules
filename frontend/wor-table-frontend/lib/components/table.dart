@@ -36,7 +36,7 @@ class _TableComponentState extends State<TableComponent> {
 
     widget.controller.game$.listen((game) {
       setState(() {
-        decks = getDecks(game, widget.controller.getDeckTransforms());
+        decks = getDecks(game, widget.controller.getDeckTransforms(), isGameEnded);
         stacks = widget.controller
             .getStacks()
             .map((e) => StackViewInstance(e))

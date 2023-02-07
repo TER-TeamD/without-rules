@@ -169,7 +169,7 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
 
       if (betweenRound.indexCurrentPlayerActionInPlayerOrder >=
           playerOrder.first.order) {
-        return MapEntry(p.id, DeckPlayed(p.cards.first));
+        return MapEntry(p.id, DeckPlayed(p.playedCards.last));
       } else {
         return MapEntry(p.id, DeckWaitOtherPlayers());
       }
