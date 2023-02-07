@@ -75,7 +75,7 @@ class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
 }
 
 class ChooseStackCardPlayerAction extends PlayerAction {
-  final int choosenStackCardByPlayer;
+  final int? choosenStackCardByPlayer;
 
   ChooseStackCardPlayerAction(this.choosenStackCardByPlayer)
       : super(chooseCardStack);

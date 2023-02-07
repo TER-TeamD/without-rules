@@ -181,7 +181,7 @@ export class GameEngineService implements OnModuleInit {
       ) {
         if (currentGame.in_game_property.current_round === MAX_ROUND_NUMBER) {
           // Fin du jeu, envoie des resultats
-          console.log("END game result")
+          this.logger.log("END game result")
           const endGame: Game = await this.gameResultService.getResults();
           await this.webSocketGateway.sendNewGameValueToTable(endGame, 'END_GAME_RESULTS',);
           for (const p of endGame.players) {
@@ -189,7 +189,7 @@ export class GameEngineService implements OnModuleInit {
           }
         } else {
 
-          console.log("New round game")
+          this.logger.log("New round game")
           const newRoundGame: Game = await this.duringRoundService.nextRound();
           await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
           for (const p of newRoundGame.players) {
@@ -222,7 +222,7 @@ export class GameEngineService implements OnModuleInit {
       }
 
       if(!raised) {
-        console.log("Unexpected error: ", error);
+        this.logger.error("Unexpected error: ", error);
       }
     }
   }

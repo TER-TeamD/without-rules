@@ -154,15 +154,14 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   public async sendNewGameValueToTable(game: Game, topic: string,): Promise<void> {
+    this.logger.log(`Send ${topic} to TABLE`);
     await this.sendMessageToEntity('0', topic, {
       game,
     });
   }
 
-  public async sendPlayerInfosToPlayer(
-    player: Player,
-    topic: string,
-  ): Promise<void> {
+  public async sendPlayerInfosToPlayer(player: Player, topic: string,): Promise<void> {
+    this.logger.log(`Send ${topic} to ${player.id}`);
     await this.sendMessageToEntity(player.id, topic, {
       player,
     });
