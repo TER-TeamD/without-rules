@@ -12,7 +12,7 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_USERNAME=jesuisadmin
       - MONGO_INITDB_ROOT_PASSWORD=njdslqd74HDJHDSBHFJSdhjfsbi
     networks:
       - ter-network-prod
@@ -27,7 +27,7 @@ services:
       - "8451:3000"
     environment:
       - APP_PORT=3000
-      - DATABASE_URI=mongodb://admin:njdslqd74HDJHDSBHFJSdhjfsbi@database:27017
+      - DATABASE_URI=mongodb://jesuisadmin:njdslqd74HDJHDSBHFJSdhjfsbi@database:27017
     networks:
       - ter-network-prod
 
