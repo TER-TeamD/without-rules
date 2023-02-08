@@ -12,6 +12,7 @@ import 'package:worfrontend/components/player_deck/states/wait_other_players.dar
 import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/icon_player_deck_footer_state.dart';
+import 'package:worfrontend/components/player_deck_footer/states/user_player_deck_footer_state.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/error_manager.dart';
@@ -23,6 +24,7 @@ import 'package:worfrontend/services/network/models/stack_card.dart';
 import 'package:worfrontend/services/network/socket_gateway.dart';
 import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
+import '../components/player_deck_footer/states/text_player_deck_footer_state.dart';
 import 'logger.dart';
 
 
@@ -161,15 +163,15 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
 
   return Map.fromEntries(game.players.map((p) {
     if (!p.isLogged && !gameStarted) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitPlayer(p.id), IconPlayerDeckFooterState()));
+      return MapEntry(p.id, KeyValueMap(DeckWaitPlayer(p.id), TextPlayerDeckFooterState()));
     }
 
     if (p.isLogged && !gameStarted) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), IconPlayerDeckFooterState()));
+      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
     }
 
     if (!p.isLogged && gameStarted) {
-      return MapEntry(p.id, KeyValueMap(DeckNoPlayer(id: p.id), IconPlayerDeckFooterState()));
+      return MapEntry(p.id, KeyValueMap(DeckNoPlayer(id: p.id), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
     }
 
     if (betweenRound != null) {
@@ -191,17 +193,17 @@ Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTrans
 
       if (betweenRound.indexCurrentPlayerActionInPlayerOrder >=
           playerOrder.first.order) {
-        return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), IconPlayerDeckFooterState()));
+        return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
       } else {
-        return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), IconPlayerDeckFooterState()));
+        return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
       }
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), IconPlayerDeckFooterState()));
+      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
     }
 
-    return MapEntry(p.id, KeyValueMap(DeckPlaying(), IconPlayerDeckFooterState()));
+    return MapEntry(p.id, KeyValueMap(DeckPlaying(), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
 
     throw "Case not handled.";
   }).map((state) =>
