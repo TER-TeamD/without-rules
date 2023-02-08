@@ -114,7 +114,7 @@ class _TableComponentState extends State<TableComponent> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text("${p.gameResult.cattleHeads} cattleheads", style: const TextStyle(color: Colors.white,  fontSize: 18.0,),),
+            child: Text("${p.gameResult.cattleHeads} 🐮", style: const TextStyle(color: Colors.white,  fontSize: 18.0,),),
           ),
         ],
       )).toList(),
