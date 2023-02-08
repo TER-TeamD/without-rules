@@ -141,8 +141,13 @@ class _TableComponentState extends State<TableComponent> {
     var result = Stack(children: [
         // logDecks(context),
         Decks(
-            states: decks.entries.map((e) => e.value).toList(growable: false)),
-        StacksComponent(stacks: stacks, shouldChoose: widget.controller.doUserShouldChoose(), onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)),
+            states: decks.entries.map((e) => e.value).toList(growable: false)
+        ),
+        StacksComponent(
+            stacks: stacks,
+            shouldChoose: widget.controller.doUserShouldChoose(),
+            onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
+        ),
         startButton(),
         ...(playerActionPlayer?.buildWidget(
                 context,
