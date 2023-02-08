@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragEnter, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Card, Player, PlayerGameResult } from "../model/player.model";
 import { Subscription } from "rxjs";
 import { LastMessageEnum } from "../model/last-message.enum";
@@ -23,7 +23,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public played: boolean = false;
   public selectedCard: Card | null = null;
   public urlAvatar: string = "";
-  public cards: Card[] | undefined = [];
+  public cards: Card[] = [];
   public cattleHeads: number = 0;
 
 
@@ -65,7 +65,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
-      this.cards = this.player?.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
+      this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
       this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
       this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
 
@@ -88,10 +88,8 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     }
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    if (this.player) {
-      moveItemInArray(this.player.cards, event.previousIndex, event.currentIndex);
-    }
+  entered(event: CdkDragEnter) {
+    moveItemInArray(this.cards, event.item.data, event.container.data);
   }
 
   ngOnDestroy(): void {

@@ -31,13 +31,12 @@
     <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
         <app-card [card]="selectedCard"></app-card>
 
-        <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
-            <div *ngFor="let card of cards" cdkDrag>
-                <app-card [card]="card" (click)="selectCard(card)"></app-card>
+        <div cdkDropListGroup class="cards-container">
+            <div cdkDropList class="card-element" [cdkDropListData]="i" *ngFor="let card of cards; let i = index;">
+                <app-card cdkDrag [cdkDragData]="i" (cdkDragEntered)="entered($event)" [card]="card"
+                    (click)="selectCard(card)"></app-card>
             </div>
         </div>
-
-
 
         <button type="button" id="button-play" (click)="play()">Play the card</button>
     </div>
