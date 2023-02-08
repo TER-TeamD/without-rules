@@ -39,12 +39,16 @@ class _TableComponentState extends State<TableComponent> {
             .map((e) => StackViewInstance(e))
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
-        playerActionPlayer = widget.controller.getCurrentPlayerActionPlayer();
       });
     });
     widget.controller.gameEnded$.listen((event) {
       setState(() {
         isGameEnded = event;
+      });
+    });
+    widget.controller.currentPlayerActionPlayer.listen((value) {
+      setState(() {
+        playerActionPlayer = value;
       });
     });
 
