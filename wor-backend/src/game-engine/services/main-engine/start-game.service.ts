@@ -29,6 +29,7 @@ export class StartGameService {
         const players: Player[] = []
         for (let i = 0; i < this.NUMBER_OF_POTENTIAL_PLAYERS; i++) {
             const player: Player = new Player()
+            player.avatar = String(i);
             players.push(player);
         }
 

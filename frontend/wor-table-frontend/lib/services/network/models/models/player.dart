@@ -11,9 +11,11 @@ class Player {
   final List<GameCard> playedCards;
   final InPlayerGameProperty? playerGameProperty;
   final PlayerGameResult gameResult;
+  final String avatar;
+  final String? username;
 
   Player(this.id, this.isLogged, this.cards, this.playedCards,
-      this.playerGameProperty, this.gameResult);
+      this.playerGameProperty, this.gameResult, this.avatar, this.username);
 
   Player.fromJson(Map<String, dynamic> json)
       : id = json["id"],
@@ -27,11 +29,16 @@ class Player {
         playerGameProperty = json["in_player_game_property"] == null
             ? null
             : InPlayerGameProperty.fromJson(json["in_player_game_property"]),
-        gameResult = PlayerGameResult.fromJson(json["gameResult"]);
+        gameResult = PlayerGameResult.fromJson(json["gameResult"]),
+        avatar = json["avatar"],
+        username = json["username"]
+  ;
 
   toJson() => {
     'id': id,
     'is_logged': isLogged,
+    'avatar': avatar,
+    'username': username,
     'cards': cards.map((e) => e.toJson()).toList(growable: false),
     'played_cards': playedCards.map((e) => e.toJson()).toList(growable: false),
     'in_player_game_property': playerGameProperty?.toJson(),

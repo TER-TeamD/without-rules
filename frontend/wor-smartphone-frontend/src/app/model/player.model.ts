@@ -1,5 +1,8 @@
 export interface Player {
   id: string;
+  username: string;
+  avatar: string;
+
   is_logged: boolean;
   cards: Card[];
   played_cards: Card[];

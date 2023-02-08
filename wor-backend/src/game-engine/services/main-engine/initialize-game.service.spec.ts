@@ -35,7 +35,7 @@ describe('InitializeGameService', () => {
     await startGameService.__deleteOtherGames();
 
     try {
-      const game: Game = await initializeGameService.playerJoinGame("abc")
+      const game: Game = await initializeGameService.playerJoinGame("abc", "")
       expect(false).toBe(true)
     } catch (error) {
 
@@ -54,7 +54,7 @@ describe('InitializeGameService', () => {
     const currentGame: Game = await startGameService.generateNewGame();
 
     try {
-      const game: Game = await initializeGameService.playerJoinGame("abc")
+      const game: Game = await initializeGameService.playerJoinGame("abc", "")
       expect(false).toBe(true)
     } catch (error) {
 
@@ -75,7 +75,7 @@ describe('InitializeGameService', () => {
     expect(currentGame.players[0].is_logged).toBe(false);
 
     try {
-      const game: Game = await initializeGameService.playerJoinGame(goodIdPlayer)
+      const game: Game = await initializeGameService.playerJoinGame(goodIdPlayer, "")
       expect(game.players[0].id).toBe(goodIdPlayer);
       expect(game.players[0].is_logged).toBe(true);
 
@@ -115,8 +115,8 @@ describe('InitializeGameService', () => {
 
     const playerOne = currentGame.players[0].id
     const playerTwo = currentGame.players[1].id
-    currentGame = await initializeGameService.playerJoinGame(playerOne)
-    currentGame = await initializeGameService.playerJoinGame(playerTwo)
+    currentGame = await initializeGameService.playerJoinGame(playerOne, "")
+    currentGame = await initializeGameService.playerJoinGame(playerTwo, "")
     const newGame: Game = initializeGameService.__initiateGameCards(currentGame);
 
     expect(newGame.players[0].cards.length).toBe(10);
@@ -132,9 +132,9 @@ describe('InitializeGameService', () => {
     const playerOne: string = currentGame.players[0].id
     const playerTwo: string = currentGame.players[1].id
     const playerThree: string = currentGame.players[2].id
-    await initializeGameService.playerJoinGame(playerOne)
-    await initializeGameService.playerJoinGame(playerTwo)
-    await initializeGameService.playerJoinGame(playerThree)
+    await initializeGameService.playerJoinGame(playerOne, "")
+    await initializeGameService.playerJoinGame(playerTwo, "")
+    await initializeGameService.playerJoinGame(playerThree, "")
 
 
     const gameInDb: Game = await initializeGameService.launchGame();

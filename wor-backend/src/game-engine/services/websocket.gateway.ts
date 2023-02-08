@@ -25,8 +25,7 @@ import {
   Card,
   Game,
   Player,
-  Result,
-  StackCard,
+
 } from '../schema/game.schema';
 import { PlayedCardDto } from '../dto/played-card.dto';
 
@@ -86,12 +85,12 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
    */
   @SubscribeMessage('PLAYER_JOIN_GAME')
   public async playerJoinGame(client: Socket, payload: any): Promise<void> {
-    const message: { player_id: string } = payload;
+    const message: { player_id: string, username: string } = payload;
     this.logger.log(
       `PLAYER ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_JOIN_GAME : ${JSON.stringify(payload)} `,
     );
 
-    await this.gameEngineService.playerJoinGame(message.player_id);
+    await this.gameEngineService.playerJoinGame(message.player_id, message.username);
   }
 
   /**

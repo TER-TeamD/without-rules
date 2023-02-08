@@ -1,11 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import {Card, Player, PlayerGameResult} from "../model/player.model";
-import {Subscription} from "rxjs";
-import {LastMessageEnum} from "../model/last-message.enum";
+import { Card, Player, PlayerGameResult } from "../model/player.model";
+import { Subscription } from "rxjs";
+import { LastMessageEnum } from "../model/last-message.enum";
 
 @Component({
   selector: 'app-display-cards',
@@ -22,6 +22,10 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
+  public urlAvatar: string = "";
+  public cards: Card[] | undefined = [];
+  public cattleHeads: number = 0;
+
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
@@ -31,6 +35,8 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
+
+
       if (lastMessage === LastMessageEnum.START_GAME) {
         console.log("Start game")
         this.loading = false;
@@ -59,6 +65,10 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+      this.cards = this.player?.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
+      this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
+      this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
+
 
       if (this.player) {
         this.selectedCard = this.player.cards[0] ? this.player.cards[0] : null;

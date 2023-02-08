@@ -1,29 +1,45 @@
-<div *ngIf="loading" class="loading">
-    <p>Waiting for the game to be launched...</p>
-</div>
+<div class="main">
 
-<div *ngIf="played" class="loading">
-    <p>Waiting for everyone to play...</p>
-    <p>Results of the round will be on the table !</p>
-</div>
-
-
-
-<div *ngIf="end" class="loading">
-    <p>Game finished...</p>
-    <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}} cattle heads !</p>
-</div>
-
-<div *ngIf="!loading && !played && !end && player !== null" class="content-container">
-    <app-card [card]="selectedCard"></app-card>
-
-    <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let card of player.cards" cdkDrag>
-            <app-card [card]="card" (click)="selectCard(card)"></app-card>
+    <div class="header">
+        <div class="header-username">
+            Hi {{player?.username}} <span *ngIf="!loading">, you currently have {{cattleHeads}} cattle heads !</span>
         </div>
+        <div class="header-avatar">
+            <img src="{{urlAvatar}}" style="width: 50px; height: 50px;" alt="" />
+
+        </div>
+
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        <p>Waiting for the game to be launched...</p>
+    </div>
+
+    <div *ngIf="played" class="loading">
+        <p>Waiting for everyone to play...</p>
+        <p>Results of the round will be on the table !</p>
     </div>
 
 
 
-    <button type="button" id="button-play" (click)="play()">Play the card</button>
+    <div *ngIf="end" class="loading">
+        <p>Game finished...</p>
+        <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}}
+            cattle heads !</p>
+    </div>
+
+    <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
+        <app-card [card]="selectedCard"></app-card>
+
+        <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
+            <div *ngFor="let card of cards" cdkDrag>
+                <app-card [card]="card" (click)="selectCard(card)"></app-card>
+            </div>
+        </div>
+
+
+
+        <button type="button" id="button-play" (click)="play()">Play the card</button>
+    </div>
+
 </div>

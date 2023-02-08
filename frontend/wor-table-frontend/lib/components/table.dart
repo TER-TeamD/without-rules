@@ -98,10 +98,30 @@ class _TableComponentState extends State<TableComponent> {
         "Game ended",
         style: const TextStyle(color: Colors.white, fontSize: 50),
       ),
-      Text(
-        widget.controller.getRank().map((p) => "${p.gameResult.ranking} - ${p.id}").join("\n"),
-        style: const TextStyle(color: Colors.white),
-      ),
+      ...widget.controller.getRank().map((p) => Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("${p.gameResult.ranking}", style: const TextStyle(color: Colors.white, fontSize: 26.0,)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'images/avatars/${p.avatar}.png',
+              width: 50.0,
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("${p.username}", style: const TextStyle(color: Colors.white, fontSize: 18.0,),),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("${p.gameResult.cattleHeads} 🐮", style: const TextStyle(color: Colors.white,  fontSize: 18.0,),),
+          ),
+        ],
+      )).toList(),
     ]);
   }
 
@@ -125,8 +145,13 @@ class _TableComponentState extends State<TableComponent> {
     var result = Stack(children: [
         // logDecks(context),
         Decks(
-            states: decks.entries.map((e) => e.value).toList(growable: false)),
-        StacksComponent(stacks: stacks, shouldChoose: widget.controller.doUserShouldChoose(), onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)),
+            states: decks.entries.map((e) => e.value).toList(growable: false)
+        ),
+        StacksComponent(
+            stacks: stacks,
+            shouldChoose: widget.controller.doUserShouldChoose(),
+            onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
+        ),
         startButton(),
         ...(playerActionPlayer?.buildWidget(
                 context,

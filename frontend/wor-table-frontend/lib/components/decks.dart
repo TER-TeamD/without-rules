@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:worfrontend/components/player_deck/player_deck.dart';
 import 'package:worfrontend/components/player_deck/player_deck_state.dart';
 import 'package:worfrontend/components/player_deck/player_spot.dart';
+import 'package:worfrontend/components/player_deck_footer/player_deck_footer.dart';
+import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
 
 class DeckTransform {
   final Offset position;
@@ -14,8 +16,9 @@ class PositionedPlayerDeckState {
   final String playerId;
   PlayerDeckState state;
   DeckTransform transform;
+  PlayerDeckFooterState footerState;
 
-  PositionedPlayerDeckState(this.playerId, this.state, this.transform);
+  PositionedPlayerDeckState(this.playerId, this.state, this.transform, this.footerState);
 }
 
 class Decks extends StatelessWidget {
@@ -33,7 +36,11 @@ class Decks extends StatelessWidget {
                 positionChanged: (transform) {
                   state.transform = transform;
                 },
-                child: PlayerDeck(visualState: state.state)))
+                child: PlayerDeck(visualState: state.state),
+                childBottom: Center(
+                    child: PlayerDeckFooter(visualState: state.footerState,),
+                ),
+              ))
             .toList(growable: false));
   }
 }
