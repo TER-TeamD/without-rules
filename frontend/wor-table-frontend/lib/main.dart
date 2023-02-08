@@ -11,9 +11,11 @@ import 'package:worfrontend/services/screen_service.dart';
 import 'constants.dart';
 
 void main() {
-  var socket = io("ws://localhost:8451", <String, dynamic>{
-    'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
-  });
+
+  var socket = io(
+      HOSTNAME,
+      { ...OptionBuilder().enableForceNew().enableForceNewConnection().build(), 'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}}
+      );
 
   var socketGateway = SocketGateway(socket);
 

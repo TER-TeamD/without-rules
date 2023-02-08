@@ -2,6 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/choose_stack_card_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/next_round_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/send_card_to_stack_and_add_cards_to_player_discard_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/send_card_to_stack_player_action.dart';
+
+import '../../../game_controller.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK_CARD";
 const String sendCardToStackAndAddCardToPlayerDiscard = "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
@@ -39,64 +45,7 @@ abstract class PlayerAction {
   }
 
   toJson();
-}
 
-class SendCardToStackPlayerAction extends PlayerAction {
-  final int stackNumber;
-
-  SendCardToStackPlayerAction(this.stackNumber) : super(sendCardToStack);
-
-  SendCardToStackPlayerAction.fromJson(Map<String, dynamic> json)
-      : this(json['stack_number']);
-
-  @override
-  toJson() => {
-        'type': type,
-        'stack_number': stackNumber,
-      };
-}
-
-class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
-    extends PlayerAction {
-  final int stackNumber;
-
-  SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(this.stackNumber)
-      : super(sendCardToStackAndAddCardToPlayerDiscard);
-
-  SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction.fromJson(
-      Map<String, dynamic> json)
-      : this(json['stack_number']);
-
-  @override
-  toJson() => {
-        'type': type,
-        'stack_number': stackNumber,
-      };
-}
-
-class ChooseStackCardPlayerAction extends PlayerAction {
-  final int? choosenStackCardByPlayer;
-
-  ChooseStackCardPlayerAction(this.choosenStackCardByPlayer)
-      : super(chooseCardStack);
-
-  ChooseStackCardPlayerAction.fromJson(Map<String, dynamic> json)
-      : this(json['choosen_stack_card_by_player']);
-
-  @override
-  toJson() => {
-        'type': type,
-        'choosen_stack_card_by_player': choosenStackCardByPlayer,
-      };
-}
-
-class NextRoundPlayerAction extends PlayerAction {
-  NextRoundPlayerAction() : super(nextRound);
-
-  NextRoundPlayerAction.fromJson(Map<String, dynamic> json) : this();
-
-  @override
-  toJson() => {
-        'type': type,
-      };
+  void execute(GameController controller, Player player) {
+  }
 }
