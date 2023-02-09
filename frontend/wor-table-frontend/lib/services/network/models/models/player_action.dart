@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/models/scene_data.dart';
+import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK_CARD";
@@ -99,4 +100,11 @@ class NextRoundPlayerAction extends PlayerAction {
   toJson() => {
         'type': type,
       };
+
+  void execute(GameController controller, Player player) {
+  }
+
+  void afterExecute(GameController controller, Player player) {
+    controller.nextRound();
+  }
 }

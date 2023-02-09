@@ -73,10 +73,6 @@ class GameController {
       allPlayerPlayedForRound = true;
     }
 
-    if (topic == "FLIP_CARD_ORDER") {
-
-    }
-
     if (topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
@@ -92,6 +88,11 @@ class GameController {
           }
         }
       });
+
+      /* var d = game.inGameProperty?.betweenRound?.currentPlayerAction;
+      if(d != null) {
+        d.action.afterExecute(this, d.player);
+      } */
     }
 
     if (topic == "END_GAME_RESULTS") {
@@ -142,6 +143,10 @@ class GameController {
     var result = game$.value.players.toList(growable: false);
     result.sort((a, b) => a.gameResult.ranking.compareTo(b.gameResult.ranking));
     return result;
+  }
+
+  void nextRound() {
+    _socketGateway.nextRoundResultAction();
   }
 }
 
