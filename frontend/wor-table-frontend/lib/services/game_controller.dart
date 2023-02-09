@@ -74,10 +74,14 @@ class GameController {
       allPlayerPlayedForRound = true;
     }
 
+    if (topic == "FLIP_CARD_ORDER") {
+
+    }
+
     if (topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
       var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
 
-      Future.delayed(Duration(milliseconds: 200), () {
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (d != null && d.type == "CHOOSE_STACK_CARD") {
         } else if (d != null && d.type == "NEXT_ROUND") {
           if (gameIsFinished == false) {
@@ -98,6 +102,7 @@ class GameController {
 
     if (topic == "END_GAME_RESULTS") {
       gameEnded$.add(true);
+      gameIsFinished = true;
     }
 
     game$.add(game);
@@ -124,10 +129,8 @@ class GameController {
   }
 
   bool doUserShouldChoose() {
-    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action
-                .type ==
-            "CHOOSE_STACK_CARD" &&
-        currentPlayerActionPlayer == null;
+    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action.type == "CHOOSE_STACK_CARD"
+        && currentPlayerActionPlayer == null;
   }
 
   void chooseStack(int stackNumber) {
@@ -208,12 +211,7 @@ Map<String, PositionedPlayerDeckState> getDecks(
         throw error.screenMessage();
       }
 
-      if (betweenRound.indexCurrentPlayerActionInPlayerOrder >=
-          playerOrder.first.order) {
-        return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
-      } else {
-        return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
-      }
+      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {
