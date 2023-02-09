@@ -39,12 +39,16 @@ class _TableComponentState extends State<TableComponent> {
             .map((e) => StackViewInstance(e))
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
-        playerActionPlayer = widget.controller.getCurrentPlayerActionPlayer();
       });
     });
     widget.controller.gameEnded$.listen((event) {
       setState(() {
         isGameEnded = event;
+      });
+    });
+    widget.controller.currentPlayerActionPlayer.listen((value) {
+      setState(() {
+        playerActionPlayer = value;
       });
     });
 
@@ -138,24 +142,28 @@ class _TableComponentState extends State<TableComponent> {
       );
     }
 
+
     var result = Stack(children: [
         // logDecks(context),
-        Decks(
+      StacksComponent(
+          stacks: stacks,
+          shouldChoose: widget.controller.doUserShouldChoose(),
+          onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
+      ),
+
+      Decks(
             states: decks.entries.map((e) => e.value).toList(growable: false)
         ),
-        StacksComponent(
-            stacks: stacks,
-            shouldChoose: widget.controller.doUserShouldChoose(),
-            onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
-        ),
+
         startButton(),
         ...(playerActionPlayer?.buildWidget(
                 context,
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
-            [])
+                        .map((e) => MapEntry(e.key, e.value.transform)))
+                )
+        ) ?? [])
       ],
     );
 

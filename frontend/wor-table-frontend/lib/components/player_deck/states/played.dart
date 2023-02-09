@@ -10,6 +10,6 @@ class DeckPlayed extends PlayerDeckState {
 
   @override
   build(BuildContext context) {
-    return CardComponent(card: card);
+    return CardComponent(card: card, isStackHead: true,);
   }
 }

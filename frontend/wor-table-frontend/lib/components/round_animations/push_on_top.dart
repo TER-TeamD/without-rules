@@ -77,6 +77,6 @@ class _PushOnTopState extends State<PushOnTop>
     return Transform.translate(
         offset: location,
         child: Transform.rotate(
-            angle: rotation, child: CardComponent(card: widget.card)));
+            angle: rotation, child: CardComponent(card: widget.card, isStackHead: false)));
   }
 }

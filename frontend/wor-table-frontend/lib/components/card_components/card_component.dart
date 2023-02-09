@@ -6,15 +6,19 @@ class CardComponent extends StatelessWidget {
   static const Offset size = Offset(100, 170);
 
   final GameCard card;
+  final bool isStackHead;
 
-  const CardComponent({super.key, required this.card});
+  const CardComponent({super.key, required this.card, required this.isStackHead});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 226, 226, 226),
-          borderRadius: BorderRadius.all(Radius.circular(5))),
+      decoration: BoxDecoration(
+          color: isStackHead
+            ? const Color.fromARGB(255, 226, 226, 226)
+            : const Color.fromARGB(255, 187, 187, 187),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+      ),
       child: SizedBox(
           width: size.dx,
           height: size.dy,

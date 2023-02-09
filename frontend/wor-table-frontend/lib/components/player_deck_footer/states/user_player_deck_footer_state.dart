@@ -15,6 +15,8 @@ class UserPlayerDeckFooterState extends PlayerDeckFooterState {
   build(BuildContext context) {
     return Center(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Image.asset(
             'images/avatars/$avatar.png',
