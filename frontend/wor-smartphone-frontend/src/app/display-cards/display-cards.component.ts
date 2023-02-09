@@ -29,6 +29,11 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
+  // public cards: Card[] = [{ value: 30, cattleHead: 1 }, { value: 77, cattleHead: 2 }, { value: 12, cattleHead: 3 },
+  // { value: 89, cattleHead: 1 }, { value: 27, cattleHead: 5 }, { value: 34, cattleHead: 2 }, { value: 56, cattleHead: 3 },
+  // { value: 90, cattleHead: 1 }, { value: 23, cattleHead: 5 }, { value: 45, cattleHead: 2 }];
+
+
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
 

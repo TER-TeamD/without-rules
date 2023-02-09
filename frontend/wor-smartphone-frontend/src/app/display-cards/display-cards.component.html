@@ -2,7 +2,11 @@
 
     <div class="header">
         <div class="header-username">
-            Hi {{player?.username}} <span *ngIf="!loading">, you currently have {{cattleHeads}} cattle heads !</span>
+            Hi {{player?.username}}
+        </div>
+        <div class="header-cattleheads" *ngIf="!loading">
+            <p class="cattlehead-image">🐮</p>
+            <p class="cattlehead-number">{{cattleHeads}}</p>
         </div>
         <div class="header-avatar">
             <img src="{{urlAvatar}}" style="width: 50px; height: 50px;" alt="" />
@@ -28,7 +32,7 @@
             cattle heads !</p>
     </div>
 
-    <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
+    <div *ngIf="!loading && !played && !end && player === null" class="content-container">
         <app-card [card]="selectedCard"></app-card>
 
         <div cdkDropListGroup class="cards-container">
