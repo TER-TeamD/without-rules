@@ -66,6 +66,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       console.log("New player value", player)
       this.player = player;
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
+      this.cattleHeads = 0;
       this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
       this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
 

@@ -180,11 +180,11 @@ Map<String, PositionedPlayerDeckState> getDecks(
 
   return Map.fromEntries(game.players.map((p) {
     if (!p.isLogged && !gameStarted) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitPlayer(p.id), TextPlayerDeckFooterState()));
+      return MapEntry(p.id, KeyValueMap(DeckWaitPlayer(p.id), const TextPlayerDeckFooterState()));
     }
 
     if (p.isLogged && !gameStarted) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
+      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), const TextPlayerDeckFooterState()));
     }
 
     if (!p.isLogged && gameStarted) {

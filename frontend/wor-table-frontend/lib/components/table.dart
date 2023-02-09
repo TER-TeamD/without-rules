@@ -158,8 +158,9 @@ class _TableComponentState extends State<TableComponent> {
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
-            [])
+                        .map((e) => MapEntry(e.key, e.value.transform)))
+                )
+        ) ?? [])
       ],
     );
 

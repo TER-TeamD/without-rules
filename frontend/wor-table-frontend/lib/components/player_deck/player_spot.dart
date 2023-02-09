@@ -130,10 +130,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
                         offset: Offset(0, CardComponent.size.dy + 50),
                         child: Container(
                           height: 50.0,
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(68, 68, 68, 1.0),
-
-                          ),
+                          // decoration: BoxDecoration(color: Color.fromRGBO(68, 68, 68, 1.0),),
                           child: widget.childBottom,
                         )
                     ),
