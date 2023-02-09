@@ -13,10 +13,11 @@ import 'constants.dart';
 
 void main() {
 
-  var socket = io(
-      HOSTNAME,
-      { ...OptionBuilder().enableForceNew().enableForceNewConnection().build(), 'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}}
-      );
+  String urlSocket = PROD ? "https://backend-ter.cryptoservice.tech/" : "ws://localhost:8451";
+
+  var socket = io(urlSocket, <String, dynamic>{
+    'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}
+  });
 
   var socketGateway = SocketGateway(socket);
 
