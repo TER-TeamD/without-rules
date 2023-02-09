@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
@@ -27,14 +28,15 @@ import 'package:worfrontend/services/network/models/models/player_action.dart';
 import '../components/player_deck_footer/states/text_player_deck_footer_state.dart';
 import 'logger.dart';
 
-
 class GameController {
   final BehaviorSubject<Game> game$;
   Map<String, DeckTransform> deckTransforms = {};
-  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ = BehaviorSubject.seeded({});
-  PlayerActionPlayer? currentPlayerActionPlayer;
+  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ =
+      BehaviorSubject.seeded({});
+  final BehaviorSubject<String?> lastTopic$ = BehaviorSubject.seeded(null);
+  final BehaviorSubject<PlayerActionPlayer?> currentPlayerActionPlayer =
+      BehaviorSubject.seeded(null);
   final SocketGateway _socketGateway;
-
 
   final BehaviorSubject<bool> gameEnded$ = BehaviorSubject.seeded(false);
 
@@ -42,32 +44,31 @@ class GameController {
   bool allPlayerPlayedForRound = false;
   bool gameIsFinished = false;
 
+  final PlayerActionPlayer? currentAction = null;
+
   GameController(Game game, this._socketGateway)
       : game$ = BehaviorSubject.seeded(game),
-        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(game.players.map((e) => e.id).toList(growable: false))
-  {
+        deckTransforms = GetIt.I.get<ScreenService>().getMapPosition(
+            game.players.map((e) => e.id).toList(growable: false)) {
     deckTransforms$.add(deckTransforms);
     _socketGateway.onMessage.listen((value) {
       value.execute(this);
     });
   }
 
-
   void gameChanged(Game game, String topic) {
     Logger.log("Game changed.");
 
-    BetweenRoundPlayerAction? action = game.inGameProperty?.betweenRound?.currentPlayerAction;
-
-    if (action != null) {
-      currentPlayerActionPlayer = PlayerActionPlayer(action.player, action.action);
-    }
-
+    // Update rising edge of end turn
     if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
       playingRound = (game.inGameProperty?.currentRound ?? 0);
       allPlayerPlayedForRound = false;
     }
 
-    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
+
+    // Trigger end turn
+    var everyoneHadPlayed = game.players
+        .every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
     if (everyoneHadPlayed && !allPlayerPlayedForRound) {
       _socketGateway.allPlayerPlayed();
       allPlayerPlayedForRound = true;
@@ -96,11 +97,11 @@ class GameController {
     }
 
     if (topic == "END_GAME_RESULTS") {
-      gameIsFinished = true;
       gameEnded$.add(true);
     }
 
     game$.add(game);
+    lastTopic$.add(topic);
   }
 
   chooseCard(GameCard card) {}
@@ -123,16 +124,25 @@ class GameController {
   }
 
   bool doUserShouldChoose() {
-    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action.type == "CHOOSE_STACK_CARD";
+    return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action
+                .type ==
+            "CHOOSE_STACK_CARD" &&
+        currentPlayerActionPlayer == null;
   }
 
   void chooseStack(int stackNumber) {
-    if(!doUserShouldChoose()) return;
     _socketGateway.nextRoundResultActionChoosingStack(stackNumber);
   }
 
-  PlayerActionPlayer? getCurrentPlayerActionPlayer() {
-    return currentPlayerActionPlayer;
+  Future play(PlayerActionPlayer playerActionPlayer) async {
+    var completer = Completer();
+    StreamSubscription<dynamic> subscription =
+        playerActionPlayer.onComplete.listen((value) => completer.complete());
+    currentPlayerActionPlayer.add(playerActionPlayer);
+
+    // Await action completion
+    await completer.future;
+    subscription.cancel();
   }
 
   Map<String, DeckTransform> getDeckTransforms() {
@@ -154,6 +164,8 @@ class PlayerActionPlayer {
   final Player _player;
   final PlayerAction _action;
 
+  Subject<dynamic> get onComplete => _action.onComplete;
+
   PlayerActionPlayer(this._player, this._action);
 
   Iterable<Widget> buildWidget(BuildContext context, SceneData sceneData) {
@@ -161,8 +173,8 @@ class PlayerActionPlayer {
   }
 }
 
-
-Map<String, PositionedPlayerDeckState> getDecks(Game game, Map<String, DeckTransform> deckTransforms) {
+Map<String, PositionedPlayerDeckState> getDecks(
+    Game game, Map<String, DeckTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
   var betweenRound = game.inGameProperty?.betweenRound;
 
