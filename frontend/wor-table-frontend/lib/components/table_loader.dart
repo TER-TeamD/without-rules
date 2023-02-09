@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/screen_initializer.dart';
 import 'package:worfrontend/components/table.dart';
 import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/models/models/game.dart';
+import 'package:worfrontend/services/tester.dart';
 
+import '../constants.dart';
 import '../services/network/socket_gateway.dart';
 
 class TableLoader extends StatefulWidget {
@@ -21,6 +26,24 @@ class _TableLoaderState extends State<TableLoader> {
     super.initState();
     GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
           controller = GameController(game, GetIt.I.get<SocketGateway>());
+
+          if(TESTERS != 0) {
+            var durations = [ 300, 600 ];
+
+            // Start the game once every testers are connected.
+            StreamSubscription<Game>? subscription;
+            subscription = controller!.game$.listen((game) {
+              if(game.players.where((p) => p.isLogged).length == TESTERS) {
+                subscription?.cancel();
+                controller!.startGame();
+              }
+            });
+
+            // Start the testers.
+            for(int i = 0; i < TESTERS; i++) {
+              MobileTester(game.players[i].id, HOSTNAME, controller!, latency: durations[i % durations.length]);
+            }
+          }
         }));
   }
 
