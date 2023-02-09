@@ -13,6 +13,7 @@ import 'package:worfrontend/components/player_deck/states/wait_other_players.dar
 import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/icon_player_deck_footer_state.dart';
+import 'package:worfrontend/components/player_deck_footer/states/user_and_cattleheads_player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/user_player_deck_footer_state.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
@@ -211,14 +212,14 @@ Map<String, PositionedPlayerDeckState> getDecks(
         throw error.screenMessage();
       }
 
-      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
+      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {
-      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
+      return MapEntry(p.id, KeyValueMap(DeckWaitOtherPlayers(p), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
     }
 
-    return MapEntry(p.id, KeyValueMap(DeckPlaying(), UserPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}")));
+    return MapEntry(p.id, KeyValueMap(DeckPlaying(), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
 
     throw "Case not handled.";
   }).map((state) =>

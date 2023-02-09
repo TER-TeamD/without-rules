@@ -127,9 +127,9 @@ class _PlayerSpotState extends State<PlayerSpot> {
                           child: content()),
                     ),
                     Transform.translate(
-                        offset: Offset(0, CardComponent.size.dy + 50),
+                        offset: Offset(0, CardComponent.size.dy + 40),
                         child: Container(
-                          height: 50.0,
+                          height: 70.0,
                           // decoration: BoxDecoration(color: Color.fromRGBO(68, 68, 68, 1.0),),
                           child: widget.childBottom,
                         )
