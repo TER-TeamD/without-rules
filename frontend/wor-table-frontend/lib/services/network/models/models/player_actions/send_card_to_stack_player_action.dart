@@ -38,7 +38,7 @@ class SendCardToStackPlayerAction extends PlayerAction {
 
 
     return [
-      SlideCard(from: sceneData.decks[player.id]!, to: DeckTransform(toPosition, 0), child: CardComponent(card: playedCard))
+      SlideCard(from: sceneData.decks[player.id]!, to: DeckTransform(toPosition, 0), child: CardComponent(card: playedCard, isStackHead: false,))
     ];
   }
 }

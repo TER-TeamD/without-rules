@@ -10,8 +10,7 @@ class StackViewInstance {
   final StackCard stack;
   final List<GlobalKey> card_holders;
 
-  StackViewInstance(this.stack)
-      : card_holders = List.generate(6, (index) => GlobalKey());
+  StackViewInstance(this.stack) : card_holders = List.generate(6, (index) => GlobalKey());
 
   GlobalKey? followingCardHolder() {
     if (card_holders.length <= stack.stackCards.length + 1) return null;
@@ -69,6 +68,7 @@ class StacksComponent extends StatelessWidget {
                                       : CardComponent(
                                           key: e.card_holders[i],
                                           card: e.getCard(i),
+                                          isStackHead: i == e.stack.stackCards.length,
                                         ),
                                 ))
                             .toList(),
