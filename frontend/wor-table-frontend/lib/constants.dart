@@ -21,5 +21,6 @@ String get HOSTNAME => PROD ? "https://backend-ter.cryptoservice.tech/" : "ws://
 
 const bool tst = false;
 const bool PROD = false;
+const bool SHOW_LOG_SOURCE = false;
 
 
