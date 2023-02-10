@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:worfrontend/services/network/models/socket_models/result.dart';
+import 'package:worfrontend/services/network/models/models/result.dart';
 
 import '../constants.dart';
 

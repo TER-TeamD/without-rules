@@ -38,7 +38,7 @@ abstract class PlayerAction {
   }
 
   setComplete() {
-    this.onComplete.add(null);
+    onComplete.add(null);
   }
 
   Iterable<Widget> buildWidget(BuildContext context, SceneData sceneData, Player player) {
@@ -47,6 +47,10 @@ abstract class PlayerAction {
 
   toJson();
 
-  void execute(GameController controller, Player player) {
+  void startAnimation(GameController controller, Player player) {
+  }
+
+  void afterAnimation(GameController controller, Player player) {
+    controller.nextRound();
   }
 }

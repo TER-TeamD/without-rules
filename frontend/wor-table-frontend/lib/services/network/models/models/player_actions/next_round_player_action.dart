@@ -13,6 +13,6 @@ class NextRoundPlayerAction extends PlayerAction {
   };
 
   @override
-  void afterExecute(GameController controller, Player player) {
+  void afterAnimation(GameController controller, Player player) {
   }
 }

@@ -7,11 +7,13 @@ import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/errors/server_error.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
-import 'package:worfrontend/services/network/models/models/player.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
-
 import '../error_manager.dart';
+
+import 'models/socket_models/end_game.dart';
+import 'models/socket_models/game_update.dart';
+import 'models/socket_models/player_result_action.dart';
 
 class SocketGateway {
   final Socket socket;
@@ -38,9 +40,22 @@ class SocketGateway {
         Logger.log(game.players.map((e) => e.id).toString());
       }
 
-      if(data != null && topic != socketTopicsToString(SocketTopics.createNewGame) && data is Map<String, dynamic> && data['game'] != null) {
+      if(data != null && data is Map<String, dynamic> && data['game'] != null) {
         var game = _decodeJson(data);
-        onMessage.add(GameUpdate(game, topic));
+
+        switch(topic) {
+          case gameCreated:
+            break;
+          case newAction:
+            onMessage.add(PlayerResultActionMessage(game, topic));
+            break;
+          case endGame:
+            onMessage.add(EndGameMessage(game, topic));
+            break;
+          default:
+            onMessage.add(GameUpdate(game, topic));
+            break;
+        }
       }
     });
 

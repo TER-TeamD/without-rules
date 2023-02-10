@@ -18,7 +18,7 @@ class ChooseStackCardPlayerAction extends PlayerAction {
   };
 
   @override
-  void afterExecute(GameController controller, Player player) {
+  void afterAnimation(GameController controller, Player player) {
     controller.chooseStack(1);
   }
 }

@@ -12,14 +12,12 @@ import 'package:worfrontend/components/player_deck/states/playing.dart';
 import 'package:worfrontend/components/player_deck/states/wait_other_players.dart';
 import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
-import 'package:worfrontend/components/player_deck_footer/states/icon_player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/user_and_cattleheads_player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/user_player_deck_footer_state.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
-import 'package:worfrontend/services/network/models/models/between_round.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
@@ -66,7 +64,6 @@ class GameController {
       allPlayerPlayedForRound = false;
     }
 
-
     // Trigger end turn
     var everyoneHadPlayed = game.players
         .every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
@@ -75,39 +72,18 @@ class GameController {
       allPlayerPlayedForRound = true;
     }
 
-    if (topic == "FLIP_CARD_ORDER") {
-
-    }
-
-    if (topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
-      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (d != null && d.type == "CHOOSE_STACK_CARD") {
-        } else if (d != null && d.type == "NEXT_ROUND") {
-          if (gameIsFinished == false) {
-            _socketGateway.nextRoundResultAction();
-          }
-        } else {
-          if (gameIsFinished == false) {
-            _socketGateway.nextRoundResultAction();
-          }
-        }
-      });
-
-      /* var d = game.inGameProperty?.betweenRound?.currentPlayerAction;
-      if(d != null) {
-        d.action.afterExecute(this, d.player);
-      } */
-    }
-
-    if (topic == "END_GAME_RESULTS") {
-      gameEnded$.add(true);
-      gameIsFinished = true;
-    }
+    // ! IMPORTANT ! //
+    // Topic specific actions has been moved inside socket_gateway.dart in the switch case statement
+    // This return a specific object for each cases.
+    // These objects can be found inside the socket_models folder.
 
     game$.add(game);
     lastTopic$.add(topic);
+  }
+
+  endGame() {
+    gameEnded$.add(true);
+    gameIsFinished = true;
   }
 
   chooseCard(GameCard card) {}

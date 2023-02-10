@@ -23,7 +23,7 @@ class SendCardToStackPlayerAction extends PlayerAction {
   };
 
   @override
-  void execute(GameController controller, Player player) {
+  void startAnimation(GameController controller, Player player) {
     controller.play(PlayerActionPlayer(player, this));
   }
 
