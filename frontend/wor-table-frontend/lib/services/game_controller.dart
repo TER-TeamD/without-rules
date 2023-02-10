@@ -56,7 +56,6 @@ class GameController {
   }
 
   void gameChanged(Game game, String topic) {
-    Logger.log("Game changed.");
 
     // Update rising edge of end turn
     if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
@@ -172,7 +171,6 @@ Map<String, PositionedPlayerDeckState> getDecks(
     }
 
     if (betweenRound != null) {
-      Logger.log(jsonEncode(betweenRound));
       var playerOrders = betweenRound.playerOrder;
       var ids = playerOrders.map((e) => e.player.id).toList(growable: false);
       if (!playerOrders.map((e) => e.player.id).contains(p.id)) {
