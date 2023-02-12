@@ -58,7 +58,7 @@ class _PlayTurnToastState extends State<PlayTurnToast> with SingleTickerProvider
       ]).animate(_controller);
       return Container(
         alignment: Alignment.center,
-        child: Opacity(opacity: opacityTween.value, child: Container(
+        child: FadeTransition(opacity: opacityTween, child: Container(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
