@@ -38,7 +38,7 @@ class _TableComponentState extends State<TableComponent> {
 
     widget.controller.game$.listen((game) {
       setState(() {
-        decks = getDecks(game, widget.controller.getDeckTransforms());
+        decks = widget.controller.getDecks();
         stacks = widget.controller
             .getStacks()
             .map((e) => StackViewInstance(e))
@@ -64,6 +64,12 @@ class _TableComponentState extends State<TableComponent> {
     widget.controller.promptChooseCard$.listen((value) {
       setState(() {
         promptChooseCard = value;
+      });
+    });
+
+    widget.controller.deckTransforms$.listen((value) {
+      setState(() {
+        decks = widget.controller.getDecks();
       });
     });
 

@@ -166,6 +166,10 @@ class GameController {
   void nextRound() {
     _socketGateway.nextRoundResultAction();
   }
+
+  Map<String, PositionedPlayerDeckState> getDecks() {
+    return getDecksStatic(game$.value, deckTransforms);
+  }
 }
 
 class PlayerActionPlayer {
@@ -181,7 +185,7 @@ class PlayerActionPlayer {
   }
 }
 
-Map<String, PositionedPlayerDeckState> getDecks(
+Map<String, PositionedPlayerDeckState> getDecksStatic(
     Game game, Map<String, AppTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
   var betweenRound = game.inGameProperty?.betweenRound;
