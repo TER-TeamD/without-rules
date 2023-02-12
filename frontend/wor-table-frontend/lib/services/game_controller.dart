@@ -219,7 +219,7 @@ Map<String, PositionedPlayerDeckState> getDecksStatic(
         throw error.screenMessage();
       }
 
-      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
+      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!, playerOrder.first.order + 1), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {
