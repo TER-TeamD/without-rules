@@ -16,6 +16,7 @@ import 'package:worfrontend/components/player_deck_footer/states/user_and_cattle
 import 'package:worfrontend/components/player_deck_footer/states/user_player_deck_footer_state.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
+import 'package:worfrontend/models/transform.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
@@ -26,22 +27,29 @@ import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
 import '../components/player_deck_footer/states/text_player_deck_footer_state.dart';
 import 'logger.dart';
+import 'network/models/models/player_actions/choose_stack_card_player_action.dart';
 
 class GameController {
   final BehaviorSubject<Game> game$;
-  Map<String, DeckTransform> deckTransforms = {};
-  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ =
+  Map<String, AppTransform> deckTransforms = {};
+  final BehaviorSubject<Map<String, AppTransform>> deckTransforms$ =
       BehaviorSubject.seeded({});
   final BehaviorSubject<String?> lastTopic$ = BehaviorSubject.seeded(null);
   final BehaviorSubject<PlayerActionPlayer?> currentPlayerActionPlayer =
       BehaviorSubject.seeded(null);
+  final BehaviorSubject<Set<int>> animatedCards$ = BehaviorSubject<Set<int>>.seeded(<int>{});
   final SocketGateway _socketGateway;
 
+  final Subject<int> stackChosen$ = PublishSubject();
+
   final BehaviorSubject<bool> gameEnded$ = BehaviorSubject.seeded(false);
+
+  final BehaviorSubject<bool> promptChooseCard$ = BehaviorSubject.seeded(false);
 
   int playingRound = 0;
   bool allPlayerPlayedForRound = false;
   bool gameIsFinished = false;
+  int animationStep = 0;
 
   final PlayerActionPlayer? currentAction = null;
 
@@ -85,13 +93,15 @@ class GameController {
     gameIsFinished = true;
   }
 
-  chooseCard(GameCard card) {}
+  startChooseCard() {
+    promptChooseCard$.add(true);
+  }
 
   void startGame() {
     _socketGateway.startGame();
   }
 
-  void deckTransformChanged(String playerId, DeckTransform transform) {
+  void deckTransformChanged(String playerId, AppTransform transform) {
     deckTransforms[playerId] = transform;
     deckTransforms$.add(deckTransforms);
   }
@@ -109,11 +119,20 @@ class GameController {
         && currentPlayerActionPlayer == null;
   }
 
-  void chooseStack(int stackNumber) {
-    _socketGateway.nextRoundResultActionChoosingStack(stackNumber);
+  void sendChoosenStack(int chosenStack) {
+    _socketGateway.nextRoundResultActionChoosingStack(chosenStack);
   }
 
-  Future play(PlayerActionPlayer playerActionPlayer) async {
+  void chooseStack(int stackNumber) {
+    stackChosen$.add(stackNumber);
+    promptChooseCard$.add(false);
+  }
+
+  Future play(PlayerActionPlayer playerActionPlayer, { Iterable<int>? usedCards }) async {
+    bool isChoose = playerActionPlayer._action is ChooseStackCardPlayerAction;
+    if(usedCards != null) {
+      animatedCards$.add(Set<int>.from(usedCards));
+    }
     var completer = Completer();
     StreamSubscription<dynamic> subscription =
         playerActionPlayer.onComplete.listen((value) => completer.complete());
@@ -121,10 +140,18 @@ class GameController {
 
     // Await action completion
     await completer.future;
+
+    animatedCards$.add(<int>{});
+    animationStep = 0;
+    currentPlayerActionPlayer.add(null);
     subscription.cancel();
   }
 
-  Map<String, DeckTransform> getDeckTransforms() {
+  void nextAnimationStep() {
+    animationStep++;
+  }
+
+  Map<String, AppTransform> getDeckTransforms() {
     return deckTransforms;
   }
 
@@ -153,7 +180,7 @@ class PlayerActionPlayer {
 }
 
 Map<String, PositionedPlayerDeckState> getDecks(
-    Game game, Map<String, DeckTransform> deckTransforms) {
+    Game game, Map<String, AppTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
   var betweenRound = game.inGameProperty?.betweenRound;
 

@@ -21,14 +21,19 @@ class TableComponent extends StatefulWidget {
 class _TableComponentState extends State<TableComponent> {
   Map<String, PositionedPlayerDeckState> decks = {};
   late List<StackViewInstance> stacks;
+  Set<int> animatedCards = <int>{};
   bool isGameStarted = false;
   bool isGameEnded = false;
+  bool promptChooseCard = false;
   PlayerActionPlayer? playerActionPlayer;
 
   @override
   void initState() {
     super.initState();
-    stacks = widget.controller.getStacks().map((e) => StackViewInstance(e)).toList(growable: false);
+    stacks = widget.controller
+        .getStacks()
+        .map((e) => StackViewInstance(e))
+        .toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
     widget.controller.game$.listen((game) {
@@ -49,6 +54,16 @@ class _TableComponentState extends State<TableComponent> {
     widget.controller.currentPlayerActionPlayer.listen((value) {
       setState(() {
         playerActionPlayer = value;
+      });
+    });
+    widget.controller.animatedCards$.listen((value) {
+      setState(() {
+        animatedCards = value;
+      });
+    });
+    widget.controller.promptChooseCard$.listen((value) {
+      setState(() {
+        promptChooseCard = value;
       });
     });
 
@@ -91,37 +106,53 @@ class _TableComponentState extends State<TableComponent> {
   }
 
   Widget gameEnd() {
-    return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+    return Column(mainAxisSize: MainAxisSize.min, children: [
       Text(
         "Game ended",
         style: const TextStyle(color: Colors.white, fontSize: 50),
       ),
-      ...widget.controller.getRank().map((p) => Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.gameResult.ranking}", style: const TextStyle(color: Colors.white, fontSize: 26.0,)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              'images/avatars/${p.avatar}.png',
-              width: 50.0,
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.username}", style: const TextStyle(color: Colors.white, fontSize: 18.0,),),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.gameResult.cattleHeads} 🐮", style: const TextStyle(color: Colors.white,  fontSize: 18.0,),),
-          ),
-        ],
-      )).toList(),
+      ...widget.controller
+          .getRank()
+          .map((p) => Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("${p.gameResult.ranking}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26.0,
+                        )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      'images/avatars/${p.avatar}.png',
+                      width: 50.0,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${p.username}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${p.gameResult.cattleHeads} 🐮",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ))
+          .toList(),
     ]);
   }
 
@@ -142,28 +173,27 @@ class _TableComponentState extends State<TableComponent> {
       );
     }
 
-
-    var result = Stack(children: [
+    var result = Stack(
+      children: [
         // logDecks(context),
-      StacksComponent(
-          stacks: stacks,
-          shouldChoose: widget.controller.doUserShouldChoose(),
-          onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
-      ),
-
-      Decks(
-            states: decks.entries.map((e) => e.value).toList(growable: false)
-        ),
-
-        startButton(),
+        StacksComponent(
+            stacks: stacks,
+            animatedCards: animatedCards,
+            shouldChoose: promptChooseCard,
+            onStackTap: (stack) =>
+                widget.controller.chooseStack(stack.stackNumber)),
         ...(playerActionPlayer?.buildWidget(
                 context,
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform)))
-                )
-        ) ?? [])
+                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
+            []),
+        Decks(
+          states: decks.entries.map((e) => e.value).toList(growable: false),
+          controller: widget.controller,
+        ),
+        startButton()
       ],
     );
 

@@ -48,6 +48,7 @@ abstract class PlayerAction {
   toJson();
 
   void startAnimation(GameController controller, Player player) {
+    afterAnimation(controller, player);
   }
 
   void afterAnimation(GameController controller, Player player) {

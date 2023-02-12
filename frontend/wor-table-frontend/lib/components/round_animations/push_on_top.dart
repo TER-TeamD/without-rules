@@ -3,12 +3,13 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
 import 'package:worfrontend/components/decks.dart';
+import 'package:worfrontend/models/transform.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
 
 class PushOnTop extends StatefulWidget {
   final GlobalKey destination;
-  final DeckTransform departure;
+  final AppTransform departure;
   final GameCard card;
   final void Function()? onComplete;
 

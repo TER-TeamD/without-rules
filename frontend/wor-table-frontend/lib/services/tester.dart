@@ -59,7 +59,7 @@ class MobileTester {
           if (action == null) break;
 
           // Check if this specific player should choose
-          if(!controller.doUserShouldChoose()) break;
+          if(!controller.promptChooseCard$.value) break;
           if (action.player.id != id) break;
 
           // Choose the first stack

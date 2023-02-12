@@ -1,26 +1,44 @@
 import 'package:flutter/widgets.dart';
 import 'package:worfrontend/components/decks.dart';
+import 'package:worfrontend/models/transform.dart';
+
+class SlideCardData {
+  final AppTransform from;
+  final AppTransform to;
+  final Widget child;
+
+  const SlideCardData({ required this.from, required this.to, required this.child});
+}
 
 class SlideCard extends StatefulWidget {
-  final DeckTransform from;
-  final DeckTransform to;
-  final Widget child;
+  final String id;
+  final SlideCardData Function() retrieveData;
   final void Function()? onDone;
 
-  const SlideCard({ Key? key, required this.from, required this.to, required this.child, this.onDone }) : super(key: key);
+  const SlideCard({ Key? key, required this.id, required this.retrieveData, this.onDone }) : super(key: key);
 
   @override
-  State<SlideCard> createState() => _SlideCardState();
+  State<SlideCard> createState() => _SlideCardState(id);
 }
 
 class _SlideCardState extends State<SlideCard> with SingleTickerProviderStateMixin {
+  final String id;
+
   late AnimationController _controller;
+
+  _SlideCardState(this.id);
 
   @override
   void initState() {
     super.initState();
 
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _controller.addListener(() {
+      if(_controller.isCompleted) {
+        widget.onDone?.call();
+      }
+    });
+    _controller.reset();
     _controller.forward(from: 0);
   }
 
@@ -31,22 +49,33 @@ class _SlideCardState extends State<SlideCard> with SingleTickerProviderStateMix
   }
 
   @override
+  void didUpdateWidget(covariant SlideCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if(oldWidget.id != widget.id) {
+      _controller.reset();
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var position = Tween<Offset>(begin: widget.from.position, end: widget.to.position).animate(_controller);
-    var rotation = Tween<double>(begin: widget.from.rotation, end: widget.to.rotation).animate(_controller);
+
 
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
+        var data = widget.retrieveData();
+        var transform = Tween<AppTransform>(begin: data.from, end: data.to).animate(_controller);
         return Transform.translate(
-          offset: position.value,
+          offset: transform.value.position,
           child: Transform.rotate(
-            angle: rotation.value,
-            child: child,
+            angle: transform.value.rotation,
+            child: data.child,
           ),
         );
       },
-      child: widget.child,
+      child: Container(),
     );
   }
 }

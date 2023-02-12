@@ -13,6 +13,6 @@ class PlayerResultActionMessage extends GameUpdate {
     var playerAction = receivedGame.inGameProperty?.betweenRound?.currentPlayerAction;
     if(playerAction == null) return;
 
-    playerAction.action.afterAnimation(controller, playerAction.player);
+    playerAction.action.startAnimation(controller, playerAction.player);
   }
 }

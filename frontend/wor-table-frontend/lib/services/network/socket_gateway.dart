@@ -22,28 +22,20 @@ class SocketGateway {
 
   SocketGateway(this.socket) : onMessage = PublishSubject();
 
-  void log(Map<String, dynamic> json) {
-    Logger.log(jsonEncode(json));
-  }
-
   listenEvents() {
     socket.onConnect((data) {
       Logger.log("Connected");
       connected.add(true);
     });
     socket.onAny((String topic, data) {
-      Logger.log("Data received from $topic: $data");
-      if(topic == "disconnect") return;
+      if (topic == "disconnect") return;
 
-      if (data != null && data['game'] != null) {
+      if (data != null && data['game'] is Map<String, dynamic>) {
         var game = _decodeJson(data);
+        Logger.log("Received $topic: ${jsonEncode(game.toJson())}");
         Logger.log(game.players.map((e) => e.id).toString());
-      }
 
-      if(data != null && data is Map<String, dynamic> && data['game'] != null) {
-        var game = _decodeJson(data);
-
-        switch(topic) {
+        switch (topic) {
           case gameCreated:
             break;
           case newAction:
@@ -74,11 +66,10 @@ class SocketGateway {
     }
   }
 
-
   Future<Game> newGame() async {
     var event = "TABLE_NEW_GAME";
     var completer = Completer<Game>();
-    socket.on(socketTopicsToString(SocketTopics.createNewGame), (data) {
+    socket.once(socketTopicsToString(SocketTopics.createNewGame), (data) {
       var game = _decodeJson(data);
       completer.complete(game);
     });
@@ -93,22 +84,18 @@ class SocketGateway {
   }
 
   void allPlayerPlayed() {
-
     var event = "TABLE_ALL_PLAYER_PLAYED";
     emit(event, {});
   }
 
   void nextRoundResultAction() {
     var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
-    emit(event, {
-      'choosen_stack': null
-    });
+    emit(event, {'choosen_stack': null});
   }
+
   void nextRoundResultActionChoosingStack(int stackNumber) {
     var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
-    emit(event, {
-      'choosen_stack': stackNumber
-    });
+    emit(event, {'choosen_stack': stackNumber});
   }
 
   void newResultAction() {
@@ -120,5 +107,4 @@ class SocketGateway {
     Logger.log("Emitting $topic: $data");
     socket.emit(topic, data);
   }
-
 }

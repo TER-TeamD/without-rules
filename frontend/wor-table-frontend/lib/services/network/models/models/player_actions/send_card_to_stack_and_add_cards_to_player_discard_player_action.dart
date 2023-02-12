@@ -1,3 +1,6 @@
+import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/models/models/player.dart';
+
 import '../player_action.dart';
 
 class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
