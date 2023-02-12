@@ -26,6 +26,8 @@ class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
 
   @override
   void executeAction(GameController controller, Game receivedGame, Player player, void Function() packetExecution) {
+    // Here the game modification is postponed until the animation is finished
+    // Because the cards on the stack are needed for the animation
     onComplete.listen((_) {
       packetExecution();
     });
