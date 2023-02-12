@@ -37,7 +37,7 @@ class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
   @override
   void startAnimation(GameController controller, Player player) {
     controller.play(PlayerActionPlayer(player, this), usedCards: [
-      ...controller.previousGame!.inGameProperty!.stacks[stackNumber]
+      ...controller.game$.value.inGameProperty!.stacks[stackNumber]
           .getCards()
           .map((e) => e.value),
       player.playerGameProperty!.playedCard!.value
