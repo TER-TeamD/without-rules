@@ -7,12 +7,7 @@ class PlayerResultActionMessage extends GameUpdate {
 
   @override
   void execute(GameController controller) {
-    super.execute(controller);
-
-    if(controller.gameIsFinished) return;
-    var playerAction = receivedGame.inGameProperty?.betweenRound?.currentPlayerAction;
-    if(playerAction == null) return;
-
-    playerAction.action.startAnimation(controller, playerAction.player);
+    var action = receivedGame.inGameProperty!.betweenRound!.currentPlayerAction!;
+    action.action.packetLifecycle(controller, receivedGame, () => super.execute(controller));
   }
 }

@@ -30,12 +30,13 @@ class ChooseStackCardPlayerAction extends PlayerAction {
     StreamSubscription<int>? subscription;
     subscription = controller.stackChosen$.listen((stackNumber) {
       choosenStackCardByPlayer = stackNumber;
-      controller.play(PlayerActionPlayer(player, this), usedCards: [
+      /* controller.play(PlayerActionPlayer(player, this), usedCards: [
         ...controller.game$.value.inGameProperty!.stacks[stackNumber]
             .getCards()
             .map((e) => e.value),
         player.playerGameProperty!.playedCard!.value
-      ]).then((_) => afterAnimation(controller, player));
+      ]).then((_) => afterAnimation(controller, player)); */
+      afterAnimation(controller, player);
       subscription?.cancel();
     });
     controller.startChooseCard();

@@ -9,6 +9,7 @@ import 'package:worfrontend/services/network/models/models/player_actions/send_c
 import 'package:worfrontend/services/network/models/models/player_actions/send_card_to_stack_player_action.dart';
 
 import '../../../game_controller.dart';
+import 'game.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK_CARD";
 const String sendCardToStackAndAddCardToPlayerDiscard = "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
@@ -46,6 +47,18 @@ abstract class PlayerAction {
   }
 
   toJson();
+
+  void packetLifecycle(GameController controller, Game receivedGame, void Function() packetExecution) {
+
+    if(controller.gameIsFinished) return;
+
+    executeAction(controller, receivedGame, receivedGame.inGameProperty!.betweenRound!.currentPlayerAction!.player, packetExecution);
+  }
+
+  void executeAction(GameController controller, Game receivedGame, Player player, void Function() packetExecution) {
+    packetExecution();
+    startAnimation(controller, player);
+  }
 
   void startAnimation(GameController controller, Player player) {
     afterAnimation(controller, player);

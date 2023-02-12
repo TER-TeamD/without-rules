@@ -39,6 +39,7 @@ class GameController {
       BehaviorSubject.seeded(null);
   final BehaviorSubject<Set<int>> animatedCards$ = BehaviorSubject<Set<int>>.seeded(<int>{});
   final SocketGateway _socketGateway;
+  Game? previousGame = null;
 
   final Subject<int> stackChosen$ = PublishSubject();
 
@@ -64,6 +65,7 @@ class GameController {
   }
 
   void gameChanged(Game game, String topic) {
+    previousGame = game$.value;
 
     // Update rising edge of end turn
     if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
