@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../services/game.service';
 import { WebsocketService } from '../services/websocket.service';
@@ -18,22 +18,22 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   private playerSubscription: Subscription | null = null;
 
   public player: Player | null = null;
-  public loading: boolean = true;
+  public loading: boolean = false;
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
   public urlAvatar: string = "";
-  public cards: Card[] = [];
+  // public cards: Card[] = [];
   public cattleHeads: number = 0;
-
+  // public cardsTemp: Card[] = [];
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
-  // public cards: Card[] = [{ value: 30, cattleHead: 1 }, { value: 77, cattleHead: 2 }, { value: 12, cattleHead: 3 },
-  // { value: 89, cattleHead: 1 }, { value: 27, cattleHead: 5 }, { value: 34, cattleHead: 2 }, { value: 56, cattleHead: 3 },
-  // { value: 90, cattleHead: 1 }, { value: 23, cattleHead: 5 }, { value: 45, cattleHead: 2 }];
+  public cards: Card[] = [{ value: 30, cattleHead: 1 }, { value: 77, cattleHead: 2 }, { value: 12, cattleHead: 3 },
+  { value: 89, cattleHead: 1 }, { value: 27, cattleHead: 5 }, { value: 34, cattleHead: 2 }, { value: 56, cattleHead: 3 },
+  { value: 90, cattleHead: 1 }, { value: 23, cattleHead: 5 }, { value: 45, cattleHead: 2 }];
 
-
+  public cardsTemp: Card[] = this.cards;
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
   }
 
@@ -71,10 +71,10 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       console.log("New player value", player)
       this.player = player;
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
+      this.cardsTemp = this.cards;
       this.cattleHeads = 0;
       this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
       this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
-
 
       if (this.player) {
         this.selectedCard = this.player.cards[0] ? this.player.cards[0] : null;
@@ -85,6 +85,8 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
 
   public selectCard(card: Card) {
     this.selectedCard = card;
+    console.log(this.cards);
+    this.cards = this.cards.filter(c => c.value !== card.value);
   }
 
   public async play(): Promise<void> {

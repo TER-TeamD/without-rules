@@ -12,8 +12,6 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
-  margin-bottom: 100px;
   background-color: #ececec;
   box-shadow: 0px 3px 3px #cccccc;
 
@@ -71,34 +69,18 @@
 .content-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  height: 60vh;
   align-items: center;
+  margin-top: 5vh;
 }
 
 .cards-container {
   display: flex;
-  flex-wrap: wrap;
-  margin-top: 10vh;
   justify-content: center;
 }
 
 .card-element {
-  display: flex;
-  margin: 0.2em;
-}
-
-.cdk-drag-placeholder {
-  opacity: 0;
-}
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.card-element:last-child {
-  border: none;
-}
-
-.cards-container.cdk-drop-list-dragging .card-element:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  position: absolute;
+  transform: translate(-50%, -50%);
 }

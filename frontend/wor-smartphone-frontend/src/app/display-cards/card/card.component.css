@@ -1,6 +1,6 @@
 .card {
-    width: 17vw;
-    height: 30vw;
+    width: 22vw;
+    height: 40vw;
     background: #999;
     border: 1px solid #000;
     border-radius: 0.5em;
@@ -22,7 +22,7 @@
 .center-card p {
     margin: 0;
     padding: 0;
-    font-size: 3.5vw;
+    font-size: 2.5vh;
     font-weight: bold;
 }
 
