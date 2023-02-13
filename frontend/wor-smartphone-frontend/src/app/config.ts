@@ -1,3 +1,3 @@
 
 
-export const PROD: boolean = true;
+export const PROD: boolean = false;
