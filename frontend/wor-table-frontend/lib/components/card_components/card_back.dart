@@ -20,7 +20,7 @@ class CardBack extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'images/avatars/${player.avatar}.png',
+              PROD ? 'assets/images/avatars/${player.avatar}.png' : 'images/avatars/${player.avatar}.png',
               width: 60.0,
             ),
             Padding(

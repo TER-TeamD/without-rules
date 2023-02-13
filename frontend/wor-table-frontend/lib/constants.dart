@@ -22,7 +22,7 @@ const int TESTERS = 0;
 String get HOSTNAME => PROD ? "https://backend-ter.cryptoservice.tech/" : "ws://localhost:8451";
 
 const bool tst = false;
-const bool PROD = true;
+const bool PROD = false;
 const bool SHOW_LOG_SOURCE = false;
 
 

@@ -78,7 +78,7 @@ flutter:
     - assets/images/avatars/4.png
     - assets/images/avatars/5.png
     - assets/images/avatars/6.png
-    - images/avatars/7.png
+    - assets/images/avatars/7.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

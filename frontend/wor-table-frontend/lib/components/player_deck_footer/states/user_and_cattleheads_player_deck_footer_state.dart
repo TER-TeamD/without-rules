@@ -61,7 +61,7 @@ class UserAndCattleHeadsPlayerDeckFooterState extends PlayerDeckFooterState {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
-                  'images/avatars/$avatar.png',
+                  PROD ? 'assets/images/avatars/$avatar.png' : 'images/avatars/$avatar.png',
                   width: 30.0,
                 ),
                 Padding(
