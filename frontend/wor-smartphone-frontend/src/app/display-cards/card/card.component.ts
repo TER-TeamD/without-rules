@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {Card} from "../../model/player.model";
+import { Card } from "../../model/player.model";
 
 @Component({
   selector: 'app-card',
@@ -30,6 +30,7 @@ export class CardComponent {
       this.cattleHeadsLine2 = "🐮🐮🐮";
     } else {
       this.cattleHeadsLine1 = "🐮".repeat(cattleHeads);
+      this.cattleHeadsLine2 = "";
     }
   }
 

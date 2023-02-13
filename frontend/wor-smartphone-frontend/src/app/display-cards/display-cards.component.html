@@ -32,7 +32,7 @@
             cattle heads !</p>
     </div>
 
-    <div *ngIf="!loading && !played && !end && player === null" class="content-container">
+    <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
         <app-card [card]="selectedCard"></app-card>
 
         <div class="cards-container">

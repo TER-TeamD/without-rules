@@ -18,20 +18,19 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   private playerSubscription: Subscription | null = null;
 
   public player: Player | null = null;
-  public loading: boolean = false;
+  public loading: boolean = true;
   public end: boolean = false;
   public played: boolean = false;
   public selectedCard: Card | null = null;
   public urlAvatar: string = "";
-  // public cards: Card[] = [];
+  public cards: Card[] = [];
   public cattleHeads: number = 0;
-  // public cardsTemp: Card[] = [];
 
   public ranks: String[] = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "nineth", "tenth"];
 
-  public cards: Card[] = [{ value: 30, cattleHead: 1 }, { value: 77, cattleHead: 2 }, { value: 12, cattleHead: 3 },
-  { value: 89, cattleHead: 1 }, { value: 27, cattleHead: 5 }, { value: 34, cattleHead: 2 }, { value: 56, cattleHead: 3 },
-  { value: 90, cattleHead: 1 }, { value: 23, cattleHead: 5 }, { value: 45, cattleHead: 2 }];
+  // public cards: Card[] = [{ value: 30, cattleHead: 1 }, { value: 77, cattleHead: 2 }, { value: 12, cattleHead: 3 },
+  // { value: 89, cattleHead: 1 }, { value: 27, cattleHead: 5 }, { value: 34, cattleHead: 2 }, { value: 56, cattleHead: 3 },
+  // { value: 90, cattleHead: 1 }, { value: 23, cattleHead: 5 }, { value: 45, cattleHead: 2 }];
 
   public cardsTemp: Card[] = this.cards;
   constructor(private wsService: WebsocketService, private gameService: GameService, private route: ActivatedRoute) {
@@ -85,8 +84,6 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
 
   public selectCard(card: Card) {
     this.selectedCard = card;
-    console.log(this.cards);
-    this.cards = this.cards.filter(c => c.value !== card.value);
   }
 
   public async play(): Promise<void> {
