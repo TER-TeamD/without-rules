@@ -51,6 +51,7 @@ class GameController {
   bool allPlayerPlayedForRound = false;
   bool gameIsFinished = false;
   int animationStep = 0;
+  Player? choosingPlayer = null;
 
   final PlayerActionPlayer? currentAction = null;
 
@@ -95,7 +96,8 @@ class GameController {
     gameIsFinished = true;
   }
 
-  startChooseCard() {
+  startChooseCard(Player player) {
+    choosingPlayer = player;
     promptChooseCard$.add(true);
   }
 
@@ -175,6 +177,8 @@ class GameController {
 class PlayerActionPlayer {
   final Player _player;
   final PlayerAction _action;
+
+  Player get player => _player;
 
   Subject<dynamic> get onComplete => _action.onComplete;
 

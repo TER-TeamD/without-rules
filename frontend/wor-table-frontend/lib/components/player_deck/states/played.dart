@@ -26,7 +26,7 @@ class DeckPlayed extends PlayerDeckState {
                     borderRadius: BorderRadius.circular(10)),
                 child: Text(
                   order.toString(),
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  style: const TextStyle(fontSize: 15, color: Colors.white),
                 ),
               )))
     ]);

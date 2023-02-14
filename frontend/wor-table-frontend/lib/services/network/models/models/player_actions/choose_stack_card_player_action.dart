@@ -39,7 +39,7 @@ class ChooseStackCardPlayerAction extends PlayerAction {
       afterAnimation(controller, player);
       subscription?.cancel();
     });
-    controller.startChooseCard();
+    controller.startChooseCard(player);
   }
 
   @override

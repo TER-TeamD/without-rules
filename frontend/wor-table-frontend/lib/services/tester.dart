@@ -65,7 +65,7 @@ class MobileTester {
           // Choose the first stack
           var stack = controller.game$.value.inGameProperty?.stacks.first;
           if (stack == null) break;
-          chooseStackCard(stack);
+          Future.delayed(Duration(seconds: 1)).then((_) => chooseStackCard(stack));
           break;
       }
     });
