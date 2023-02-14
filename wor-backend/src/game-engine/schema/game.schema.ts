@@ -8,6 +8,9 @@ export class InGameProperty {
   stacks: StackCard[] = [];
   current_round = 0;
   between_round: BetweenRound | null = null;
+
+  chrono_up_to: string | null = null;
+
 }
 
 export type GameDocument = Game & Document;
@@ -90,6 +93,7 @@ export class InPlayerGameProperty {
   played_card: Card | null;
   had_played_turn: boolean;
   player_discard: Card[] = [];
+  chrono_up_to: string | null = null;
 
   constructor() {
     this.played_card = null
@@ -160,6 +164,7 @@ export class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction extends P
 
 export class ChooseStackCardPlayerAction extends PlayerAction {
   choosen_stack_card_by_player: number | null = null;
+  chrono_up_to: string | null = null;
 
 
   constructor() {

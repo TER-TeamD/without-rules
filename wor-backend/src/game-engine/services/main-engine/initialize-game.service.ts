@@ -6,7 +6,7 @@ import {GameNotFoundException} from "./exceptions/game-not-found.exception";
 import {UserNotFoundWhenJoinGameException} from "./exceptions/user-not-found-when-join-game.exception";
 import {NotEnoughPlayersForStartingGameException} from "./exceptions/not-enough-players-for-starting-game.exception";
 import {EngineUtilsService} from "./engine-utils.service";
-import {NUMBER_OF_CARDS_PER_PLAYER, NUMBER_OF_DECKS} from "../../config";
+import {DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS, NUMBER_OF_CARDS_PER_PLAYER, NUMBER_OF_DECKS} from "../../config";
 
 @Injectable()
 export class InitializeGameService {
@@ -39,8 +39,21 @@ export class InitializeGameService {
         }
 
         currentGame = await this.__initiateGameCards(currentGame);
+        currentGame = await this.__initiateChrono(currentGame);
 
         return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: 'after'});
+    }
+
+    public __initiateChrono(game: Game): Game {
+
+        const chronoUpTo: string = new Date(((new Date()).setSeconds((new Date().getSeconds() + DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS)))).toISOString();
+        game.in_game_property.chrono_up_to = chronoUpTo;
+
+        game.players.forEach(p => {
+            p.in_player_game_property.chrono_up_to = chronoUpTo;
+        });
+
+        return game
     }
 
     public __initiateGameCards(game: Game): Game {
