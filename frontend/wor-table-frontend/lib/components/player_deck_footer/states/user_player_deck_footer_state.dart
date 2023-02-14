@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:worfrontend/components/avatar.dart';
 import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
 import 'package:worfrontend/constants.dart';
 
@@ -18,10 +19,7 @@ class UserPlayerDeckFooterState extends PlayerDeckFooterState {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(
-            PROD ? 'assets/images/avatars/$avatar.png' : 'images/avatars/$avatar.png',
-            width: 30.0,
-          ),
+          Avatar(avatar: avatar),
           Padding(
             padding: const EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 0.0),
             child: Text(

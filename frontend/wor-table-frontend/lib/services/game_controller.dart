@@ -176,6 +176,8 @@ class PlayerActionPlayer {
   final Player _player;
   final PlayerAction _action;
 
+  Player get player => _player;
+
   Subject<dynamic> get onComplete => _action.onComplete;
 
   PlayerActionPlayer(this._player, this._action);

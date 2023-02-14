@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/stacks.dart';
-import 'package:worfrontend/components/toast.dart';
+import 'package:worfrontend/components/toast/choose_stack_popup.dart';
+import 'package:worfrontend/components/toast/play_turn_toast.dart';
+import 'package:worfrontend/components/toast/toast.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
@@ -46,7 +48,8 @@ class _TableComponentState extends State<TableComponent> {
             .map((e) => StackViewInstance(e))
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
-        isPlayTime = game.players.any((element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
+        isPlayTime = game.players.any(
+            (element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
       });
     });
     widget.controller.gameEnded$.listen((event) {
@@ -203,8 +206,9 @@ class _TableComponentState extends State<TableComponent> {
           controller: widget.controller,
         ),
         startButton(),
-        if(isPlayTime)
-          const PlayTurnToast()
+        if (isPlayTime) const PlayTurnToast(),
+        if (promptChooseCard)
+          ChooseStackToast(player: playerActionPlayer!.player)
       ],
     );
 
