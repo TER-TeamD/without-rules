@@ -4,11 +4,11 @@ import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/stacks.dart';
 import 'package:worfrontend/components/toast/choose_stack_popup.dart';
 import 'package:worfrontend/components/toast/play_turn_toast.dart';
-import 'package:worfrontend/components/toast/toast.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
+import 'package:worfrontend/services/network/models/models/player.dart';
 
 import '../services/error_manager.dart';
 
@@ -29,6 +29,7 @@ class _TableComponentState extends State<TableComponent> {
   bool isPlayTime = false;
   bool isGameEnded = false;
   bool promptChooseCard = false;
+  Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
 
   @override
@@ -69,6 +70,7 @@ class _TableComponentState extends State<TableComponent> {
     });
     widget.controller.promptChooseCard$.listen((value) {
       setState(() {
+        choosingPlayer = widget.controller.choosingPlayer;
         promptChooseCard = value;
       });
     });
@@ -119,9 +121,9 @@ class _TableComponentState extends State<TableComponent> {
 
   Widget gameEnd() {
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(
+      const Text(
         "Game ended",
-        style: const TextStyle(color: Colors.white, fontSize: 50),
+        style: TextStyle(color: Colors.white, fontSize: 50),
       ),
       ...widget.controller
           .getRank()
@@ -207,8 +209,8 @@ class _TableComponentState extends State<TableComponent> {
         ),
         startButton(),
         if (isPlayTime) const PlayTurnToast(),
-        if (promptChooseCard)
-          ChooseStackToast(player: playerActionPlayer!.player)
+        if (promptChooseCard && choosingPlayer != null)
+          ChooseStackToast(player: choosingPlayer!)
       ],
     );
 
