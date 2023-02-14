@@ -11,8 +11,13 @@ export class CardComponent {
   @Input()
   public card?: Card | null;
 
+  @Input()
+  public indicator?: boolean;
+
   public cattleHeadsLine1: string = "";
   public cattleHeadsLine2: string = "";
+  public cattleHeadsIndicator: string = "";
+  public numbers: any[] = [];
 
   constructor() { }
 
@@ -21,6 +26,8 @@ export class CardComponent {
 
   ngOnChanges(): void {
     let cattleHeads = this.card?.cattleHead || 0;
+    this.cattleHeadsIndicator = "🐮".repeat(cattleHeads);
+    this.numbers = Array(cattleHeads).fill(0);
 
     if (cattleHeads == 5) {
       this.cattleHeadsLine1 = "🐮🐮🐮";

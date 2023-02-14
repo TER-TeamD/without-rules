@@ -33,12 +33,12 @@
     </div>
 
     <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
-        <app-card [card]="selectedCard"></app-card>
+        <app-card [indicator]="false" [card]="selectedCard"></app-card>
 
         <div class="cards-container">
             <div class="card-element" *ngFor="let card of cards; let i = index"
                 [ngStyle]="{'transform': 'rotate(' + (120 / cards.length * i - (120 / (2 * cards.length)) * (cards.length - 1)) + 'deg) translate(0, -80%)'}">
-                <app-card [card]="card" (click)="selectCard(card)"></app-card>
+                <app-card [indicator]="i !== cards.length-1" [card]="card" (click)="selectCard(card)"></app-card>
             </div>
         </div>
 

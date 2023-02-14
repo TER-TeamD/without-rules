@@ -31,3 +31,14 @@
     align-items: center;
     flex-direction: column;
 }
+
+.indicator {
+    position: absolute;
+    top: 20%;
+}
+
+.indicator p {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9em;
+}
