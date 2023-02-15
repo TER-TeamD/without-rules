@@ -14,7 +14,6 @@
   align-items: center;
   background-color: #ececec;
   box-shadow: 0px 3px 3px #cccccc;
-
 }
 
 .header-username {
@@ -46,16 +45,33 @@
   font-size: 24px;
 }
 
+.buttons {
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  bottom: 0;
+  width: 100%;
+}
 
 #button-play {
   padding: 10px;
   background-color: rgb(9, 201, 19);
   border-radius: 5px;
   border: none;
-  position: absolute;
-  bottom: 10px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 1.5em;
+  font-size: 1.3em;
+}
+
+#button-cancel {
+  padding: 10px;
+  background-color: rgb(201, 73, 9);
+  border-radius: 5px;
+  border: none;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1em;
 }
 
 .loading {
@@ -68,20 +84,20 @@
 }
 
 .content-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 60vh;
-  align-items: center;
-  margin-top: 5vh;
+  height: 100%;
 }
 
 .cards-container {
   display: flex;
   justify-content: center;
+  margin-top: 50%;
 }
 
 .card-element {
   position: absolute;
-  transform: translate(-50%, -50%);
+}
+
+.text {
+  text-align: center;
+  font-size: 1.5em;
 }

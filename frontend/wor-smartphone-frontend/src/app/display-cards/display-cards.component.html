@@ -24,25 +24,24 @@
         <p>Results of the round will be on the table !</p>
     </div>
 
-
-
     <div *ngIf="end" class="loading">
         <p>Game finished...</p>
         <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}}
             cattle heads !</p>
     </div>
 
-    <div *ngIf="!loading && !played && !end && player !== null" class="content-container">
-        <app-card [indicator]="false" [card]="selectedCard"></app-card>
-
+    <div class="content-container" *ngIf="!loading && !played && !end && player !== null">
+        <p class="text" [ngStyle]="{'visibility': (selectedCard !== null) ? 'hidden' : 'visible'}">Pick a card !</p>
         <div class="cards-container">
-            <div class="card-element" *ngFor="let card of cards; let i = index"
-                [ngStyle]="{'transform': 'rotate(' + (120 / cards.length * i - (120 / (2 * cards.length)) * (cards.length - 1)) + 'deg) translate(0, -80%)'}">
-                <app-card [indicator]="i !== cards.length-1" [card]="card" (click)="selectCard(card)"></app-card>
-            </div>
+            <app-card class="card-element" *ngFor="let card of cards; let i = index" (click)="select(card)"
+                [@cardAnimation]="{ value: card.state, params: { degree: (120 / cards.length * i - (120 / (2 * cards.length)) * (cards.length - 1)) } }"
+                [ngStyle]="{'filter': (card !== selectedCard && selectedCard !== null) ? 'blur(10px)' : 'blur(0px)', 'zIndex': (card !== selectedCard && selectedCard !== null) ? 'auto' : 2, 'transition': 'filter 600ms'}"
+                [indicator]="i !== cards.length-1 && card !== selectedCard" [card]="card"></app-card>
         </div>
-
-        <button type="button" id="button-play" (click)="play()">Play the card</button>
+        <div class="buttons" *ngIf="selectedCard !== null">
+            <button type="button" id="button-play" (click)="play()">Play the card</button>
+            <button type="button" id="button-cancel" (click)="cancel()">Cancel</button>
+        </div>
     </div>
 
 </div>
