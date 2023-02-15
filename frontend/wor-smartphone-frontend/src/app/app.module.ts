@@ -8,6 +8,7 @@ import { DisplayCardsComponent } from './display-cards/display-cards.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { CardComponent } from './display-cards/card/card.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,

@@ -12,6 +12,7 @@ export interface Player {
 }
 
 export interface Card {
+  state: string;
   value: number;
   cattleHead: number;
 }

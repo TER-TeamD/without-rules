@@ -3,10 +3,13 @@
         <p>{{ card?.value }}</p>
         <p>{{ card?.value }}</p>
     </div>
-    <h3 class="center-card">
+    <div class="indicator" *ngIf="indicator">
+        <p *ngFor="let number of numbers">🐮</p>
+    </div>
+    <div class="center-card" *ngIf="!indicator">
         <p>{{ cattleHeadsLine1 }}</p>
         <p>{{ cattleHeadsLine2 }}</p>
-    </h3>
+    </div>
     <div class="bottom-card">
         <p class="bottom-value">{{ card?.value }}</p>
         <p class="bottom-value">{{ card?.value }}</p>

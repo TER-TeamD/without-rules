@@ -1,9 +1,9 @@
 .card {
-    width: 120px;
-    height: 200px;
+    width: 22vw;
+    height: 40vw;
     background: #999;
     border: 1px solid #000;
-    border-radius: 5px;
+    border-radius: 0.5em;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -11,29 +11,34 @@
 
 .top-card,
 .bottom-card {
-    margin: 5px;
+    margin: 0.2em;
     display: flex;
     justify-content: space-between;
-    text-align: center;
 }
 
 
 .top-card p,
-.bottom-card p {
+.bottom-card p,
+.center-card p {
     margin: 0;
     padding: 0;
-    font-size: 20px;
+    font-size: 2.2vh;
     font-weight: bold;
 }
 
 .center-card {
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100%;
     flex-direction: column;
 }
 
-.center-card p {
+.indicator {
+    position: absolute;
+    top: 20%;
+}
+
+.indicator p {
     margin: 0;
+    padding: 0;
+    font-size: 0.9em;
 }
