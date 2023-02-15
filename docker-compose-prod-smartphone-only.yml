@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  frontend-smartphone:
+    build:
+      context: frontend/wor-smartphone-frontend
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "8452:80"
+    networks:
+      - ter-network-prod

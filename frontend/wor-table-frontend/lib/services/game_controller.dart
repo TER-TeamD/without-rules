@@ -12,14 +12,13 @@ import 'package:worfrontend/components/player_deck/states/playing.dart';
 import 'package:worfrontend/components/player_deck/states/wait_other_players.dart';
 import 'package:worfrontend/components/player_deck/states/wait_player.dart';
 import 'package:worfrontend/components/player_deck_footer/player_deck_footer_state.dart';
-import 'package:worfrontend/components/player_deck_footer/states/icon_player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/user_and_cattleheads_player_deck_footer_state.dart';
 import 'package:worfrontend/components/player_deck_footer/states/user_player_deck_footer_state.dart';
 import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
+import 'package:worfrontend/models/transform.dart';
 import 'package:worfrontend/services/error_manager.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
-import 'package:worfrontend/services/network/models/models/between_round.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
@@ -28,22 +27,31 @@ import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player_action.dart';
 import '../components/player_deck_footer/states/text_player_deck_footer_state.dart';
 import 'logger.dart';
+import 'network/models/models/player_actions/choose_stack_card_player_action.dart';
 
 class GameController {
   final BehaviorSubject<Game> game$;
-  Map<String, DeckTransform> deckTransforms = {};
-  final BehaviorSubject<Map<String, DeckTransform>> deckTransforms$ =
+  Map<String, AppTransform> deckTransforms = {};
+  final BehaviorSubject<Map<String, AppTransform>> deckTransforms$ =
       BehaviorSubject.seeded({});
   final BehaviorSubject<String?> lastTopic$ = BehaviorSubject.seeded(null);
   final BehaviorSubject<PlayerActionPlayer?> currentPlayerActionPlayer =
       BehaviorSubject.seeded(null);
+  final BehaviorSubject<Set<int>> animatedCards$ = BehaviorSubject<Set<int>>.seeded(<int>{});
   final SocketGateway _socketGateway;
+  Game? previousGame = null;
+
+  final Subject<int> stackChosen$ = PublishSubject();
 
   final BehaviorSubject<bool> gameEnded$ = BehaviorSubject.seeded(false);
+
+  final BehaviorSubject<bool> promptChooseCard$ = BehaviorSubject.seeded(false);
 
   int playingRound = 0;
   bool allPlayerPlayedForRound = false;
   bool gameIsFinished = false;
+  int animationStep = 0;
+  Player? choosingPlayer = null;
 
   final PlayerActionPlayer? currentAction = null;
 
@@ -58,14 +66,13 @@ class GameController {
   }
 
   void gameChanged(Game game, String topic) {
-    Logger.log("Game changed.");
+    previousGame = game$.value;
 
     // Update rising edge of end turn
     if ((game.inGameProperty?.currentRound ?? 0) > playingRound) {
       playingRound = (game.inGameProperty?.currentRound ?? 0);
       allPlayerPlayedForRound = false;
     }
-
 
     // Trigger end turn
     var everyoneHadPlayed = game.players
@@ -75,48 +82,30 @@ class GameController {
       allPlayerPlayedForRound = true;
     }
 
-    if (topic == "FLIP_CARD_ORDER") {
-
-    }
-
-    if (topic == "NEW_RESULT_ACTION" && !gameEnded$.value) {
-      var d = game.inGameProperty?.betweenRound?.currentPlayerAction?.action;
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (d != null && d.type == "CHOOSE_STACK_CARD") {
-        } else if (d != null && d.type == "NEXT_ROUND") {
-          if (gameIsFinished == false) {
-            _socketGateway.nextRoundResultAction();
-          }
-        } else {
-          if (gameIsFinished == false) {
-            _socketGateway.nextRoundResultAction();
-          }
-        }
-      });
-
-      /* var d = game.inGameProperty?.betweenRound?.currentPlayerAction;
-      if(d != null) {
-        d.action.afterExecute(this, d.player);
-      } */
-    }
-
-    if (topic == "END_GAME_RESULTS") {
-      gameEnded$.add(true);
-      gameIsFinished = true;
-    }
+    // ! IMPORTANT ! //
+    // Topic specific actions has been moved inside socket_gateway.dart in the switch case statement
+    // This return a specific object for each cases.
+    // These objects can be found inside the socket_models folder.
 
     game$.add(game);
     lastTopic$.add(topic);
   }
 
-  chooseCard(GameCard card) {}
+  endGame() {
+    gameEnded$.add(true);
+    gameIsFinished = true;
+  }
+
+  startChooseCard(Player player) {
+    choosingPlayer = player;
+    promptChooseCard$.add(true);
+  }
 
   void startGame() {
     _socketGateway.startGame();
   }
 
-  void deckTransformChanged(String playerId, DeckTransform transform) {
+  void deckTransformChanged(String playerId, AppTransform transform) {
     deckTransforms[playerId] = transform;
     deckTransforms$.add(deckTransforms);
   }
@@ -134,11 +123,20 @@ class GameController {
         && currentPlayerActionPlayer == null;
   }
 
-  void chooseStack(int stackNumber) {
-    _socketGateway.nextRoundResultActionChoosingStack(stackNumber);
+  void sendChoosenStack(int chosenStack) {
+    _socketGateway.nextRoundResultActionChoosingStack(chosenStack);
   }
 
-  Future play(PlayerActionPlayer playerActionPlayer) async {
+  void chooseStack(int stackNumber) {
+    stackChosen$.add(stackNumber);
+    promptChooseCard$.add(false);
+  }
+
+  Future play(PlayerActionPlayer playerActionPlayer, { Iterable<int>? usedCards }) async {
+    bool isChoose = playerActionPlayer._action is ChooseStackCardPlayerAction;
+    if(usedCards != null) {
+      animatedCards$.add(Set<int>.from(usedCards));
+    }
     var completer = Completer();
     StreamSubscription<dynamic> subscription =
         playerActionPlayer.onComplete.listen((value) => completer.complete());
@@ -146,10 +144,18 @@ class GameController {
 
     // Await action completion
     await completer.future;
+
+    animatedCards$.add(<int>{});
+    animationStep = 0;
+    currentPlayerActionPlayer.add(null);
     subscription.cancel();
   }
 
-  Map<String, DeckTransform> getDeckTransforms() {
+  void nextAnimationStep() {
+    animationStep++;
+  }
+
+  Map<String, AppTransform> getDeckTransforms() {
     return deckTransforms;
   }
 
@@ -162,11 +168,17 @@ class GameController {
   void nextRound() {
     _socketGateway.nextRoundResultAction();
   }
+
+  Map<String, PositionedPlayerDeckState> getDecks() {
+    return getDecksStatic(game$.value, deckTransforms);
+  }
 }
 
 class PlayerActionPlayer {
   final Player _player;
   final PlayerAction _action;
+
+  Player get player => _player;
 
   Subject<dynamic> get onComplete => _action.onComplete;
 
@@ -177,8 +189,8 @@ class PlayerActionPlayer {
   }
 }
 
-Map<String, PositionedPlayerDeckState> getDecks(
-    Game game, Map<String, DeckTransform> deckTransforms) {
+Map<String, PositionedPlayerDeckState> getDecksStatic(
+    Game game, Map<String, AppTransform> deckTransforms) {
   var gameStarted = (game.inGameProperty?.currentRound ?? 0) > 0;
   var betweenRound = game.inGameProperty?.betweenRound;
 
@@ -196,7 +208,6 @@ Map<String, PositionedPlayerDeckState> getDecks(
     }
 
     if (betweenRound != null) {
-      Logger.log(jsonEncode(betweenRound));
       var playerOrders = betweenRound.playerOrder;
       var ids = playerOrders.map((e) => e.player.id).toList(growable: false);
       if (!playerOrders.map((e) => e.player.id).contains(p.id)) {
@@ -212,7 +223,7 @@ Map<String, PositionedPlayerDeckState> getDecks(
         throw error.screenMessage();
       }
 
-      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
+      return MapEntry(p.id, KeyValueMap(DeckPlayed(p.playerGameProperty!.playedCard!, playerOrder.first.order + 1), UserAndCattleHeadsPlayerDeckFooterState(avatar: p.avatar, username: "${p.username}", numberOfDiscardCard: p.playerGameProperty?.playerDiscard.length )));
     }
 
     if (p.playerGameProperty?.hadPlayedTurn ?? false) {

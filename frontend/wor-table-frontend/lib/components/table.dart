@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/stacks.dart';
+import 'package:worfrontend/components/toast/choose_stack_popup.dart';
+import 'package:worfrontend/components/toast/play_turn_toast.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/screen_service.dart';
+import 'package:worfrontend/services/network/models/models/player.dart';
 
 import '../services/error_manager.dart';
 
@@ -21,24 +24,33 @@ class TableComponent extends StatefulWidget {
 class _TableComponentState extends State<TableComponent> {
   Map<String, PositionedPlayerDeckState> decks = {};
   late List<StackViewInstance> stacks;
+  Set<int> animatedCards = <int>{};
   bool isGameStarted = false;
+  bool isPlayTime = false;
   bool isGameEnded = false;
+  bool promptChooseCard = false;
+  Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
 
   @override
   void initState() {
     super.initState();
-    stacks = widget.controller.getStacks().map((e) => StackViewInstance(e)).toList(growable: false);
+    stacks = widget.controller
+        .getStacks()
+        .map((e) => StackViewInstance(e))
+        .toList(growable: false);
     isGameStarted = widget.controller.isGameStarted();
 
     widget.controller.game$.listen((game) {
       setState(() {
-        decks = getDecks(game, widget.controller.getDeckTransforms());
+        decks = widget.controller.getDecks();
         stacks = widget.controller
             .getStacks()
             .map((e) => StackViewInstance(e))
             .toList(growable: false);
         isGameStarted = widget.controller.isGameStarted();
+        isPlayTime = game.players.any(
+            (element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
       });
     });
     widget.controller.gameEnded$.listen((event) {
@@ -49,6 +61,23 @@ class _TableComponentState extends State<TableComponent> {
     widget.controller.currentPlayerActionPlayer.listen((value) {
       setState(() {
         playerActionPlayer = value;
+      });
+    });
+    widget.controller.animatedCards$.listen((value) {
+      setState(() {
+        animatedCards = value;
+      });
+    });
+    widget.controller.promptChooseCard$.listen((value) {
+      setState(() {
+        choosingPlayer = widget.controller.choosingPlayer;
+        promptChooseCard = value;
+      });
+    });
+
+    widget.controller.deckTransforms$.listen((value) {
+      setState(() {
+        decks = widget.controller.getDecks();
       });
     });
 
@@ -91,37 +120,53 @@ class _TableComponentState extends State<TableComponent> {
   }
 
   Widget gameEnd() {
-    return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-      Text(
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      const Text(
         "Game ended",
-        style: const TextStyle(color: Colors.white, fontSize: 50),
+        style: TextStyle(color: Colors.white, fontSize: 50),
       ),
-      ...widget.controller.getRank().map((p) => Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.gameResult.ranking}", style: const TextStyle(color: Colors.white, fontSize: 26.0,)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              'images/avatars/${p.avatar}.png',
-              width: 50.0,
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.username}", style: const TextStyle(color: Colors.white, fontSize: 18.0,),),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("${p.gameResult.cattleHeads} 🐮", style: const TextStyle(color: Colors.white,  fontSize: 18.0,),),
-          ),
-        ],
-      )).toList(),
+      ...widget.controller
+          .getRank()
+          .map((p) => Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("${p.gameResult.ranking}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26.0,
+                        )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      'images/avatars/${p.avatar}.png',
+                      width: 50.0,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${p.username}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${p.gameResult.cattleHeads} 🐮",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ))
+          .toList(),
     ]);
   }
 
@@ -142,28 +187,30 @@ class _TableComponentState extends State<TableComponent> {
       );
     }
 
-
-    var result = Stack(children: [
+    var result = Stack(
+      children: [
         // logDecks(context),
-      StacksComponent(
-          stacks: stacks,
-          shouldChoose: widget.controller.doUserShouldChoose(),
-          onStackTap: (stack) => widget.controller.chooseStack(stack.stackNumber)
-      ),
-
-      Decks(
-            states: decks.entries.map((e) => e.value).toList(growable: false)
-        ),
-
-        startButton(),
+        StacksComponent(
+            stacks: stacks,
+            animatedCards: animatedCards,
+            shouldChoose: promptChooseCard,
+            onStackTap: (stack) =>
+                widget.controller.chooseStack(stack.stackNumber)),
         ...(playerActionPlayer?.buildWidget(
                 context,
                 SceneData(
                     stacks,
                     Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform)))
-                )
-        ) ?? [])
+                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
+            []),
+        Decks(
+          states: decks.entries.map((e) => e.value).toList(growable: false),
+          controller: widget.controller,
+        ),
+        startButton(),
+        if (isPlayTime) const PlayTurnToast(),
+        if (promptChooseCard && choosingPlayer != null)
+          ChooseStackToast(player: choosingPlayer!)
       ],
     );
 

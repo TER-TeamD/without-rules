@@ -48,7 +48,7 @@ class MobileTester {
     });
 
     Future.delayed(Duration(milliseconds: latency)).then((value) {
-      socket.emit('PLAYER_JOIN_GAME', <String, dynamic>{'player_id': id});
+      emit('PLAYER_JOIN_GAME', <String, dynamic>{'player_id': id});
     });
 
     controller.lastTopic$.listen((topic) {
@@ -57,10 +57,15 @@ class MobileTester {
           var action = controller
               .game$.value.inGameProperty?.betweenRound?.currentPlayerAction;
           if (action == null) break;
+
+          // Check if this specific player should choose
+          if(!controller.promptChooseCard$.value) break;
           if (action.player.id != id) break;
+
+          // Choose the first stack
           var stack = controller.game$.value.inGameProperty?.stacks.first;
           if (stack == null) break;
-          chooseStackCard(stack);
+          Future.delayed(Duration(seconds: 1)).then((_) => chooseStackCard(stack));
           break;
       }
     });
@@ -68,12 +73,17 @@ class MobileTester {
 
   void playCard(GameCard card) {
     Logger.log("Player $id played card ${card.value}");
-    socket.emit("PLAYER_PLAYED_CARD",
+    emit("PLAYER_PLAYED_CARD",
         <String, dynamic>{'player_id': id, 'card_value': card.value});
   }
 
   void chooseStackCard(StackCard stack) {
     Logger.log("Player $id chose stack card ${stack.stackNumber}");
     controller.chooseStack(stack.stackNumber);
+  }
+
+  emit(String topic, dynamic data) {
+    Logger.log("Player $id emitted $topic: $data");
+    socket.emit(topic, data);
   }
 }

@@ -21,4 +21,8 @@ class StackCard {
         'stackHead': stackHead.toJson(),
         'stackCards': stackCards.map((e) => e.toJson()).toList(),
       };
+
+  Iterable<GameCard> getCards() {
+    return [...stackCards, stackHead];
+  }
 }

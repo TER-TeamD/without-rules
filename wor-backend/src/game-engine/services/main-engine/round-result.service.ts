@@ -15,7 +15,10 @@ import {
 import {Model} from "mongoose";
 import {EngineUtilsService} from "./engine-utils.service";
 import {GameNotFoundException} from "./exceptions/game-not-found.exception";
-import {MAX_CARDS_PER_STACK} from "../../config";
+import {
+    DURATION_PLAYER_CHOOSE_STACK_CARDS_IN_SECONDS,
+    MAX_CARDS_PER_STACK
+} from "../../config";
 import {PlayerNotFoundException} from "./exceptions/player-not-found.exception";
 import {StackNotFoundException} from "./exceptions/stack-not-found.exception";
 
@@ -191,7 +194,11 @@ export class RoundResultService {
         if ( game.in_game_property.between_round.current_player_action === null) {
             game.in_game_property.between_round.current_player_action = new BetweenRoundPlayerAction(currentPlayer, null);
         }
-        game.in_game_property.between_round.current_player_action.action = new ChooseStackCardPlayerAction();
+
+        const newPlayerAction: ChooseStackCardPlayerAction = new ChooseStackCardPlayerAction();
+        newPlayerAction.chrono_up_to = new Date(((new Date()).setSeconds((new Date().getSeconds() + DURATION_PLAYER_CHOOSE_STACK_CARDS_IN_SECONDS)))).toISOString();
+
+        game.in_game_property.between_round.current_player_action.action = newPlayerAction;
 
         return game;
     }

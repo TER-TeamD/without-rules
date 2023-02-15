@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/player_deck/rotation_handler.dart';
+import 'package:worfrontend/models/transform.dart';
 
 import '../../constants.dart';
 
@@ -12,7 +13,7 @@ class PlayerSpot extends StatefulWidget {
   final Widget childBottom;
   final Offset position;
   final double rotation;
-  final void Function(DeckTransform)? positionChanged;
+  final void Function(AppTransform)? positionChanged;
 
   const PlayerSpot(
       {
@@ -50,7 +51,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
             color: CARD_BORDER_COLOR,
             width: 4.0,
           ),
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(5.0)),
         ),
         child: SizedBox(
             width: CardComponent.size.dx,
@@ -81,7 +82,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
         });
       },
       rotationEnd: () {
-        widget.positionChanged?.call(DeckTransform(position, rotation));
+        widget.positionChanged?.call(AppTransform(position, rotation));
       },
     );
   }
@@ -122,7 +123,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
                           },
                           onScaleEnd: (_) {
                             widget.positionChanged
-                                ?.call(DeckTransform(position, rotation));
+                                ?.call(AppTransform(position, rotation));
                           },
                           child: content()),
                     ),

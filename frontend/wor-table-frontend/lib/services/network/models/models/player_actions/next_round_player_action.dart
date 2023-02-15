@@ -11,8 +11,4 @@ class NextRoundPlayerAction extends PlayerAction {
   toJson() => {
     'type': type,
   };
-
-  @override
-  void afterExecute(GameController controller, Player player) {
-  }
 }
