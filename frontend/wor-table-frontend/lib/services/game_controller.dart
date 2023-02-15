@@ -18,6 +18,7 @@ import 'package:worfrontend/errors/app_error.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/models/transform.dart';
 import 'package:worfrontend/services/error_manager.dart';
+import 'package:worfrontend/services/network/models/chronometer_data.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
@@ -40,6 +41,8 @@ class GameController {
   final BehaviorSubject<Set<int>> animatedCards$ = BehaviorSubject<Set<int>>.seeded(<int>{});
   final SocketGateway _socketGateway;
   Game? previousGame = null;
+
+  final BehaviorSubject<ChronometerData?> chronometer$ = BehaviorSubject.seeded(null);
 
   final Subject<int> stackChosen$ = PublishSubject();
 
@@ -121,6 +124,14 @@ class GameController {
   bool doUserShouldChoose() {
     return game$.value.inGameProperty?.betweenRound?.currentPlayerAction?.action.type == "CHOOSE_STACK_CARD"
         && currentPlayerActionPlayer == null;
+  }
+
+  void createChronometer(ChronometerData chronometerData) {
+    chronometer$.add(chronometerData);
+  }
+
+  void stopChronometer() {
+    chronometer$.add(null);
   }
 
   void sendChoosenStack(int chosenStack) {

@@ -25,13 +25,15 @@ class StackViewInstance {
   StackViewInstance(this.stack)
       : card_holders = List.generate(6, (index) => GlobalKey());
 
-  GlobalKey? followingCardHolder({ bool included = true }) {
+  GlobalKey? followingCardHolder({bool included = true}) {
     if (card_holders.length <= stack.stackCards.length + 1) return null;
     return card_holders[stack.stackCards.length + (included ? 0 : 1)];
   }
 
-  Offset followingCardHolderPosition({ bool included = true }) {
-    var fch = followingCardHolder(included: included)?.currentContext?.findRenderObject() as RenderBox?;
+  Offset followingCardHolderPosition({bool included = true}) {
+    var fch = followingCardHolder(included: included)
+        ?.currentContext
+        ?.findRenderObject() as RenderBox?;
     return fch?.localToGlobal(Offset.zero) ?? Offset.zero;
   }
 
@@ -43,7 +45,8 @@ class StackViewInstance {
 
   SceneCard getCard(int i) {
     if (i >= stack.stackCards.length + 1) throw "No card at this index.";
-    if (i == stack.stackCards.length) return SceneCard(stack.stackHead, card_holders[i]);
+    if (i == stack.stackCards.length)
+      return SceneCard(stack.stackHead, card_holders[i]);
     return SceneCard(stack.stackCards[i], card_holders[i]);
   }
 
@@ -69,49 +72,47 @@ class StacksComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: stacks
-            .map(
-              (e) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                    behavior: shouldChoose
-                        ? HitTestBehavior.opaque
-                        : HitTestBehavior.translucent,
-                    onTap: () => onStackTap(e.stack),
-                    child: Container(
-                      decoration: shouldChoose
-                          ? BoxDecoration(
-                              border: Border.all(color: Colors.white),
-                            )
-                          : null,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: Iterable.generate(6)
-                            .map((i) => Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: i >= e.stack.stackCards.length + 1 ||
-                                          animatedCards
-                                              .contains(e.getCard(i).card.value)
-                                      ? CardHolder(
-                                          key: e.card_holders[i],
-                                        )
-                                      : CardComponent(
-                                          key: e.card_holders[i],
-                                          card: e.getCard(i).card,
-                                          isStackHead:
-                                              i == e.stack.stackCards.length,
-                                        ),
-                                ))
-                            .toList(),
-                      ),
-                    )),
-              ),
-            )
-            .toList(),
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: stacks
+          .map(
+            (e) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                  behavior: shouldChoose
+                      ? HitTestBehavior.opaque
+                      : HitTestBehavior.translucent,
+                  onTap: () => onStackTap(e.stack),
+                  child: Container(
+                    decoration: shouldChoose
+                        ? BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                          )
+                        : null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: Iterable.generate(6)
+                          .map((i) => Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: i >= e.stack.stackCards.length + 1 ||
+                                        animatedCards
+                                            .contains(e.getCard(i).card.value)
+                                    ? CardHolder(
+                                        key: e.card_holders[i],
+                                      )
+                                    : CardComponent(
+                                        key: e.card_holders[i],
+                                        card: e.getCard(i).card,
+                                        isStackHead:
+                                            i == e.stack.stackCards.length,
+                                      ),
+                              ))
+                          .toList(),
+                    ),
+                  )),
+            ),
+          )
+          .toList(),
     );
   }
 }

@@ -7,10 +7,12 @@ import 'package:worfrontend/components/toast/play_turn_toast.dart';
 import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
+import 'package:worfrontend/services/network/models/chronometer_data.dart';
 import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 
 import '../services/error_manager.dart';
+import 'chronometer.dart';
 
 class TableComponent extends StatefulWidget {
   final GameController controller;
@@ -31,6 +33,7 @@ class _TableComponentState extends State<TableComponent> {
   bool promptChooseCard = false;
   Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
+  ChronometerData? chronometer;
 
   @override
   void initState() {
@@ -119,6 +122,30 @@ class _TableComponentState extends State<TableComponent> {
     }
   }
 
+  Widget buildChronometer(ChronometerData data) {
+    return Chronometer(data: data);
+  }
+
+  Widget stackLayer() {
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if(chronometer != null) buildChronometer(chronometer!),
+          const SizedBox(width: 30),
+          StacksComponent(
+                  stacks: stacks,
+                  animatedCards: animatedCards,
+                  shouldChoose: promptChooseCard,
+                  onStackTap: (stack) =>
+                      widget.controller.chooseStack(stack.stackNumber)),
+          const SizedBox(width: 30),
+          if(chronometer != null) RotatedBox(quarterTurns: 2, child: buildChronometer(chronometer!)),
+        ],
+      ),
+    );
+  }
+
   Widget gameEnd() {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       const Text(
@@ -190,18 +217,13 @@ class _TableComponentState extends State<TableComponent> {
     var result = Stack(
       children: [
         // logDecks(context),
-        StacksComponent(
-            stacks: stacks,
-            animatedCards: animatedCards,
-            shouldChoose: promptChooseCard,
-            onStackTap: (stack) =>
-                widget.controller.chooseStack(stack.stackNumber)),
+        stackLayer(),
         ...(playerActionPlayer?.buildWidget(
-                context,
-                SceneData(
-                    stacks,
-                    Map.fromEntries(decks.entries
-                        .map((e) => MapEntry(e.key, e.value.transform))))) ??
+            context,
+            SceneData(
+                stacks,
+                Map.fromEntries(decks.entries
+                    .map((e) => MapEntry(e.key, e.value.transform))))) ??
             []),
         Decks(
           states: decks.entries.map((e) => e.value).toList(growable: false),
