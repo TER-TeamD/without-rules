@@ -1,6 +1,7 @@
 class ChronometerData {
   final DateTime startTime = DateTime.now();
-  final Duration interval;
+  final DateTime endTime;
+  Duration get interval => endTime.difference(startTime);
 
-  ChronometerData(this.interval);
+  ChronometerData(this.endTime);
 }

@@ -90,6 +90,11 @@ class GameController {
     // This return a specific object for each cases.
     // These objects can be found inside the socket_models folder.
 
+    var chronoEnd = game.inGameProperty?.chronoUpTo;
+    if(chronoEnd != null) {
+      chronometer$.add(ChronometerData(chronoEnd));
+    }
+
     game$.add(game);
     lastTopic$.add(topic);
   }

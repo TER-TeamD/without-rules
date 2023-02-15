@@ -83,6 +83,11 @@ class _TableComponentState extends State<TableComponent> {
         decks = widget.controller.getDecks();
       });
     });
+    widget.controller.chronometer$.listen((value) {
+      setState(() {
+        chronometer = value;
+      });
+    });
 
     GetIt.I.get<ErrorManager>().onError.listen((event) {
       Logger.log("Error: $event");

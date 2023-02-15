@@ -8,7 +8,7 @@ class InGameProperty {
   final List<StackCard> stacks;
   final int currentRound;
   final BetweenRound? betweenRound;
-  final int? chronoUpTo;
+  final DateTime? chronoUpTo;
 
   InGameProperty(this.deck, this.stacks, this.currentRound, this.betweenRound,
       this.chronoUpTo);
@@ -24,7 +24,7 @@ class InGameProperty {
         betweenRound = json['between_round'] == null
             ? null
             : BetweenRound.fromJson(json['between_round']),
-        chronoUpTo = json['chrono_up_to'] == null ? null : int.tryParse(json['chrono_up_to']);
+        chronoUpTo = json['chrono_up_to'] == null ? null : DateTime.parse(json['chrono_up_to']);
 
   toJson() =>
       {
