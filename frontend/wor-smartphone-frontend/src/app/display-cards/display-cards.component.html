@@ -41,7 +41,8 @@
             <app-card class="card-element" *ngFor="let card of cards; let i = index" (click)="select(card)"
                 [@cardAnimation]="{ value: card.state, params: { degree: (120 / cards.length * i - (120 / (2 * cards.length)) * (cards.length - 1)) } }"
                 [ngStyle]="{'filter': (card !== selectedCard && selectedCard !== null) ? 'blur(10px)' : 'blur(0px)', 'zIndex': (card !== selectedCard && selectedCard !== null) ? 'auto' : 2, 'transition': 'filter 600ms'}"
-                [indicator]="i !== cards.length-1 && card !== selectedCard" [card]="card"></app-card>
+                [indicator]="i !== cards.length-1 && card !== selectedCard && cards.length >= 5"
+                [card]="card"></app-card>
         </div>
         <div class="buttons" *ngIf="selectedCard !== null">
             <button type="button" id="button-play" (click)="play()">Play the card</button>

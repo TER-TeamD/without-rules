@@ -13,7 +13,7 @@ import { CardComponent } from './card/card.component';
   animations: [
     trigger('cardAnimation', [
       state('selected', style({
-        transform: 'scale(3)',
+        transform: 'scale(' + window.innerHeight / 300 + ')',
         top: '40%'
       })),
       state('unselected', style({
@@ -54,6 +54,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log(window.innerHeight, window.innerWidth)
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
 
       if (lastMessage === LastMessageEnum.START_GAME) {
@@ -87,6 +88,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
 
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
       this.cards.forEach(c => c.state = 'unselected');
+      this.selectedCard = null;
 
       this.cattleHeads = 0;
       this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
