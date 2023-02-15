@@ -1,18 +1,20 @@
 <div class="main">
+    <div class="header" [ngStyle]="{'justifyContent': loading ? 'center' : 'space-between'}">
+        <div class="header-left" *ngIf="!loading">
+            <p>🐮</p>
+            <p>{{cattleHeads}}</p>
+        </div>
 
-    <div class="header">
-        <div class="header-username">
-            Hi {{player?.username}}
+        <div class="header-center" *ngIf="!loading && !played && !end && player !== null"
+            [ngStyle]="{'color': (timer<=10) ? 'red' : 'black'}">
+            <mat-icon>timer</mat-icon>
+            <p>{{timer}}</p>
         </div>
-        <div class="header-cattleheads" *ngIf="!loading">
-            <p class="cattlehead-image">🐮</p>
-            <p class="cattlehead-number">{{cattleHeads}}</p>
-        </div>
-        <div class="header-avatar">
+
+        <div class="header-right">
             <img src="{{urlAvatar}}" style="width: 50px; height: 50px;" alt="" />
-
+            <p>{{player?.username}}</p>
         </div>
-
     </div>
 
     <div *ngIf="loading" class="loading">
@@ -31,6 +33,9 @@
     </div>
 
     <div class="content-container" *ngIf="!loading && !played && !end && player !== null">
+        <p class="text" [ngStyle]="{'visibility': (timer<=10) ? 'visible' : 'hidden', 'color': 'red'}">You don't have
+            much time left !
+        </p>
         <p class="text" [ngStyle]="{'visibility': (selectedCard !== null) ? 'hidden' : 'visible'}">Pick a card !</p>
         <div class="cards-container">
             <app-card class="card-element" *ngFor="let card of cards; let i = index" (click)="select(card)"

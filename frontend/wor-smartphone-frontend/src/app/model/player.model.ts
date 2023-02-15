@@ -21,6 +21,7 @@ export interface InPlayerGameProperty {
   played_card: Card | null;
   had_played_turn: boolean;
   player_discard: Card[];
+  chrono_up_to: any;
 }
 
 export interface PlayerGameResult {

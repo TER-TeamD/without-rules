@@ -16,33 +16,40 @@
   box-shadow: 0px 3px 3px #cccccc;
 }
 
-.header-username {
-  padding-left: 20px;
-  flex: 1;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 10px;
 }
 
-.header-avatar {
-  margin-right: 20px;
+.header-left p {
+  margin: 0;
+  font-size: 27px;
+}
+
+.header-center {
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 2em;
 }
 
-.header-cattleheads {
+.header-center mat-icon {
+  font-size: 1.1em;
+  width: fit-content;
+  height: fit-content;
+}
+
+.header-right {
   margin-right: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-.cattlehead-image {
-  font-size: 30px;
+.header-right p {
   margin: 0;
-}
-
-.cattlehead-number {
-  margin: 0;
-  font-size: 24px;
 }
 
 .buttons {

@@ -14,6 +14,7 @@ import { CardComponent } from './card/card.component';
     trigger('cardAnimation', [
       state('selected', style({
         transform: 'scale(3)',
+        top: '40%'
       })),
       state('unselected', style({
         transform: 'rotate({{degree}}deg) translate(0, -80%)',
@@ -41,6 +42,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public urlAvatar: string = "";
   public cards: Card[] = [];
   public cattleHeads: number = 0;
+  public timer: number = 60;
 
   // public cards: Card[] = [{ value: 30, cattleHead: 1, state: "unselected" }, { value: 97, cattleHead: 3, state: "unselected" },
   // { value: 44, cattleHead: 5, state: "unselected" }, { value: 15, cattleHead: 3, state: "unselected" },
@@ -82,10 +84,18 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
       this.cards.forEach(c => c.state = 'unselected');
+
       this.cattleHeads = 0;
       this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
+
+      setInterval(() => {
+        let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
+        let now = new Date().getTime();
+        this.timer = Math.floor((end - now) / 1000) + 1;
+      }, 1000);
       this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
     })
   }
@@ -97,7 +107,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       this.cards.forEach(c => c.state = c === this.selectedCard ? 'played' : 'unselected');
       setTimeout(() => {
         this.gameService.playerPlayedCard(this.player!.id, this.selectedCard!.value);
-      }, 2000);
+      }, 1500);
     }
   }
 
