@@ -119,6 +119,7 @@ export class GameEngineService implements OnModuleInit {
     try {
       const game: Game = await this.duringRoundService.newPlayerPlayed(player_id, card_value);
       await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_PLAYER_PLAYED_CARD',);
+      await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_PLAYER_PLAYED_CARD');
 
       const indexPlayer: number = game.players.findIndex(
         (p) => p.id === player_id,
@@ -153,9 +154,11 @@ export class GameEngineService implements OnModuleInit {
         const gameWithFlipCard: Game = await this.roundResultService.flipCardOrder();
 
         await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, 'FLIP_CARD_ORDER',);
+        await this.webSocketGateway.sendNewGameValueToPhone(gameWithFlipCard, 'PHONE_FLIP_CARD_ORDER');
 
         const game: Game = await this.roundResultService.generateNextAction();
         await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
+        await this.webSocketGateway.sendNewGameValueToPhone(gameWithFlipCard, 'PHONE_NEW_RESULT_ACTION');
 
         if (game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
           this.chooseAutomaticStackAfterTimeout();
@@ -198,6 +201,7 @@ export class GameEngineService implements OnModuleInit {
 
       const game: Game = await this.roundResultService.generateNextAction();
       await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
+      await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
 
       if (choosen_stack == null && game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD" ) {
         this.chooseAutomaticStackAfterTimeout();

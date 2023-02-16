@@ -7,3 +7,10 @@ export enum LastMessageEnum {
   END_GAME_RESULTS,
   NEW_ROUND,
 }
+
+
+export enum LastGameMessageEnum {
+  PHONE_NEW_PLAYER_PLAYED_CARD,
+  PHONE_FLIP_CARD_ORDER,
+  PHONE_NEW_RESULT_ACTION,
+}

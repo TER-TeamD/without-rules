@@ -126,10 +126,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
    * tous les utilisateurs ont fini de jouer leur carte
    */
   @SubscribeMessage('TABLE_ALL_PLAYER_PLAYED')
-  public async tableAllPlayerPlayed(
-    client: Socket,
-    payload: any,
-  ): Promise<void> {
+  public async tableAllPlayerPlayed(client: Socket, payload: any,): Promise<void> {
     this.logger.log(
       `TABLE | TABLE_ALL_PLAYER_PLAYED : ${JSON.stringify(payload)}`,
     );
@@ -157,6 +154,15 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     await this.sendMessageToEntity('0', topic, {
       game,
     });
+  }
+
+  public async sendNewGameValueToPhone(game: Game, topic: string): Promise<void> {
+    this.logger.log(`Send ${topic} to PHONES`);
+    for (const p of game.players) {
+      await this.sendMessageToEntity(p.id, topic, {
+        game,
+      });
+    }
   }
 
   public async sendPlayerInfosToPlayer(player: Player, topic: string,): Promise<void> {
