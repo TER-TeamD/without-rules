@@ -40,6 +40,7 @@ class ChooseStackCardPlayerAction extends PlayerAction {
       subscription?.cancel();
     });
     controller.startChooseCard(player);
+    controller.stopChronometer();
   }
 
   @override

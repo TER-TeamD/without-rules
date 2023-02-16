@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:worfrontend/components/background.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/stacks.dart';
 import 'package:worfrontend/components/toast/choose_stack_popup.dart';
@@ -30,6 +31,7 @@ class _TableComponentState extends State<TableComponent> {
   bool isGameStarted = false;
   bool isPlayTime = false;
   bool isGameEnded = false;
+  bool isAlert = false;
   bool promptChooseCard = false;
   Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
@@ -54,6 +56,7 @@ class _TableComponentState extends State<TableComponent> {
         isGameStarted = widget.controller.isGameStarted();
         isPlayTime = game.players.any(
             (element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
+        isAlert = false;
       });
     });
     widget.controller.gameEnded$.listen((event) {
@@ -86,6 +89,12 @@ class _TableComponentState extends State<TableComponent> {
     widget.controller.chronometer$.listen((value) {
       setState(() {
         chronometer = value;
+        isAlert = value?.isAlert$.value ?? false;
+      });
+      value?.isAlert$.listen((value) {
+        setState(() {
+          isAlert = value;
+        });
       });
     });
 
@@ -222,6 +231,7 @@ class _TableComponentState extends State<TableComponent> {
     var result = Stack(
       children: [
         // logDecks(context),
+        Background(blink: isAlert),
         stackLayer(),
         ...(playerActionPlayer?.buildWidget(
             context,
