@@ -35,7 +35,6 @@ class _TableComponentState extends State<TableComponent> {
   bool promptChooseCard = false;
   Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
-  ChronometerData? chronometer;
 
   @override
   void initState() {
@@ -56,7 +55,7 @@ class _TableComponentState extends State<TableComponent> {
         isGameStarted = widget.controller.isGameStarted();
         isPlayTime = game.players.any(
             (element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
-        isAlert = false;
+        isAlert = widget.controller.chronometer$.value?.isAlert$.value ?? false;
       });
     });
     widget.controller.gameEnded$.listen((event) {
@@ -88,7 +87,6 @@ class _TableComponentState extends State<TableComponent> {
     });
     widget.controller.chronometer$.listen((value) {
       setState(() {
-        chronometer = value;
         isAlert = value?.isAlert$.value ?? false;
       });
       value?.isAlert$.listen((value) {
@@ -136,8 +134,8 @@ class _TableComponentState extends State<TableComponent> {
     }
   }
 
-  Widget buildChronometer(ChronometerData data) {
-    return Chronometer(data: data);
+  Widget buildChronometer() {
+    return Chronometer(controller: widget.controller);
   }
 
   Widget stackLayer() {
@@ -145,7 +143,7 @@ class _TableComponentState extends State<TableComponent> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if(chronometer != null) buildChronometer(chronometer!),
+          buildChronometer(),
           const SizedBox(width: 30),
           StacksComponent(
                   stacks: stacks,
@@ -154,7 +152,7 @@ class _TableComponentState extends State<TableComponent> {
                   onStackTap: (stack) =>
                       widget.controller.chooseStack(stack.stackNumber)),
           const SizedBox(width: 30),
-          if(chronometer != null) RotatedBox(quarterTurns: 2, child: buildChronometer(chronometer!)),
+          RotatedBox(quarterTurns: 2, child: buildChronometer()),
         ],
       ),
     );
@@ -231,7 +229,7 @@ class _TableComponentState extends State<TableComponent> {
     var result = Stack(
       children: [
         // logDecks(context),
-        Background(blink: isAlert),
+        Background(controller: widget.controller),
         stackLayer(),
         ...(playerActionPlayer?.buildWidget(
             context,

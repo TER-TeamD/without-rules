@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:worfrontend/constants.dart';
+import 'package:worfrontend/services/game_controller.dart';
 
 class Background extends StatefulWidget {
-  final bool blink;
+  final GameController controller;
 
-  const Background({Key? key, required this.blink}) : super(key: key);
+  const Background({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<Background> createState() => _BackgroundState();
@@ -13,6 +14,7 @@ class Background extends StatefulWidget {
 class _BackgroundState extends State<Background>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  bool blink = false;
 
   @override
   void initState() {
@@ -25,20 +27,32 @@ class _BackgroundState extends State<Background>
       }
     });
 
-    if (widget.blink) {
-      _controller.forward(from: 0);
-    } else {
-      _controller.stop();
-      _controller.reset();
-    }
+    widget.controller.chronometer$.listen((event) {
+      bool previous = blink;
+      blink = false;
+
+      event?.isAlert$.listen((value) {
+        bool previous = blink;
+        setState(() {
+          blink = value;
+        });
+
+        if(blink != previous) {
+          triggerBlinkChange();
+        }
+      });
+
+      if(blink != previous) {
+        triggerBlinkChange();
+      }
+    });
+
   }
 
-  @override
-  void didUpdateWidget(covariant Background oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.blink && !oldWidget.blink) {
+  void triggerBlinkChange() {
+    if(blink) {
       _controller.forward(from: 0);
-    } else if (!widget.blink && oldWidget.blink) {
+    } else {
       _controller.stop();
       _controller.reset();
     }
@@ -56,16 +70,16 @@ class _BackgroundState extends State<Background>
   Widget build(BuildContext context) {
     var deco1 = const BoxDecoration(
         gradient: LinearGradient(
-      colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ));
+          colors: [BACKGROUND_TABLE_COLOR_1, BACKGROUND_TABLE_COLOR_2],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ));
     var deco2 = const BoxDecoration(
         gradient: LinearGradient(
-      colors: [Color(0xff981e1e), Color(0xFF460B0B)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ));
+          colors: [Color(0xff981e1e), Color(0xFF460B0B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ));
 
     return AnimatedBuilder(
         animation: _controller,
@@ -79,7 +93,7 @@ class _BackgroundState extends State<Background>
                 weight: 1),
           ]).animate(_controller);
           return Container(
-            decoration: decoration.value
+              decoration: decoration.value
           );
         },
         child: Container(

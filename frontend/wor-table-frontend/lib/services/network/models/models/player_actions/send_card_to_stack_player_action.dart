@@ -30,6 +30,7 @@ class SendCardToStackPlayerAction extends PlayerAction {
     //afterAnimation(controller, player);
     controller.play(PlayerActionPlayer(player, this), usedCards: [player.playerGameProperty!.playedCard!.value])
         .then((_) => afterAnimation(controller, player));
+    controller.stopChronometer();
   }
 
   @override
