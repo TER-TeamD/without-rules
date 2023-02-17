@@ -10,6 +10,7 @@ import 'package:worfrontend/services/tester.dart';
 
 import '../constants.dart';
 import '../services/network/socket_gateway.dart';
+import '../services/screen_service.dart';
 
 class TableLoader extends StatefulWidget {
   const TableLoader({Key? key}) : super(key: key);
@@ -26,6 +27,10 @@ class _TableLoaderState extends State<TableLoader> {
     super.initState();
     GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
           controller = GameController(game, GetIt.I.get<SocketGateway>());
+
+          var transforms = GetIt.I.get<ScreenService>().getMapPosition(
+              game.players.map((e) => e.id).toList(growable: false));
+          controller!.setDeckTransforms(transforms);
 
           if(TESTERS != 0) {
             var durations = [ 300, 600 ];

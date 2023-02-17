@@ -118,6 +118,11 @@ class GameController {
     deckTransforms$.add(deckTransforms);
   }
 
+  void setDeckTransforms(Map<String, AppTransform> transforms) {
+    deckTransforms = transforms;
+    deckTransforms$.add(deckTransforms);
+  }
+
   List<StackCard> getStacks() {
     return game$.value.inGameProperty?.stacks ?? [];
   }
