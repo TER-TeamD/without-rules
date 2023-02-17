@@ -19,9 +19,8 @@ class _ChronometerState extends State<Chronometer> {
   @override
   void initState() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-
-      });
+      if (!mounted) return;
+      setState(() {});
     });
   }
 
@@ -34,11 +33,16 @@ class _ChronometerState extends State<Chronometer> {
           width: 50,
           height: 50,
           child: CircularProgressIndicator(
-            value: 1.0 - (DateTime.now().difference(widget.data.startTime).inSeconds * 1.0 / widget.data.interval.inSeconds),
-            color: Colors.white
-          ),
+              value: 1.0 -
+                  (DateTime.now().difference(widget.data.startTime).inSeconds *
+                      1.0 /
+                      widget.data.interval.inSeconds),
+              color: Colors.white),
         ),
-        Text("${widget.data.endTime.difference(DateTime.now()).inSeconds}s", style: TextStyle(color: Colors.white),)
+        Text(
+          "${widget.data.endTime.difference(DateTime.now()).inSeconds}s",
+          style: TextStyle(color: Colors.white),
+        )
       ],
     );
   }
