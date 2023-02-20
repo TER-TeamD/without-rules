@@ -14,6 +14,7 @@ class StackPosition {
 
 class ScreenService {
   Size? _screenSize;
+  Map<String, AppTransform>? positions = null;
 
   void setScreenSize(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
@@ -38,7 +39,11 @@ class ScreenService {
 
   Map<String, AppTransform> getMapPosition(List<String> ids) {
     if(ids.length > 10) throw "The list of ids is too long (max length: 10).";
-    var positions = getPositions();
-    return Map.fromEntries(Iterable.generate(ids.length).map((i) => MapEntry(ids[i], positions[i])));
+    if(positions == null) {
+      var pos = getPositions();
+      positions = Map.fromEntries(
+          Iterable.generate(ids.length).map((i) => MapEntry(ids[i], pos[i])));
+    }
+    return positions!;
   }
 }
