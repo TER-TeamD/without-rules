@@ -1,5 +1,5 @@
 const String createNewGame = "CREATE_NEW_GAME";
-const String gameCreated = "TABLE_NEW_GAME";
+const String gameCreated = "CREATE_NEW_GAME";
 const String playerJoin = "TABLE_PLAYER_JOIN";
 const String startGame = "START_GAME";
 const String playerPlayedCard = "NEW_PLAYER_PLAYED_CARD";
