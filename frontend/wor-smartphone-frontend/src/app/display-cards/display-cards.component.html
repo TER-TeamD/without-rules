@@ -1,38 +1,20 @@
 <div class="main">
-    <div class="header" [ngStyle]="{'justifyContent': loading ? 'center' : 'space-between'}">
-        <div class="header-left" *ngIf="!loading">
-            <p>🐮</p>
-            <p>{{cattleHeads}}</p>
-        </div>
-
-        <div class="header-center" *ngIf="!loading && !played && !end && player !== null"
-            [ngStyle]="{'color': (timer<=10) ? 'red' : 'black'}">
-            <mat-icon>timer</mat-icon>
-            <p>{{timer}}</p>
-        </div>
-
-        <div class="header-right">
-            <img src="{{urlAvatar}}" style="width: 50px; height: 50px;" alt="" />
-            <p>{{player?.username}}</p>
-        </div>
-    </div>
-
-    <div *ngIf="loading" class="loading">
+    <app-info-bar [player]="player" [gameStatus]="gameStatus"></app-info-bar>
+    <div *ngIf="gameStatus === GameStatusEnum.BEGINING" class="message">
         <p>Waiting for the game to be launched...</p>
     </div>
 
-    <div *ngIf="played" class="loading">
-        <p>Waiting for everyone to play...</p>
-        <p>Results of the round will be on the table !</p>
-    </div>
-
-    <div *ngIf="end" class="loading">
+    <div *ngIf="gameStatus === GameStatusEnum.END" class="message">
         <p>Game finished...</p>
         <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}}
             cattle heads !</p>
     </div>
 
-    <div class="content-container" *ngIf="!loading && !played && !end && player !== null">
+    <div *ngIf="gameStatus === GameStatusEnum.WAITING" class="table">
+        <app-table-cards [player]="player"></app-table-cards>
+    </div>
+
+    <div class="content-container" *ngIf="gameStatus === GameStatusEnum.PLAYING && player !== null">
         <p class="text" [ngStyle]="{'visibility': (timer<=10) ? 'visible' : 'hidden', 'color': 'red'}">You don't have
             much time left !
         </p>

@@ -14,3 +14,11 @@ export enum LastGameMessageEnum {
   PHONE_FLIP_CARD_ORDER,
   PHONE_NEW_RESULT_ACTION,
 }
+
+
+export enum GameStatusEnum {
+  BEGINING,
+  PLAYING,
+  WAITING,
+  END
+}

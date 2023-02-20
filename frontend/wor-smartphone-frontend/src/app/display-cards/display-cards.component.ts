@@ -2,9 +2,9 @@ import { AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChildren } 
 import { GameService } from '../services/game.service';
 import { Card, Player } from "../model/player.model";
 import { Subscription } from "rxjs";
-import { LastMessageEnum } from "../model/last-message.enum";
+import { LastMessageEnum, GameStatusEnum } from "../model/last-message.enum";
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { CardComponent } from './card/card.component';
+import { CardComponent } from '../card/card.component';
 
 @Component({
   selector: 'app-display-cards',
@@ -29,55 +29,55 @@ import { CardComponent } from './card/card.component';
   ]
 })
 export class DisplayCardsComponent implements OnInit, OnDestroy {
-  @ViewChildren(CardComponent) cardElements: QueryList<CardComponent> = new QueryList<CardComponent>();
 
   private lastMessageSubscription: Subscription | null = null;
   private playerSubscription: Subscription | null = null;
-
   public player: Player | null = null;
-  public loading: boolean = true;
-  public end: boolean = false;
-  public played: boolean = false;
-  public selectedCard: Card | null = null;
-  public urlAvatar: string = "";
-  public cards: Card[] = [];
-  public cattleHeads: number = 0;
-  public timer: number = 60;
 
-  // public cards: Card[] = [{ value: 30, cattleHead: 1, state: "unselected" }, { value: 97, cattleHead: 3, state: "unselected" },
-  // { value: 44, cattleHead: 5, state: "unselected" }, { value: 15, cattleHead: 3, state: "unselected" },
-  // { value: 12, cattleHead: 2, state: "unselected" }, { value: 10, cattleHead: 1, state: "unselected" },
-  // { value: 9, cattleHead: 1, state: "unselected" }, { value: 8, cattleHead: 1, state: "unselected" },
-  // { value: 7, cattleHead: 1, state: "unselected", }, { value: 6, cattleHead: 7, state: "unselected" }];
+  public selectedCard: Card | null = null;
+  public GameStatusEnum: typeof GameStatusEnum = GameStatusEnum;
+  public gameStatus = GameStatusEnum.BEGINING;
+  public timer: number = 60;
+  // public cards: Card[] = [];
+
+
+  public cards: Card[] = [{ value: 30, cattleHead: 1, state: "unselected" }, { value: 97, cattleHead: 3, state: "unselected" },
+  { value: 44, cattleHead: 5, state: "unselected" }, { value: 15, cattleHead: 3, state: "unselected" },
+  { value: 12, cattleHead: 2, state: "unselected" }, { value: 10, cattleHead: 1, state: "unselected" },
+  { value: 9, cattleHead: 1, state: "unselected" }, { value: 8, cattleHead: 1, state: "unselected" },
+  { value: 7, cattleHead: 1, state: "unselected", }, { value: 6, cattleHead: 7, state: "unselected" }];
+
 
   constructor(private gameService: GameService) {
   }
 
   ngOnInit(): void {
-    console.log(window.innerHeight, window.innerWidth)
+
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
 
       if (lastMessage === LastMessageEnum.START_GAME) {
         console.log("Start game")
-        this.loading = false;
+        this.gameStatus = GameStatusEnum.PLAYING;
       }
 
       if (lastMessage === LastMessageEnum.CARD_PLAYED) {
         console.log("Card played")
-        this.played = true;
+        this.gameStatus = GameStatusEnum.WAITING;
       }
 
       if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
         console.log("End result");
-        this.end = true;
-        this.played = false;
+        this.gameStatus = GameStatusEnum.END;
       }
 
       if (lastMessage === LastMessageEnum.NEW_ROUND) {
         console.log("New Round");
-        this.end = false;
-        this.loading = false;
-        this.played = false;
+        this.gameStatus = GameStatusEnum.PLAYING;
+        setInterval(() => {
+          let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
+          let now = new Date().getTime();
+          this.timer = Math.floor((end - now) / 1000) + 1;
+        }, 1000);
       }
 
     });
@@ -90,15 +90,6 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       this.cards.forEach(c => c.state = 'unselected');
       this.selectedCard = null;
 
-      this.cattleHeads = 0;
-      this.player?.in_player_game_property?.player_discard.forEach(card => this.cattleHeads += card.cattleHead);
-
-      setInterval(() => {
-        let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
-        let now = new Date().getTime();
-        this.timer = Math.floor((end - now) / 1000) + 1;
-      }, 1000);
-      this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
     })
   }
 

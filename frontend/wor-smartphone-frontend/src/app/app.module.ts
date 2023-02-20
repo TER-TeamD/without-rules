@@ -6,17 +6,21 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DisplayCardsComponent } from './display-cards/display-cards.component';
 import { LoginPageComponent } from './login-page/login-page.component';
-import { CardComponent } from './display-cards/card/card.component';
+import { CardComponent } from './card/card.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
+import { InfoBarComponent } from './info-bar/info-bar.component';
+import { TableCardsComponent } from './table-cards/table-cards.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DisplayCardsComponent,
     LoginPageComponent,
-    CardComponent
+    CardComponent,
+    InfoBarComponent,
+    TableCardsComponent
   ],
   imports: [
     BrowserModule,

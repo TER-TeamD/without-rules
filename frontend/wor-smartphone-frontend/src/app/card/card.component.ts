@@ -1,6 +1,6 @@
 import { state, style, trigger } from '@angular/animations';
 import { Component, Input } from '@angular/core';
-import { Card } from "../../model/player.model";
+import { Card } from "../model/player.model";
 
 @Component({
   selector: 'app-card',
