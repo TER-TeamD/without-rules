@@ -105,15 +105,15 @@ export class TableCardsComponent {
               { transform: 'translateX(0) translateY(0)' },
               { transform: 'translateX(' + x + 'px) translateY(' + y + 'px)', zIndex: currentIndex },
             ], {
-              duration: 1500,
+              duration: 1000,
               iterations: 1,
               fill: 'forwards'
             });
-          }, 1000);
+          }, 500);
 
           setTimeout(() => {
             this.stacks = this.gameService.game?.in_game_property.stacks || [];
-          }, 2500);
+          }, 1500);
         }
       }
     });
