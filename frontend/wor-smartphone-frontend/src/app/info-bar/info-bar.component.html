@@ -1,6 +1,6 @@
 <div class="header"
     [ngStyle]="{'justifyContent': (gameStatus === 'LOADING' || gameStatus === 'END') ? 'center' : 'space-between'}">
-    <div class="header-left" *ngIf="gameStatus === 'PLAYING' || gameStatus === 'WAITING'">
+    <div class="header-left" *ngIf="gameStatus === 'PLAYING' || gameStatus === 'WAITING'" [style.background-color]="colorCattleHeadBackground">
         <p>🐮</p>
         <p>{{cattleHeads}}</p>
     </div>

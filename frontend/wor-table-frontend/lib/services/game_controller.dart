@@ -68,7 +68,7 @@ class GameController {
     });
   }
 
-  void gameChanged(Game game, String topic) {
+  Future<void> gameChanged(Game game, String topic) async {
     previousGame = game$.value;
 
     // Update rising edge of end turn
@@ -78,8 +78,7 @@ class GameController {
     }
 
     // Trigger end turn
-    var everyoneHadPlayed = game.players
-        .every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
+    var everyoneHadPlayed = game.players.every((element) => element.playerGameProperty?.hadPlayedTurn ?? false);
     if (everyoneHadPlayed && !allPlayerPlayedForRound) {
       _socketGateway.allPlayerPlayed();
       allPlayerPlayedForRound = true;
