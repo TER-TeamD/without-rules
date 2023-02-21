@@ -20,6 +20,7 @@ export class EndPageComponent {
   }
 
   ngOnInit(): void {
+
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
 
       if (lastMessage === LastMessageEnum.START_GAME) {
@@ -31,12 +32,19 @@ export class EndPageComponent {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+      if (this.player === null) {
+        this.router.navigate(['/']);
+      }
     })
   }
 
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
     this.playerSubscription?.unsubscribe();
+  }
+
+  public replay() {
+    this.router.navigate(['/']);
   }
 
 }

@@ -59,10 +59,17 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+      if (this.player === null) {
+        this.router.navigate(['/']);
+      }
 
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
       this.cards.forEach(c => c.state = 'unselected');
       this.selectedCard = null;
+      if (this.cards.length === 1) {
+        this.select(this.cards[0]);
+        this.cards[0].state = 'selected';
+      }
     })
   }
 

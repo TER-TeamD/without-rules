@@ -1,13 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { StackCard } from '../model/game.model';
-import { Card, Player } from '../model/player.model';
+import { Player } from '../model/player.model';
 import { GameService } from '../services/game.service';
 import Stacks from './mocks/stacks.json';
 import Players from './mocks/players.json';
-import { LastMessageEnum } from '../model/last-message.enum';
+import { LastGameMessageEnum, LastMessageEnum } from '../model/last-message.enum';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-table-cards',
@@ -17,18 +16,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class TableCardsComponent {
   public gameStatus = "WAITING";
   private lastMessageSubscription: Subscription | null = null;
+  private lastGameMessageSubscription: Subscription | null = null;
   private playerSubscription: Subscription | null = null;
   public player: Player | null = null;
   public players: Player[] = [];
   public stacks: StackCard[] = [];
   public canChooseStack: boolean = false;
-  public timer: number = 0;
+  public timer: number = 30;
   public timerVisible: boolean = false;
   public messageVisible: boolean = false;
   // public players: any[] = Players;
   // public stacks: any[] = Stacks;
 
-  constructor(private gameService: GameService, private router: Router, private snackBar: MatSnackBar) {
+  constructor(private gameService: GameService, private router: Router) {
   }
 
 
@@ -50,24 +50,39 @@ export class TableCardsComponent {
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
+      if (this.player === null) {
+        this.router.navigate(['/']);
+      }
     })
 
-    this.gameService.game$.subscribe(game => {
-      if (game) {
-        console.log("game", game);
-        this.stacks = game.in_game_property.stacks;
-        this.players = game.players;
-
-        let currentPlayerAction = game.in_game_property.between_round?.current_player_action;
-        if (currentPlayerAction) {
-          console.log("current_player_action", game.in_game_property.between_round?.current_player_action);
-
+    this.lastGameMessageSubscription = this.gameService.lastGameMessage$.subscribe(lastMessage => {
+      console.log("game", this.gameService.game);
+      console.log("lastMessage", lastMessage)
+      if (lastMessage === LastGameMessageEnum.PHONE_NEW_PLAYER_PLAYED_CARD) {
+        let currentGame = this.gameService.game;
+        if (currentGame) {
+          this.stacks = currentGame.in_game_property.stacks;
+          this.players = currentGame.players;
+          for (let p of this.players) {
+            p.in_player_game_property = null;
+          }
         }
-        if (currentPlayerAction?.action.type === "CHOOSE_STACK_CARD" && currentPlayerAction.player.id === this.player?.id) {
-          this.canChooseStack = true;
-          this.timerVisible = true;
-          this.messageVisible = true;
 
+      }
+
+
+      if (lastMessage === LastGameMessageEnum.PHONE_FLIP_CARD_ORDER) {
+        let currentGame = this.gameService.game;
+        if (currentGame) {
+          this.stacks = currentGame.in_game_property.stacks;
+          this.players = currentGame.players;
+        }
+      }
+
+      if (lastMessage === LastGameMessageEnum.PHONE_NEW_RESULT_ACTION) {
+        let currentPlayerAction = this.gameService.game?.in_game_property.between_round?.current_player_action;
+
+        if (currentPlayerAction?.action.type === "CHOOSE_STACK_CARD" && currentPlayerAction.player.id === this.player?.id) {
           setInterval(() => {
             let end = new Date(currentPlayerAction?.action.chrono_up_to).getTime();
             let now = new Date().getTime();
@@ -78,13 +93,15 @@ export class TableCardsComponent {
               this.messageVisible = false;
             }
           }, 1000);
+          this.canChooseStack = true;
+          this.timerVisible = true;
+          this.messageVisible = true;
         }
       }
+
+
     });
 
-    // this.gameService.lastGameMessage$.subscribe(lastMessage => {
-
-    // });
   }
 
   public countCattleHeads(stack: StackCard): number {
@@ -105,5 +122,6 @@ export class TableCardsComponent {
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
     this.playerSubscription?.unsubscribe();
+    this.lastGameMessageSubscription?.unsubscribe();
   }
 }
