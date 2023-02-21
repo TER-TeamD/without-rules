@@ -1,1 +1,26 @@
-<p>table-cards works!</p>
+<div class="main">
+    <app-info-bar [player]="player" [gameStatus]="gameStatus" [timer]="timer"
+        [isTimerVisible]="timerVisible"></app-info-bar>
+    <div class="table">
+        <div id="players">
+            <div *ngFor="let player of players">
+                <app-card class="card" [card]="player.in_player_game_property?.played_card"></app-card>
+                <img class="avatar" src="/assets/avatars/{{player.avatar}}.png" style="width: 50px; height: 50px;"
+                    alt="" />
+                <div class="username">{{player.username}}</div>
+            </div>
+        </div>
+        <div id="message-stack" *ngIf="messageVisible">You have to choose a stack !</div>
+        <div id="stacks">
+            <div class="card-container" *ngFor=" let stack of stacks"
+                (click)="(canChooseStack) ? chooseStack(stack.stackNumber) : null"
+                [ngStyle]="{'border': (canChooseStack) ? 'solid green' : 'none'}">
+                <div class="number-container">
+                    <div class="cards-number">🐮:{{stack.stackCards.length+1}}</div>
+                    <div class="cattleheads-number">🃏:{{countCattleHeads(stack)}}</div>
+                </div>
+                <app-card [card]="stack.stackHead"></app-card>
+            </div>
+        </div>
+    </div>
+</div>

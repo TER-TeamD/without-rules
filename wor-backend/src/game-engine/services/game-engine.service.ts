@@ -49,9 +49,9 @@ export class GameEngineService implements OnModuleInit {
     private readonly initializeGameService: InitializeGameService,
     private readonly roundResultService: RoundResultService,
     private readonly startGameService: StartGameService,
-  ) {}
+  ) { }
 
-  onModuleInit(): any {}
+  onModuleInit(): any { }
 
   public async tableCreateNewGame(): Promise<void> {
     const game: Game = await this.startGameService.generateNewGame();
@@ -158,7 +158,7 @@ export class GameEngineService implements OnModuleInit {
 
         const game: Game = await this.roundResultService.generateNextAction();
         await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
-        await this.webSocketGateway.sendNewGameValueToPhone(gameWithFlipCard, 'PHONE_NEW_RESULT_ACTION');
+        await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
 
         if (game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
           this.chooseAutomaticStackAfterTimeout();
@@ -172,7 +172,7 @@ export class GameEngineService implements OnModuleInit {
         console.error('Player is not found');
       } else if (error instanceof PlayerAlreadyPlayedCardException) {
         console.error('Player already played a card');
-      }else if (error instanceof PlayerDontHaveCardException) {
+      } else if (error instanceof PlayerDontHaveCardException) {
         console.error("Played don't have the card he want to play");
       } else if (error instanceof StackNotFoundException) {
         console.error('Stack not found');
@@ -193,8 +193,8 @@ export class GameEngineService implements OnModuleInit {
 
       // Si la précédente action est une action du type ChooseStackCardPlayerAction, on donne le choosen stack
       if (choosen_stack != null
-          && currentGame.in_game_property.between_round.current_player_action != null
-          && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD"
+        && currentGame.in_game_property.between_round.current_player_action != null
+        && currentGame.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD"
       ) {
         const newRoundGame: Game = await this.roundResultService.updateActionWhenChooseStackCard(choosen_stack);
       }
@@ -203,14 +203,14 @@ export class GameEngineService implements OnModuleInit {
       await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
       await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
 
-      if (choosen_stack == null && game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD" ) {
+      if (choosen_stack == null && game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
         this.chooseAutomaticStackAfterTimeout();
       }
 
 
 
       if (game.in_game_property.between_round.current_player_action != null
-          && game.in_game_property.between_round.current_player_action.action.type === "NEXT_ROUND"
+        && game.in_game_property.between_round.current_player_action.action.type === "NEXT_ROUND"
       ) {
         if (game.in_game_property.current_round === MAX_ROUND_NUMBER) {
           // Fin du jeu, envoie des resultats
@@ -256,7 +256,7 @@ export class GameEngineService implements OnModuleInit {
         raised = true;
       }
 
-      if(!raised) {
+      if (!raised) {
         this.logger.error("Unexpected error: ", error);
       }
     }

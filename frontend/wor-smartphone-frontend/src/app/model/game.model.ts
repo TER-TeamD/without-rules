@@ -1,4 +1,4 @@
-import {Card, Player} from "./player.model";
+import { Card, Player } from "./player.model";
 
 
 export interface Game {
@@ -40,8 +40,8 @@ export interface BetweenRoundPlayerAction {
 
 export enum PlayerActionType {
   CHOOSE_STACK_CARD = "CHOOSE_STACK_CARD",
-  NEXT_ROUND= "NEXT_ROUND",
-  SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD= "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD",
+  NEXT_ROUND = "NEXT_ROUND",
+  SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD = "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD",
   SEND_CARD_TO_STACK_CARD = "SEND_CARD_TO_STACK_CARD",
 }
 
@@ -49,5 +49,5 @@ export interface PlayerAction {
   type: PlayerActionType;
   stack_number: number;
   choosen_stack_card_by_player: number | null;
-  chrono_up_to: string | null;
+  chrono_up_to: any;
 }

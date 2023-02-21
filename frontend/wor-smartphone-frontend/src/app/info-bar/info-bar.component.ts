@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { Player } from '../model/player.model';
-import { GameStatusEnum } from '../model/last-message.enum';
 
 @Component({
   selector: 'app-info-bar',
@@ -12,11 +11,11 @@ export class InfoBarComponent {
   @Input()
   public player: Player | null = null;
   @Input()
-  public gameStatus = GameStatusEnum.BEGINING;
+  public gameStatus: string = "";
   @Input()
-  public timer: number = 60;
-
-  public GameStatusEnum: typeof GameStatusEnum = GameStatusEnum;
+  public timer: number = 0;
+  @Input()
+  public isTimerVisible: boolean = false;
   public urlAvatar: string = "";
   public cattleHeads: number = 0;
 

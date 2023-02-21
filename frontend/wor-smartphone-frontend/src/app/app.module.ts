@@ -12,6 +12,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { InfoBarComponent } from './info-bar/info-bar.component';
 import { TableCardsComponent } from './table-cards/table-cards.component';
+import { EndPageComponent } from './end-page/end-page.component';
+import { LoadingPageComponent } from './loading-page/loading-page.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,9 @@ import { TableCardsComponent } from './table-cards/table-cards.component';
     LoginPageComponent,
     CardComponent,
     InfoBarComponent,
-    TableCardsComponent
+    TableCardsComponent,
+    EndPageComponent,
+    LoadingPageComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +34,8 @@ import { TableCardsComponent } from './table-cards/table-cards.component';
     FormsModule,
     HttpClientModule,
     DragDropModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,10 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '../services/game.service';
 import { Card, Player } from "../model/player.model";
 import { Subscription } from "rxjs";
-import { LastMessageEnum, GameStatusEnum } from "../model/last-message.enum";
+import { LastMessageEnum } from "../model/last-message.enum";
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { CardComponent } from '../card/card.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-display-cards',
@@ -29,57 +29,31 @@ import { CardComponent } from '../card/card.component';
   ]
 })
 export class DisplayCardsComponent implements OnInit, OnDestroy {
-
+  public gameStatus: string = "PLAYING";
   private lastMessageSubscription: Subscription | null = null;
   private playerSubscription: Subscription | null = null;
   public player: Player | null = null;
-
   public selectedCard: Card | null = null;
-  public GameStatusEnum: typeof GameStatusEnum = GameStatusEnum;
-  public gameStatus = GameStatusEnum.BEGINING;
   public timer: number = 60;
-  // public cards: Card[] = [];
+  public cards: Card[] = [];
 
-
-  public cards: Card[] = [{ value: 30, cattleHead: 1, state: "unselected" }, { value: 97, cattleHead: 3, state: "unselected" },
-  { value: 44, cattleHead: 5, state: "unselected" }, { value: 15, cattleHead: 3, state: "unselected" },
-  { value: 12, cattleHead: 2, state: "unselected" }, { value: 10, cattleHead: 1, state: "unselected" },
-  { value: 9, cattleHead: 1, state: "unselected" }, { value: 8, cattleHead: 1, state: "unselected" },
-  { value: 7, cattleHead: 1, state: "unselected", }, { value: 6, cattleHead: 7, state: "unselected" }];
-
-
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService, private router: Router) {
   }
 
   ngOnInit(): void {
 
+    setInterval(() => {
+      let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
+      let now = new Date().getTime();
+      this.timer = Math.floor((end - now) / 1000) + 1;
+    }, 1000);
+
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
 
-      if (lastMessage === LastMessageEnum.START_GAME) {
-        console.log("Start game")
-        this.gameStatus = GameStatusEnum.PLAYING;
-      }
-
       if (lastMessage === LastMessageEnum.CARD_PLAYED) {
-        console.log("Card played")
-        this.gameStatus = GameStatusEnum.WAITING;
+        console.log("Card played");
+        await this.router.navigate(['/table']);
       }
-
-      if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
-        console.log("End result");
-        this.gameStatus = GameStatusEnum.END;
-      }
-
-      if (lastMessage === LastMessageEnum.NEW_ROUND) {
-        console.log("New Round");
-        this.gameStatus = GameStatusEnum.PLAYING;
-        setInterval(() => {
-          let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
-          let now = new Date().getTime();
-          this.timer = Math.floor((end - now) / 1000) + 1;
-        }, 1000);
-      }
-
     });
 
     this.playerSubscription = this.gameService.player$.subscribe(async player => {
@@ -89,18 +63,16 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       this.cards = this.player!.cards.sort((a, b) => (a.value > b.value) ? 1 : -1);
       this.cards.forEach(c => c.state = 'unselected');
       this.selectedCard = null;
-
     })
   }
 
 
   public play(): void {
     if (this.player && this.selectedCard) {
-      console.log("Play card", this.selectedCard)
       this.cards.forEach(c => c.state = c === this.selectedCard ? 'played' : 'unselected');
       setTimeout(() => {
         this.gameService.playerPlayedCard(this.player!.id, this.selectedCard!.value);
-      }, 1500);
+      }, 1000);
     }
   }
 
@@ -118,5 +90,4 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.lastMessageSubscription?.unsubscribe();
     this.playerSubscription?.unsubscribe();
   }
-
 }

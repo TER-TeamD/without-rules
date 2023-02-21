@@ -1,12 +1,11 @@
 <div class="header"
-    [ngStyle]="{'justifyContent': (gameStatus === GameStatusEnum.BEGINING) ? 'center' : 'space-between'}">
-    <div class="header-left" *ngIf="gameStatus === GameStatusEnum.PLAYING || gameStatus === GameStatusEnum.WAITING">
+    [ngStyle]="{'justifyContent': (gameStatus === 'LOADING' || gameStatus === 'END') ? 'center' : 'space-between'}">
+    <div class="header-left" *ngIf="gameStatus === 'PLAYING' || gameStatus === 'WAITING'">
         <p>🐮</p>
         <p>{{cattleHeads}}</p>
     </div>
 
-    <div class="header-center" *ngIf="gameStatus === GameStatusEnum.PLAYING && player !== null"
-        [ngStyle]="{'color': (timer<=10) ? 'red' : 'black'}">
+    <div class="header-center" *ngIf="isTimerVisible" [ngStyle]="{'color': (timer<=10) ? 'red' : 'black'}">
         <mat-icon>timer</mat-icon>
         <p>{{timer}}</p>
     </div>

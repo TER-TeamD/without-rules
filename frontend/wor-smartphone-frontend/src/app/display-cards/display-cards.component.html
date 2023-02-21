@@ -1,20 +1,8 @@
 <div class="main">
-    <app-info-bar [player]="player" [gameStatus]="gameStatus"></app-info-bar>
-    <div *ngIf="gameStatus === GameStatusEnum.BEGINING" class="message">
-        <p>Waiting for the game to be launched...</p>
-    </div>
+    <app-info-bar [player]="player" [gameStatus]="gameStatus" [timer]="timer" [isTimerVisible]="true"></app-info-bar>
 
-    <div *ngIf="gameStatus === GameStatusEnum.END" class="message">
-        <p>Game finished...</p>
-        <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}}
-            cattle heads !</p>
-    </div>
 
-    <div *ngIf="gameStatus === GameStatusEnum.WAITING" class="table">
-        <app-table-cards [player]="player"></app-table-cards>
-    </div>
-
-    <div class="content-container" *ngIf="gameStatus === GameStatusEnum.PLAYING && player !== null">
+    <div class="content-container">
         <p class="text" [ngStyle]="{'visibility': (timer<=10) ? 'visible' : 'hidden', 'color': 'red'}">You don't have
             much time left !
         </p>
