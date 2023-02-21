@@ -67,10 +67,6 @@ export class TableCardsComponent {
         if (currentGame) {
           this.stacks = currentGame.in_game_property.stacks;
           this.players = currentGame.players;
-
-          for (let p of this.players) {
-            p.move_card = false;
-          }
         }
       }
 
