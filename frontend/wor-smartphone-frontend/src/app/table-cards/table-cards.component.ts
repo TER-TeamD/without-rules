@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { StackCard } from '../model/game.model';
 import { Player } from '../model/player.model';
 import { GameService } from '../services/game.service';
-import Stacks from './mocks/stacks.json';
-import Players from './mocks/players.json';
 import { LastGameMessageEnum, LastMessageEnum } from '../model/last-message.enum';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -25,15 +23,10 @@ export class TableCardsComponent {
   public timer: number = 30;
   public timerVisible: boolean = false;
   public messageVisible: boolean = false;
-  // public players: any[] = Players;
-  // public stacks: any[] = Stacks;
 
-  constructor(private gameService: GameService, private router: Router) {
-  }
-
+  constructor(private gameService: GameService, private router: Router) { }
 
   ngOnInit(): void {
-
     this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
 
       if (lastMessage === LastMessageEnum.END_GAME_RESULTS) {
@@ -56,8 +49,8 @@ export class TableCardsComponent {
     })
 
     this.lastGameMessageSubscription = this.gameService.lastGameMessage$.subscribe(lastMessage => {
-      console.log("game", this.gameService.game);
-      console.log("lastMessage", lastMessage)
+      console.log("New game", this.gameService.game);
+
       if (lastMessage === LastGameMessageEnum.PHONE_NEW_PLAYER_PLAYED_CARD) {
         let currentGame = this.gameService.game;
         if (currentGame) {
@@ -67,15 +60,17 @@ export class TableCardsComponent {
             p.in_player_game_property = null;
           }
         }
-
       }
-
 
       if (lastMessage === LastGameMessageEnum.PHONE_FLIP_CARD_ORDER) {
         let currentGame = this.gameService.game;
         if (currentGame) {
           this.stacks = currentGame.in_game_property.stacks;
           this.players = currentGame.players;
+
+          for (let p of this.players) {
+            p.move_card = false;
+          }
         }
       }
 
@@ -83,6 +78,7 @@ export class TableCardsComponent {
         let currentPlayerAction = this.gameService.game?.in_game_property.between_round?.current_player_action;
 
         if (currentPlayerAction?.action.type === "CHOOSE_STACK_CARD" && currentPlayerAction.player.id === this.player?.id) {
+
           setInterval(() => {
             let end = new Date(currentPlayerAction?.action.chrono_up_to).getTime();
             let now = new Date().getTime();
@@ -93,13 +89,37 @@ export class TableCardsComponent {
               this.messageVisible = false;
             }
           }, 1000);
+
           this.canChooseStack = true;
           this.timerVisible = true;
           this.messageVisible = true;
         }
+
+        if (currentPlayerAction?.action.type === "SEND_CARD_TO_STACK_CARD" || currentPlayerAction?.action.type === "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD") {
+
+          let elementCard = document.getElementsByClassName("card-" + currentPlayerAction?.player.id)[0];
+          let positionCard = elementCard.getBoundingClientRect();
+          let positionStack = document.getElementsByClassName("stack-" + currentPlayerAction?.action.stack_number)[0].getBoundingClientRect();
+          let x = (positionStack.x - positionCard.x).toString();
+          let y = (positionStack.y - positionCard.y).toString();
+
+          let currentIndex = this.gameService.game?.in_game_property.between_round?.index_current_player_action_in_player_order || 0;
+          setTimeout(() => {
+            elementCard.animate([
+              { transform: 'translateX(0) translateY(0)' },
+              { transform: 'translateX(' + x + 'px) translateY(' + y + 'px)', zIndex: currentIndex },
+            ], {
+              duration: 1500,
+              iterations: 1,
+              fill: 'forwards'
+            });
+          }, 1000);
+
+          setTimeout(() => {
+            this.stacks = this.gameService.game?.in_game_property.stacks || [];
+          }, 2500);
+        }
       }
-
-
     });
 
   }
