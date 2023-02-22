@@ -295,6 +295,7 @@ export class RoundResultService {
             const currentDelta: number = currentCard.value - stack.stackHead.value;
             if (currentDelta > 0 && currentDelta <= minimumVariation.delta) {
                 minimumVariation.stack_card = stack;
+                minimumVariation.delta = currentDelta;
             }
         });
 
