@@ -155,6 +155,10 @@ class GameController {
     stackChosen$.add(stackNumber);
     promptChooseCard$.add(false);
   }
+  void resetChooseStack() {
+    promptChooseCard$.add(false);
+  }
+
 
   Future play(PlayerActionPlayer playerActionPlayer, { Iterable<int>? usedCards }) async {
     bool isChoose = playerActionPlayer._action is ChooseStackCardPlayerAction;

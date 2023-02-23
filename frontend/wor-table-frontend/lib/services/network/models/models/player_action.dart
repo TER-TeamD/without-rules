@@ -52,6 +52,7 @@ abstract class PlayerAction {
 
     if(controller.gameIsFinished) return;
 
+    controller.resetChooseStack();
     executeAction(controller, receivedGame, receivedGame.inGameProperty!.betweenRound!.currentPlayerAction!.player, packetExecution);
   }
 
