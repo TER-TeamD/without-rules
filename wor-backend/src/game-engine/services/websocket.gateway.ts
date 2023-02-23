@@ -74,7 +74,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('TABLE_NEW_GAME')
   public async tableCreateNewGame(client: Socket, payload: {}): Promise<void> {
     this.logger.log(
-      `TABLE | TABLE_NEW_GAME : ${JSON.stringify(payload)}`,
+      `IN_TABLE => TABLE_NEW_GAME : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableCreateNewGame();
@@ -87,7 +87,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   public async playerJoinGame(client: Socket, payload: any): Promise<void> {
     const message: { player_id: string, username: string } = payload;
     this.logger.log(
-      `PLAYER ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_JOIN_GAME : ${JSON.stringify(payload)} `,
+      `IN_PLAYER => ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_JOIN_GAME : ${JSON.stringify(payload)} `,
     );
 
     await this.gameEngineService.playerJoinGame(message.player_id, message.username);
@@ -99,7 +99,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('TABLE_START_GAME')
   public async tableStartGame(client: Socket, payload: any): Promise<void> {
     this.logger.log(
-      `TABLE | TABLE_START_GAME : ${JSON.stringify(payload)}`,
+      `IN_TABLE => TABLE_START_GAME : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableStartGame();
@@ -112,7 +112,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   public async playerPlayedCard(client: Socket, payload: any): Promise<void> {
     const message: { player_id: string; card_value: number } = payload;
     this.logger.log(
-      `PLAYER ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_PLAYED_CARD : ${JSON.stringify(payload)} `,
+      `IN_PLAYER => ${JSON.stringify(this.entitiesConnected[client.handshake.auth.id],)} - PLAYER_PLAYED_CARD : ${JSON.stringify(payload)} `,
     );
 
     await this.gameEngineService.playerPlayedCard(
@@ -128,7 +128,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   @SubscribeMessage('TABLE_ALL_PLAYER_PLAYED')
   public async tableAllPlayerPlayed(client: Socket, payload: any,): Promise<void> {
     this.logger.log(
-      `TABLE | TABLE_ALL_PLAYER_PLAYED : ${JSON.stringify(payload)}`,
+      `IN_TABLE => TABLE_ALL_PLAYER_PLAYED : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableAllPlayerPlayed();
@@ -141,7 +141,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   ): Promise<void> {
     const message: { choosen_stack: number | null } = payload;
     this.logger.log(
-      `TABLE | TABLE_NEXT_ROUND_RESULT_ACTION : ${JSON.stringify(payload)}`,
+      `IN_TABLE => TABLE_NEXT_ROUND_RESULT_ACTION : ${JSON.stringify(payload)}`,
     );
 
     await this.gameEngineService.tableNextRoundResultAction(
@@ -150,14 +150,14 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   public async sendNewGameValueToTable(game: Game, topic: string,): Promise<void> {
-    this.logger.log(`Send ${topic} to TABLE`);
+    this.logger.log(`OUT_TABLE => Send ${topic} to TABLE`);
     await this.sendMessageToEntity('0', topic, {
       game,
     });
   }
 
   public async sendNewGameValueToPhone(game: Game, topic: string): Promise<void> {
-    this.logger.log(`Send ${topic} to PHONES`);
+    this.logger.log(`OUT_PHONE_TABLE => Send ${topic} to PHONES`);
     for (const p of game.players) {
       await this.sendMessageToEntity(p.id, topic, {
         game,
@@ -166,7 +166,7 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
   }
 
   public async sendPlayerInfosToPlayer(player: Player, topic: string,): Promise<void> {
-    this.logger.log(`Send ${topic} to ${player.id}`);
+    this.logger.log(`OUT_PLAYER => Send ${topic} to ${player.id}`, );
     await this.sendMessageToEntity(player.id, topic, {
       player,
     });

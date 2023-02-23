@@ -40,6 +40,8 @@ export class GameEngineService implements OnModuleInit {
   private idCurrentSetTimeoutPlayerChoose;
   private idChooseAutomaticStackAfterTimeout;
 
+  private lastTableMessage: string = '';
+
   constructor(
     @InjectModel(Game.name) private gameModel: Model<GameDocument>,
     @Inject(forwardRef(() => WebsocketGateway))
@@ -55,6 +57,7 @@ export class GameEngineService implements OnModuleInit {
 
   public async tableCreateNewGame(): Promise<void> {
     const game: Game = await this.startGameService.generateNewGame();
+    this.lastTableMessage = 'CREATE_NEW_GAME';
     await this.webSocketGateway.sendNewGameValueToTable(
       game,
       'CREATE_NEW_GAME',
@@ -75,6 +78,7 @@ export class GameEngineService implements OnModuleInit {
         'PLAYER_LOGGED_IN_GAME',
       );
 
+      this.lastTableMessage = 'TABLE_PLAYER_JOIN';
       await this.webSocketGateway.sendNewGameValueToTable(
         game,
         'TABLE_PLAYER_JOIN',
@@ -96,6 +100,7 @@ export class GameEngineService implements OnModuleInit {
     try {
       const game: Game = await this.initializeGameService.launchGame();
 
+      this.lastTableMessage = 'START_GAME';
       await this.webSocketGateway.sendNewGameValueToTable(game, 'START_GAME');
 
       for (const p of game.players) {
@@ -118,6 +123,7 @@ export class GameEngineService implements OnModuleInit {
 
     try {
       const game: Game = await this.duringRoundService.newPlayerPlayed(player_id, card_value);
+      this.lastTableMessage = 'NEW_PLAYER_PLAYED_CARD';
       await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_PLAYER_PLAYED_CARD',);
       await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_PLAYER_PLAYED_CARD');
 
@@ -129,17 +135,17 @@ export class GameEngineService implements OnModuleInit {
 
     } catch (error) {
       if (error instanceof GameNotFoundException) {
-        this.logger.error('Game not found');
+        this.logger.error("playerPlayedCard => ", error.message);
       }
 
       if (error instanceof PlayerNotFoundException) {
-        this.logger.error('Player is not found');
+        this.logger.error("playerPlayedCard => ", error.message);
       }
       if (error instanceof PlayerAlreadyPlayedCardException) {
-        this.logger.error('Player already played a card');
+        this.logger.error("playerPlayedCard => ", error.message);
       }
       if (error instanceof PlayerDontHaveCardException) {
-        this.logger.error("Played don't have the card he want to play");
+        this.logger.error("playerPlayedCard => ", error.message);
       }
     }
   }
@@ -153,10 +159,12 @@ export class GameEngineService implements OnModuleInit {
 
         const gameWithFlipCard: Game = await this.roundResultService.flipCardOrder();
 
+        this.lastTableMessage = 'FLIP_CARD_ORDER';
         await this.webSocketGateway.sendNewGameValueToTable(gameWithFlipCard, 'FLIP_CARD_ORDER',);
         await this.webSocketGateway.sendNewGameValueToPhone(gameWithFlipCard, 'PHONE_FLIP_CARD_ORDER');
 
         const game: Game = await this.roundResultService.generateNextAction();
+        this.lastTableMessage = 'NEW_RESULT_ACTION';
         await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
         await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
 
@@ -167,17 +175,17 @@ export class GameEngineService implements OnModuleInit {
       }
     } catch (error) {
       if (error instanceof GameNotFoundException) {
-        console.error('Game not found');
+        this.logger.error(error.message);
       } else if (error instanceof PlayerNotFoundException) {
-        console.error('Player is not found');
+        this.logger.error(error.message);
       } else if (error instanceof PlayerAlreadyPlayedCardException) {
-        console.error('Player already played a card');
+        this.logger.error(error.message);
       } else if (error instanceof PlayerDontHaveCardException) {
-        console.error("Played don't have the card he want to play");
+        this.logger.error(error.message);
       } else if (error instanceof StackNotFoundException) {
-        console.error('Stack not found');
+        this.logger.error(error.message);
       } else {
-        console.error(error)
+        this.logger.error(error)
       }
     }
   }
@@ -187,7 +195,7 @@ export class GameEngineService implements OnModuleInit {
     try {
       const currentGame: Game = await EngineUtilsService.getCurrentGame(this.gameModel,);
 
-      clearTimeout(this.idChooseAutomaticStackAfterTimeout)
+      clearTimeout(this.idCurrentSetTimeoutPlayerChoose)
       clearTimeout(this.idChooseAutomaticStackAfterTimeout)
 
 
@@ -200,8 +208,14 @@ export class GameEngineService implements OnModuleInit {
       }
 
       const game: Game = await this.roundResultService.generateNextAction();
-      await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
-      await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
+
+      if (game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type != "NEXT_ROUND") {
+        this.lastTableMessage = 'NEW_RESULT_ACTION';
+        await this.webSocketGateway.sendNewGameValueToTable(game, 'NEW_RESULT_ACTION',);
+        await this.webSocketGateway.sendNewGameValueToPhone(game, 'PHONE_NEW_RESULT_ACTION');
+        return;
+      }
+
 
       if (choosen_stack == null && game.in_game_property.between_round.current_player_action != null && game.in_game_property.between_round.current_player_action.action.type === "CHOOSE_STACK_CARD") {
         this.chooseAutomaticStackAfterTimeout();
@@ -216,48 +230,53 @@ export class GameEngineService implements OnModuleInit {
           // Fin du jeu, envoie des resultats
           this.logger.log("END game result")
           const endGame: Game = await this.gameResultService.getResults();
+          this.lastTableMessage = 'END_GAME_RESULTS';
           await this.webSocketGateway.sendNewGameValueToTable(endGame, 'END_GAME_RESULTS',);
           for (const p of endGame.players) {
             await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'END_GAME_RESULTS',);
           }
         } else {
 
-          this.logger.log("New round game")
-          const newRoundGame: Game = await this.duringRoundService.nextRound();
-          await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
-          for (const p of newRoundGame.players) {
-            await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'NEW_ROUND');
+          if (this.lastTableMessage != "NEW_ROUND") {
+            this.logger.log("New round game")
+            const newRoundGame: Game = await this.duringRoundService.nextRound();
+            this.lastTableMessage = 'NEW_ROUND';
+            await this.webSocketGateway.sendNewGameValueToTable(newRoundGame, 'NEW_ROUND',);
+            for (const p of newRoundGame.players) {
+              await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'NEW_ROUND');
+            }
+
+            this.verifyAndExecuteTimeOutForRound();
           }
 
-          this.verifyAndExecuteTimeOutForRound();
 
         }
       }
     } catch (error) {
       let raised = false;
       if (error instanceof GameNotFoundException) {
-        this.logger.error('Game not found');
+        this.logger.error("tableNextRoundResultAction => ", error.message);
         raised = true;
       }
       if (error instanceof PlayerNotFoundException) {
-        this.logger.error('Player is not found');
+        this.logger.error("tableNextRoundResultAction => ", error.message);
         raised = true;
       }
       if (error instanceof PlayerAlreadyPlayedCardException) {
-        this.logger.error('Player already played a card');
+        this.logger.error("tableNextRoundResultAction => ", error.message);
         raised = true;
       }
       if (error instanceof PlayerDontHaveCardException) {
-        this.logger.error("Played don't have the card he want to play");
+        this.logger.error("tableNextRoundResultAction => ", error.message);
         raised = true;
       }
       if (error instanceof StackNotFoundException) {
-        this.logger.error('Stack not found');
+        this.logger.error("tableNextRoundResultAction => ", error.message);
         raised = true;
       }
 
       if (!raised) {
-        this.logger.error("Unexpected error: ", error);
+        this.logger.error("tableNextRoundResultAction => Unexpected error: ", error.message);
       }
     }
   }

@@ -72,7 +72,7 @@ export class Player {
   gameResult: PlayerGameResult;
 
   constructor() {
-    this.id = (Math.random() + 1).toString(36).substring(8);
+    this.id = (Math.random() + 1).toString(36).substring(6);
     this.is_logged = false;
     this.cards = [];
     this.in_player_game_property = new InPlayerGameProperty()

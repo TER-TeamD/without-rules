@@ -37,7 +37,7 @@ class MobileTester {
 
       if (player == null) return;
 
-      Future.delayed(Duration(milliseconds: latency)).then((_) {
+      Future.delayed(Duration(milliseconds: 2000)).then((_) {
         switch (topic) {
           case "START_GAME":
           case "NEW_ROUND":
@@ -65,7 +65,7 @@ class MobileTester {
           // Choose the first stack
           var stack = controller.game$.value.inGameProperty?.stacks.first;
           if (stack == null) break;
-          Future.delayed(Duration(seconds: 1)).then((_) => chooseStackCard(stack));
+          Future.delayed(Duration(milliseconds: 200)).then((_) => chooseStackCard(stack));
           break;
       }
     });

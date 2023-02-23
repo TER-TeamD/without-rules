@@ -90,7 +90,7 @@ export class DuringRoundService {
         player.in_player_game_property.played_card = player.cards[indexCard];
         player.in_player_game_property.had_played_turn = true;
 
-        return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
+        return this.gameModel.findOneAndUpdate({_id: currentGame._id, 'players.id': playerId}, {$set: { 'players.$': player }}, {returnDocument: "after"});
     }
 
 

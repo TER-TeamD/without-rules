@@ -55,6 +55,9 @@ class GameController {
   bool gameIsFinished = false;
   int animationStep = 0;
   Player? choosingPlayer = null;
+  String lastTopic = '';
+
+
 
   final PlayerActionPlayer? currentAction = null;
 
@@ -94,6 +97,7 @@ class GameController {
       chronometer$.add(ChronometerData(chronoEnd));
     }
 
+    lastTopic = topic;
     game$.add(game);
     lastTopic$.add(topic);
   }
@@ -186,6 +190,7 @@ class GameController {
   }
 
   void nextRound() {
+    Logger.log("=====> ${lastTopic}");
     _socketGateway.nextRoundResultAction();
   }
 

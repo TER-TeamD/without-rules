@@ -1,6 +1,6 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Card, Game, GameDocument, StackCard} from "../../schema/game.schema";
+import {Card, Game, GameDocument, Player, StackCard} from "../../schema/game.schema";
 import {Model} from "mongoose";
 import {GameNotFoundException} from "./exceptions/game-not-found.exception";
 import {UserNotFoundWhenJoinGameException} from "./exceptions/user-not-found-when-join-game.exception";
@@ -102,21 +102,25 @@ export class InitializeGameService {
         const currentGame: Game = tempCurrentGame;
 
         let isPlayerFound: boolean = false;
+        let player: Player | null = null;
         for (const p of currentGame.players) {
             if (p.id === playerId) {
+                player = p;
                 isPlayerFound = true;
-                p.is_logged = true;
-                p.username = username;
+                player.is_logged = true;
+                player.username = username;
             }
         }
 
-        if (!isPlayerFound) {
+        if (!isPlayerFound || player === null) {
             throw new UserNotFoundWhenJoinGameException(playerId)
         }
 
+
+
         return this.gameModel.findOneAndUpdate(
-            {_id: currentGame._id},
-            {players: currentGame.players},
+            {_id: currentGame._id, 'players.id': playerId},
+            {$set: { 'players.$': player }},
             {returnDocument: 'after'});
     }
 

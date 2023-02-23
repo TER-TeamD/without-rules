@@ -9,6 +9,7 @@ import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/tester.dart';
 
 import '../constants.dart';
+import '../services/logger.dart';
 import '../services/network/socket_gateway.dart';
 import '../services/screen_service.dart';
 
@@ -25,7 +26,8 @@ class _TableLoaderState extends State<TableLoader> {
   @override
   void initState() {
     super.initState();
-    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
+    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() async {
+
           controller = GameController(game, GetIt.I.get<SocketGateway>());
 
           var transforms = GetIt.I.get<ScreenService>().getMapPosition(
@@ -33,7 +35,8 @@ class _TableLoaderState extends State<TableLoader> {
           controller!.setDeckTransforms(transforms);
 
           if(TESTERS != 0) {
-            var durations = [ 300, 600 ];
+            var durations = [ 500, 1000 ];
+
 
             // Start the game once every testers are connected.
             StreamSubscription<Game>? subscription;
@@ -46,6 +49,7 @@ class _TableLoaderState extends State<TableLoader> {
 
             // Start the testers.
             for(int i = 0; i < TESTERS; i++) {
+              Logger.log("=======>" + game.players[i].id);
               MobileTester(game.players[i].id, HOSTNAME, controller!, latency: durations[i % durations.length]);
             }
           }
