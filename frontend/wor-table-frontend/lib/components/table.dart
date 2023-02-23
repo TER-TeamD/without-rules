@@ -136,7 +136,7 @@ class _TableComponentState extends State<TableComponent> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if(chronometer != null) buildChronometer(chronometer!),
+          if (chronometer != null && !chronometer!.expired) buildChronometer(chronometer!),
           const SizedBox(width: 30),
           StacksComponent(
                   stacks: stacks,
@@ -145,7 +145,8 @@ class _TableComponentState extends State<TableComponent> {
                   onStackTap: (stack) =>
                       widget.controller.chooseStack(stack.stackNumber)),
           const SizedBox(width: 30),
-          if(chronometer != null) RotatedBox(quarterTurns: 2, child: buildChronometer(chronometer!)),
+          if (chronometer != null && !chronometer!.expired)
+            RotatedBox(quarterTurns: 2, child: buildChronometer(chronometer!)),
         ],
       ),
     );
