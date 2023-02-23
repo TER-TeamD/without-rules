@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:worfrontend/constants.dart';
 import 'package:worfrontend/services/game_controller.dart';
@@ -15,6 +17,7 @@ class _BackgroundState extends State<Background>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool blink = false;
+  StreamSubscription<bool>? _blinkSubscription;
 
   @override
   void initState() {
@@ -31,7 +34,11 @@ class _BackgroundState extends State<Background>
       bool previous = blink;
       blink = false;
 
-      event?.isAlert$.listen((value) {
+      if(_blinkSubscription != null) {
+        _blinkSubscription!.cancel();
+      }
+
+      _blinkSubscription = event?.isAlert$.listen((value) {
         bool previous = blink;
         setState(() {
           blink = value;

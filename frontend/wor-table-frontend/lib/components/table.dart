@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:worfrontend/components/background.dart';
@@ -31,7 +33,6 @@ class _TableComponentState extends State<TableComponent> {
   bool isGameStarted = false;
   bool isPlayTime = false;
   bool isGameEnded = false;
-  bool isAlert = false;
   bool promptChooseCard = false;
   Player? choosingPlayer = null;
   PlayerActionPlayer? playerActionPlayer;
@@ -55,7 +56,6 @@ class _TableComponentState extends State<TableComponent> {
         isGameStarted = widget.controller.isGameStarted();
         isPlayTime = game.players.any(
             (element) => !(element.playerGameProperty?.hadPlayedTurn ?? false));
-        isAlert = widget.controller.chronometer$.value?.isAlert$.value ?? false;
       });
     });
     widget.controller.gameEnded$.listen((event) {
@@ -83,16 +83,6 @@ class _TableComponentState extends State<TableComponent> {
     widget.controller.deckTransforms$.listen((value) {
       setState(() {
         decks = widget.controller.getDecks();
-      });
-    });
-    widget.controller.chronometer$.listen((value) {
-      setState(() {
-        isAlert = value?.isAlert$.value ?? false;
-      });
-      value?.isAlert$.listen((value) {
-        setState(() {
-          isAlert = value;
-        });
       });
     });
 

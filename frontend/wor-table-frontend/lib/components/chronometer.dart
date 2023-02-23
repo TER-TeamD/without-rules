@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/chronometer_data.dart';
 
 class Chronometer extends StatefulWidget {
@@ -21,7 +22,7 @@ class _ChronometerState extends State<Chronometer> {
   @override
   void initState() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {});
+      if(mounted) setState(() {});
     });
 
     widget.controller.chronometer$.listen((event) {
@@ -33,7 +34,8 @@ class _ChronometerState extends State<Chronometer> {
 
   @override
   Widget build(BuildContext context) {
-    if(data?.expired ?? true) {
+    if(data?.endTime.isBefore(DateTime.now()) ?? true)  {
+      Logger.log(data == null ? "data is null" : "data is not null");
       return Container();
     }
 

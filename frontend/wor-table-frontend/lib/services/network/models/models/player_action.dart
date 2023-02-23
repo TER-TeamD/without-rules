@@ -73,7 +73,6 @@ abstract class PlayerAction {
   void executeAction(GameController controller, Game receivedGame,
       Player player, void Function() packetExecution) {
     packetExecution();
-    controller.stopChronometer();
     startAnimation(controller, player);
   }
 
