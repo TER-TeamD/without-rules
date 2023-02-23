@@ -33,7 +33,7 @@ class _ChronometerState extends State<Chronometer> {
 
   @override
   Widget build(BuildContext context) {
-    if(data?.endTime.isBefore(DateTime.now()) ?? true) {
+    if(data?.expired ?? true) {
       return Container();
     }
 
