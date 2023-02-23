@@ -30,6 +30,10 @@
         <p>Game finished...</p>
         <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}}
             cattle heads !</p>
+
+      <button type="button" class="button-play" (click)="newGame()">Play new game</button>
+
+
     </div>
 
     <div class="content-container" *ngIf="!loading && !played && !end && player !== null">
@@ -45,7 +49,7 @@
                 [card]="card"></app-card>
         </div>
         <div class="buttons" *ngIf="selectedCard !== null">
-            <button type="button" id="button-play" (click)="play()">Play the card</button>
+            <button type="button" id="button-play" class="button-play" (click)="play()">Play the card</button>
             <button type="button" id="button-cancel" (click)="cancel()">Cancel</button>
         </div>
     </div>

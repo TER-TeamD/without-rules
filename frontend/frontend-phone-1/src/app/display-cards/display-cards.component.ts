@@ -5,6 +5,7 @@ import { Subscription } from "rxjs";
 import { LastMessageEnum } from "../model/last-message.enum";
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CardComponent } from './card/card.component';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-display-cards',
@@ -50,7 +51,7 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   // { value: 9, cattleHead: 1, state: "unselected" }, { value: 8, cattleHead: 1, state: "unselected" },
   // { value: 7, cattleHead: 1, state: "unselected", }, { value: 6, cattleHead: 7, state: "unselected" }];
 
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -100,6 +101,11 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       }, 1000);
       this.urlAvatar = `/assets/avatars/${this.player?.avatar}.png`;
     })
+  }
+
+
+  public newGame(): void {
+    this.router.navigate(['']);
   }
 
 

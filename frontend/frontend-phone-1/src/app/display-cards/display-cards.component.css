@@ -60,7 +60,7 @@
   width: 100%;
 }
 
-#button-play {
+.button-play {
   padding: 10px;
   background-color: rgb(9, 201, 19);
   border-radius: 5px;
