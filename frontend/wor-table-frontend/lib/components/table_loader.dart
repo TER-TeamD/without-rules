@@ -26,7 +26,7 @@ class _TableLoaderState extends State<TableLoader> {
   @override
   void initState() {
     super.initState();
-    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() async {
+    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
 
           controller = GameController(game, GetIt.I.get<SocketGateway>());
 
