@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/network/models/chronometer_data.dart';
 
 class Chronometer extends StatefulWidget {
-  final ChronometerData data;
 
-  const Chronometer({Key? key, required this.data}) : super(key: key);
+  final GameController controller;
+
+  const Chronometer({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<Chronometer> createState() => _ChronometerState();
@@ -15,17 +16,27 @@ class Chronometer extends StatefulWidget {
 
 class _ChronometerState extends State<Chronometer> {
   late Timer timer;
+  ChronometerData? data;
 
   @override
   void initState() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return;
       setState(() {});
+    });
+
+    widget.controller.chronometer$.listen((event) {
+      setState(() {
+        data = event;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if(data?.endTime.isBefore(DateTime.now()) ?? true) {
+      return Container();
+    }
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -33,16 +44,11 @@ class _ChronometerState extends State<Chronometer> {
           width: 50,
           height: 50,
           child: CircularProgressIndicator(
-              value: 1.0 -
-                  (DateTime.now().difference(widget.data.startTime).inSeconds *
-                      1.0 /
-                      widget.data.interval.inSeconds),
-              color: Colors.white),
+            value: 1.0 - (DateTime.now().difference(data!.startTime).inSeconds * 1.0 / data!.interval.inSeconds),
+            color: Colors.white
+          ),
         ),
-        Text(
-          "${widget.data.endTime.difference(DateTime.now()).inSeconds}s",
-          style: TextStyle(color: Colors.white),
-        )
+        Text("${data!.endTime.difference(DateTime.now()).inSeconds}s", style: const TextStyle(color: Colors.white),)
       ],
     );
   }

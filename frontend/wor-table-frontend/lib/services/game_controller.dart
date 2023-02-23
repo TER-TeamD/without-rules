@@ -201,6 +201,8 @@ class GameController {
   Map<String, PositionedPlayerDeckState> getDecks() {
     return getDecksStatic(game$.value, deckTransforms);
   }
+
+  void resetChronometer() {}
 }
 
 class PlayerActionPlayer {

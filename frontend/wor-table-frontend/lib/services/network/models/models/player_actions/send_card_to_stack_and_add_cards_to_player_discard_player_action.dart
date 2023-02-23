@@ -42,6 +42,7 @@ class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
           .map((e) => e.value),
       player.playerGameProperty!.playedCard!.value
     ]).then((_) => afterAnimation(controller, player));
+    controller.stopChronometer();
   }
 
   @override

@@ -41,7 +41,7 @@ class MobileTester {
         switch (topic) {
           case "START_GAME":
           case "NEW_ROUND":
-            playCard(player!.cards.first);
+            //playCard(player!.cards.first);
             break;
         }
       });
