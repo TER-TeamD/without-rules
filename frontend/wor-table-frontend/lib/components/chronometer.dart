@@ -35,7 +35,6 @@ class _ChronometerState extends State<Chronometer> {
   @override
   Widget build(BuildContext context) {
     if(data?.endTime.isBefore(DateTime.now()) ?? true)  {
-      Logger.log(data == null ? "data is null" : "data is not null");
       return Container();
     }
 
