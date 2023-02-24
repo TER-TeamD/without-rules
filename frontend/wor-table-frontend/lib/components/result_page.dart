@@ -36,7 +36,11 @@ class ResultPage extends StatelessWidget {
       child: Center(
         child: renderBothDirection(Container(), Column(
           mainAxisSize: MainAxisSize.min,
-          children: getRanking().map((e) => Text(e, style: const TextStyle(color: Colors.white))).toList(),
+          children: [
+            ...getRanking().map((e) => Text(e, style: const TextStyle(color: Colors.white))).toList(),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: () {}, child: const Text("Restart"))
+          ],
         ),
       )),
     );

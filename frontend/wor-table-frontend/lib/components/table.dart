@@ -196,6 +196,8 @@ class _TableComponentState extends State<TableComponent> {
                 ],
               ))
           .toList(),
+      const SizedBox(height: 20),
+      ElevatedButton(onPressed: () => widget.controller.restartGame(), child: const Text("Restart"))
     ]);
   }
 

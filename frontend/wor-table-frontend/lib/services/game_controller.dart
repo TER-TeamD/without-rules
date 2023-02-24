@@ -50,6 +50,8 @@ class GameController {
 
   final BehaviorSubject<bool> promptChooseCard$ = BehaviorSubject.seeded(false);
 
+  final Subject onRestartGame$ = PublishSubject();
+
   int playingRound = 0;
   bool allPlayerPlayedForRound = false;
   bool gameIsFinished = false;
@@ -69,6 +71,10 @@ class GameController {
     _socketGateway.onMessage.listen((value) {
       value.execute(this);
     });
+  }
+
+  Future restartGame() async {
+    onRestartGame$.add(null);
   }
 
   Future<void> gameChanged(Game game, String topic) async {

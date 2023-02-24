@@ -1,9 +1,10 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/services/network/models/game_card.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
 import 'package:worfrontend/services/network/models/stack_card.dart';
+
 import 'game_controller.dart';
 import 'logger.dart';
 
@@ -13,6 +14,9 @@ class MobileTester {
   late Socket socket;
   final GameController controller;
   final int latency;
+
+  bool _disposed = false;
+  StreamSubscription<String?>? _lastTopicSubs;
 
   MobileTester(this.id, this.hostname, this.controller, {this.latency = 600}) {
     Logger.log("Starting tester $id");
@@ -27,6 +31,7 @@ class MobileTester {
     Player? player = null;
 
     socket.onAny((topic, data) {
+      if (_disposed) return;
       Logger.log("Player $id received $topic: $data");
 
       if (data is Map<String, dynamic>) {
@@ -51,7 +56,7 @@ class MobileTester {
       emit('PLAYER_JOIN_GAME', <String, dynamic>{'player_id': id});
     });
 
-    controller.lastTopic$.listen((topic) {
+    _lastTopicSubs = controller.lastTopic$.listen((topic) {
       switch (topic) {
         case "NEW_RESULT_ACTION":
           var action = controller
@@ -59,13 +64,14 @@ class MobileTester {
           if (action == null) break;
 
           // Check if this specific player should choose
-          if(!controller.promptChooseCard$.value) break;
+          if (!controller.promptChooseCard$.value) break;
           if (action.player.id != id) break;
 
           // Choose the first stack
           var stack = controller.game$.value.inGameProperty?.stacks.first;
           if (stack == null) break;
-          Future.delayed(Duration(milliseconds: 200)).then((_) => chooseStackCard(stack));
+          Future.delayed(Duration(milliseconds: 200)).then((_) =>
+              chooseStackCard(stack));
           break;
       }
     });
@@ -85,5 +91,11 @@ class MobileTester {
   emit(String topic, dynamic data) {
     Logger.log("Player $id emitted $topic: $data");
     socket.emit(topic, data);
+  }
+
+  dispose() {
+    _disposed = true;
+    socket.dispose();
+    _lastTopicSubs?.cancel();
   }
 }

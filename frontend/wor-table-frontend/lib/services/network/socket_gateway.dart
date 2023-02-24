@@ -9,6 +9,7 @@ import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
+
 import '../error_manager.dart';
 
 import 'models/socket_models/end_game.dart';
@@ -20,6 +21,8 @@ class SocketGateway {
   final Subject<SocketMessage> onMessage;
   final Subject connected = BehaviorSubject();
 
+  final Subject<MapEntry<String, dynamic>> onAny$ = PublishSubject();
+
   SocketGateway(this.socket) : onMessage = PublishSubject();
 
   listenEvents() {
@@ -28,6 +31,7 @@ class SocketGateway {
       connected.add(true);
     });
     socket.onAny((String topic, data) {
+      onAny$.add(MapEntry<String, dynamic>(topic, data));
       if (topic == "disconnect") return;
 
       if (data != null && data['game'] is Map<String, dynamic>) {

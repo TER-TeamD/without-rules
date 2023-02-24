@@ -9,7 +9,6 @@ import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/tester.dart';
 
 import '../constants.dart';
-import '../services/logger.dart';
 import '../services/network/socket_gateway.dart';
 import '../services/screen_service.dart';
 
@@ -26,41 +25,70 @@ class _TableLoaderState extends State<TableLoader> {
   @override
   void initState() {
     super.initState();
-    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
+    startGame();
+  }
 
+  void restartGame() {
+    setState(() {
+      controller = null;
+    });
+    startGame();
+  }
+
+  void startGame() {
+    GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
           controller = GameController(game, GetIt.I.get<SocketGateway>());
 
           var transforms = GetIt.I.get<ScreenService>().getMapPosition(
               game.players.map((e) => e.id).toList(growable: false));
           controller!.setDeckTransforms(transforms);
 
-          if(TESTERS != 0) {
-            var durations = [ 500, 1000 ];
+          Iterable<MobileTester> testers = Iterable.empty();
 
+          if (TESTERS != 0) {
+            var durations = [500, 1000];
 
             // Start the game once every testers are connected.
             StreamSubscription<Game>? subscription;
             subscription = controller!.game$.listen((game) {
-              if(game.players.where((p) => p.isLogged).length == TESTERS) {
+              if (game.players.where((p) => p.isLogged).length == TESTERS) {
                 subscription?.cancel();
                 controller!.startGame();
               }
             });
 
             // Start the testers.
-            for(int i = 0; i < TESTERS; i++) {
-              Logger.log("=======>" + game.players[i].id);
-              MobileTester(game.players[i].id, HOSTNAME, controller!, latency: durations[i % durations.length]);
-            }
+            testers = Iterable.generate(TESTERS).map((i) => MobileTester(
+                game.players[i].id, HOSTNAME, controller!,
+                latency: durations[i % durations.length])).toList(growable: false);
           }
+          StreamSubscription? subscription = null;
+          subscription = controller!.onRestartGame$.listen((value) {
+            subscription?.cancel();
+            for (var element in testers) {
+              element.dispose();
+            }
+            restartGame();
+          });
         }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScreenInitializer(child: controller == null
-        ? const Center(child: CircularProgressIndicator())
-        : TableComponent(controller: controller!),
+    return ScreenInitializer(
+      child: controller == null
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                TableComponent(controller: controller!),
+                IconButton(
+                    onPressed: () => restartGame(),
+                    icon: Icon(
+                      Icons.loop,
+                      color: Colors.white,
+                    ))
+              ],
+            ),
     );
   }
 }

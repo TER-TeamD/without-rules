@@ -14,21 +14,20 @@ class StackPosition {
 
 class ScreenService {
   Size? _screenSize;
-  Map<String, AppTransform>? positions = null;
 
   void setScreenSize(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
   }
 
-  getPositions() {
+  List<AppTransform> getPositions() {
     if (_screenSize == null) throw "The screen size has not been set yet.";
     return [
-      ...Iterable.generate(4)
-          .map((i) => AppTransform(Offset((1 / 5) * (i + 1), 1 / 5), math.pi)),
-      ...Iterable.generate(4)
-          .map((i) => AppTransform(Offset((1 / 5) * (i + 1), 4 / 5), 0)),
-      const AppTransform(Offset(1 / 5, 1 / 2), 3 * math.pi / 2),
-      const AppTransform(Offset(4 / 5, 1 / 2), math.pi / 2)
+      ...Iterable.generate(3)
+          .map((i) => AppTransform(Offset((1 / 4) * (i + 1), 1 / 5), math.pi)),
+      ...Iterable.generate(3)
+          .map((i) => AppTransform(Offset((1 / 4) * (i + 1), 4 / 5), 0)),
+      const AppTransform(Offset(1 / 6, 1 / 2), 3 * math.pi / 2),
+      const AppTransform(Offset(5 / 6, 1 / 2), math.pi / 2)
     ]
         .map((e) => AppTransform(
             Offset(e.position.dx * _screenSize!.width,
@@ -38,12 +37,8 @@ class ScreenService {
   }
 
   Map<String, AppTransform> getMapPosition(List<String> ids) {
-    if(ids.length > 10) throw "The list of ids is too long (max length: 10).";
-    if(positions == null) {
-      var pos = getPositions();
-      positions = Map.fromEntries(
-          Iterable.generate(ids.length).map((i) => MapEntry(ids[i], pos[i])));
-    }
-    return positions!;
+    if(ids.length > 8) throw "The list of ids is too long (max length: 10).";
+    var positions = getPositions();
+    return Map<String, AppTransform>.fromEntries(Iterable.generate(ids.length).map((e) => MapEntry(ids[e], positions[e])));
   }
 }
