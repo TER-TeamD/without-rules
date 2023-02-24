@@ -11,8 +11,8 @@ import 'package:worfrontend/models/scene_data.dart';
 import 'package:worfrontend/services/game_controller.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/chronometer_data.dart';
-import 'package:worfrontend/services/screen_service.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
+import 'package:worfrontend/services/screen_service.dart';
 
 import '../services/error_manager.dart';
 import 'chronometer.dart';

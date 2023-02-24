@@ -9,6 +9,7 @@ class InGameProperty {
   final int currentRound;
   final BetweenRound? betweenRound;
   final DateTime? chronoUpTo;
+  final DateTime receivedAt = DateTime.now().toUtc();
 
   InGameProperty(this.deck, this.stacks, this.currentRound, this.betweenRound,
       this.chronoUpTo);
@@ -32,6 +33,7 @@ class InGameProperty {
         'stacks': stacks.map((e) => e.toJson()).toList(),
         'current_round': currentRound,
         'between_round': betweenRound?.toJson(),
-        'chrono_up_to': chronoUpTo?.toString()
+        'chrono_up_to': chronoUpTo?.toString(),
+        'received_at': receivedAt.toIso8601String(),
       };
 }
