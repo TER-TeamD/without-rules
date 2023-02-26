@@ -13,6 +13,19 @@ import 'constants.dart';
 
 void main() {
 
+  var segments = Uri.base.pathSegments;
+  if(segments.isNotEmpty) {
+    var versionString = segments.first;
+    var regex = RegExp("^v(\\d+)\$");
+    var result = regex.firstMatch(versionString);
+    if(result != null) {
+      var version = int.parse(result.group(1)!);
+      if(SUPPORTED_VERSION.contains(version)) {
+        VERSION = version;
+      }
+    }
+  }
+
   var socket = io(
       HOSTNAME,
       { ...OptionBuilder().enableForceNew().enableForceNewConnection().build(), 'auth': <String, dynamic>{'id': 0, 'type': "TABLE"}}
