@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from '../services/game.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LastMessageEnum} from "../model/last-message.enum";
 import {Subscription} from "rxjs";
 
@@ -15,10 +15,18 @@ export class LoginPageComponent implements OnInit, OnDestroy{
   public username: string = "";
   private lastMessageSubscription: Subscription | null = null;
 
+  private idSubs?: Subscription;
+
   constructor(
     private gameService: GameService,
+    private aroute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    this.idSubs = aroute.queryParamMap.subscribe((_) => {
+      const snap = aroute.snapshot;
+      this.playerId = snap.queryParamMap.get('id') || "";
+    })
+  }
 
   ngOnInit(): void {
    this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
@@ -37,5 +45,6 @@ export class LoginPageComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
+    this.idSubs?.unsubscribe();
   }
 }
