@@ -14,13 +14,14 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   public playerId: string = "";
   public username: string = "";
   private lastMessageSubscription: Subscription | null = null;
+  private idSubs?: Subscription;
 
   constructor(
     private gameService: GameService,
     private aroute: ActivatedRoute,
     private router: Router
   ) {
-    aroute.queryParamMap.subscribe((_) => {
+    this.idSubs = aroute.queryParamMap.subscribe((_) => {
       const snap = aroute.snapshot;
       this.playerId = snap.queryParamMap.get('id') || "";
     })
@@ -43,5 +44,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
+    this.idSubs?.unsubscribe();
   }
 }
