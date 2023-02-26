@@ -30,6 +30,6 @@ const bool SHOW_LOG_SOURCE = false;
 
 
 String getPlayerConnectionUrl(String playerId) {
-  return "https://table-ter-1.cryptoservice.tech/cards/${playerId}";
+  return "https://table-ter-1.cryptoservice.tech/?id=${playerId}";
 }
 
