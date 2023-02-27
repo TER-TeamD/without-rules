@@ -69,6 +69,11 @@ export class GameService {
       this.updateGame(g);
       this.updateLastGameMessage(LastGameMessageEnum.PHONE_NEW_RESULT_ACTION);
     });
+
+    this.webSocketService.newStartGameValue$.subscribe(g => {
+      this.updateGame(g);
+      this.updateLastGameMessage(LastGameMessageEnum.START_GAME_VALUE);
+    });
   }
 
   /* Player */

@@ -5,6 +5,7 @@ import { Subscription } from "rxjs";
 import { LastMessageEnum } from "../model/last-message.enum";
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Router } from '@angular/router';
+import {Game, StackCard} from "../model/game.model";
 
 @Component({
   selector: 'app-display-cards',
@@ -32,15 +33,20 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
   public gameStatus: string = "PLAYING";
   private lastMessageSubscription: Subscription | null = null;
   private playerSubscription: Subscription | null = null;
+  private gameSubscription: Subscription | null = null;
   public player: Player | null = null;
   public selectedCard: Card | null = null;
   public timer: number = 60;
   public cards: Card[] = [];
 
+  public game: Game | null = null;
+
   constructor(private gameService: GameService, private router: Router) {
+
   }
 
   ngOnInit(): void {
+
 
     setInterval(() => {
       let end = new Date(this.player?.in_player_game_property?.chrono_up_to).getTime();
@@ -56,7 +62,11 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.playerSubscription = this.gameService.player$.subscribe(async player => {
+    this.gameSubscription = this.gameService.game$.subscribe(async game => {
+      this.game = game;
+    })
+
+      this.playerSubscription = this.gameService.player$.subscribe(async player => {
       console.log("New player value", player)
       this.player = player;
       if (this.player === null) {
@@ -93,8 +103,17 @@ export class DisplayCardsComponent implements OnInit, OnDestroy {
     this.cards.forEach(c => c.state = 'unselected');
   }
 
+  public countCattleHeads(stack: StackCard): number {
+    let cattleHeads = stack.stackHead.cattleHead;
+    stack.stackCards.forEach(card => {
+      cattleHeads += card.cattleHead;
+    });
+    return cattleHeads;
+  }
+
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
     this.playerSubscription?.unsubscribe();
+    this.gameSubscription?.unsubscribe();
   }
 }

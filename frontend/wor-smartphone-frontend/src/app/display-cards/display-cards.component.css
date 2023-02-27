@@ -53,3 +53,20 @@
   font-size: 1.5em;
 }
 
+#stacks {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+  margin-bottom: -10%;
+}
+
+.number-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-radius: 10%;
+  background-color: rgb(183, 181, 181);
+}

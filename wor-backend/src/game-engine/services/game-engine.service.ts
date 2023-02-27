@@ -102,6 +102,7 @@ export class GameEngineService implements OnModuleInit {
 
       this.lastTableMessage = 'START_GAME';
       await this.webSocketGateway.sendNewGameValueToTable(game, 'START_GAME');
+      await this.webSocketGateway.sendNewGameValueToPhone(game, 'START_GAME_VALUE');
 
       for (const p of game.players) {
         await this.webSocketGateway.sendPlayerInfosToPlayer(p, 'START_GAME');
@@ -302,8 +303,6 @@ export class GameEngineService implements OnModuleInit {
 
 
   private chooseAutomaticStackAfterTimeout() {
-
-    this.logger.warn("Yeeeees")
 
     this.idChooseAutomaticStackAfterTimeout = setTimeout(async () => {
       const game = await EngineUtilsService.getCurrentGame(this.gameModel);

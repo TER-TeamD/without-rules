@@ -27,6 +27,7 @@ export class WebsocketService {
   public newPlayerPlayedCard$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
   public flipCardOrder$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
   public newResultAction$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
+  public newStartGameValue$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
 
 
 
@@ -79,6 +80,11 @@ export class WebsocketService {
     this._socket.on('PHONE_NEW_RESULT_ACTION', async (message: { game: Game }) => {
       this.newResultAction$.next(message.game);
     });
+    this._socket.on('START_GAME_VALUE', async (message: { game: Game }) => {
+      this.newStartGameValue$.next(message.game);
+    });
+
+
   }
 
 

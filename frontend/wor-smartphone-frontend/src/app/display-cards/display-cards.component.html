@@ -20,4 +20,16 @@
         </div>
     </div>
 
+
+
+  <div id="stacks" *ngIf="game != null" [ngStyle]="{'visibility': (selectedCard !== null) ? 'hidden' : 'visible'}">
+    <div class="card-container" *ngFor=" let stack of game.in_game_property.stacks">
+      <div class="number-container">
+        <div class="cards-number">🃏:{{stack.stackCards.length+1}}</div>
+        <div class="cattleheads-number">🐮:{{countCattleHeads(stack)}}</div>
+      </div>
+      <app-card class="stack-{{stack.stackNumber}}" [card]="stack.stackHead"></app-card>
+    </div>
+  </div>
+
 </div>
