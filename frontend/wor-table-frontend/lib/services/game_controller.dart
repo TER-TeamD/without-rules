@@ -127,11 +127,6 @@ class GameController {
     deckTransforms$.add(deckTransforms);
   }
 
-  void setDeckTransforms(Map<String, AppTransform> transforms) {
-    deckTransforms = transforms;
-    deckTransforms$.add(deckTransforms);
-  }
-
   List<StackCard> getStacks() {
     return game$.value.inGameProperty?.stacks ?? [];
   }
@@ -187,10 +182,6 @@ class GameController {
 
   void nextAnimationStep() {
     animationStep++;
-  }
-
-  Map<String, AppTransform> getDeckTransforms() {
-    return deckTransforms;
   }
 
   List<Player> getRank() {

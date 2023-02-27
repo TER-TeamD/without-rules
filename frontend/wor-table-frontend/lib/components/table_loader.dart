@@ -39,9 +39,6 @@ class _TableLoaderState extends State<TableLoader> {
     GetIt.I.get<SocketGateway>().newGame().then((game) => setState(() {
           controller = GameController(game, GetIt.I.get<SocketGateway>());
 
-          var transforms = GetIt.I.get<ScreenService>().getMapPosition(
-              game.players.map((e) => e.id).toList(growable: false));
-          controller!.setDeckTransforms(transforms);
 
           Iterable<MobileTester> testers = Iterable.empty();
 

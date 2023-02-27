@@ -88,6 +88,17 @@ class _PlayerSpotState extends State<PlayerSpot> {
   }
 
   @override
+  void didUpdateWidget(covariant PlayerSpot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.position != widget.position) {
+      position = widget.position;
+    }
+    if (oldWidget.rotation != widget.rotation) {
+      rotation = widget.rotation;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var p = position;
 
