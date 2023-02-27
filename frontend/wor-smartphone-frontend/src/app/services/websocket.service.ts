@@ -23,6 +23,7 @@ export class WebsocketService {
   public cardPlayed$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null);
   public endGameResult$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null);
   public newRound$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null);
+  public wrongIdPlayer$: BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
 
   public newPlayerPlayedCard$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
   public flipCardOrder$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(null);
@@ -67,6 +68,10 @@ export class WebsocketService {
 
     this._socket.on('NEW_ROUND', async (message: { player: Player }) => {
       this.newRound$.next(message.player);
+    });
+
+    this._socket.on('WRONG_ID_PLAYER', async (message: { message: any }) => {
+      this.wrongIdPlayer$.next(message);
     });
 
 

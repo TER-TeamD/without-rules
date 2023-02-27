@@ -6,6 +6,7 @@ export enum LastMessageEnum {
   CARD_PLAYED,
   END_GAME_RESULTS,
   NEW_ROUND,
+  WRONG_ID_PLAYER
 }
 
 

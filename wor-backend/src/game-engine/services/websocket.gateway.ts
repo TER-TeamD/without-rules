@@ -172,6 +172,10 @@ export class WebsocketGateway implements OnGatewayInit, OnGatewayConnection, OnG
     });
   }
 
+  public async sendPlayerError(idPlayer: string, topic: string) {
+    await this.sendMessageToEntity(idPlayer, topic, {status: "wrong id"})
+  }
+
   private async sendMessageToEntity(id: string, topic: string, message: any,): Promise<void> {
 
     if (!this.DEBUG) {

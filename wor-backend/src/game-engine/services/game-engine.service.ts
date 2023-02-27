@@ -73,6 +73,7 @@ export class GameEngineService implements OnModuleInit {
       const indexPlayer: number = game.players.findIndex(
         (p) => p.id === player_id,
       );
+
       await this.webSocketGateway.sendPlayerInfosToPlayer(
         game.players[indexPlayer],
         'PLAYER_LOGGED_IN_GAME',
@@ -90,6 +91,11 @@ export class GameEngineService implements OnModuleInit {
 
       if (error instanceof UserNotFoundWhenJoinGameException) {
         this.logger.error('User not found when he tried to join game');
+
+        await this.webSocketGateway.sendPlayerError(
+            player_id,
+            'WRONG_ID_PLAYER',
+        );
       }
 
       this.logger.error('Unhandled error: ', error);

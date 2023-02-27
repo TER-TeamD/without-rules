@@ -12,7 +12,11 @@ import {Game} from "../model/game.model";
 export class GameService {
 
   public player: Player | null = null;
-  public player$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(this.player)
+  public player$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(this.player);
+
+  public errorMessage: string | null = null;
+  public errorMessage$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.errorMessage);
+
 
   public lastMessage: LastMessageEnum | null = null;
   public lastMessage$: BehaviorSubject<LastMessageEnum | null> = new BehaviorSubject<LastMessageEnum | null>(this.lastMessage);
@@ -50,6 +54,11 @@ export class GameService {
     this.webSocketService.newRound$.subscribe(p => {
       this.updatePlayer(p);
       this.updateLastMessage(LastMessageEnum.NEW_ROUND);
+    });
+
+    this.webSocketService.wrongIdPlayer$.subscribe(p => {
+      this.updateError(p);
+      this.updateLastMessage(LastMessageEnum.WRONG_ID_PLAYER);
     });
 
 
@@ -91,6 +100,11 @@ export class GameService {
     await this.webSocketService.tableNextRoundResultAction(choosen_stack);
   }
 
+
+  private updateError(message: string): void {
+    this.errorMessage = message;
+    this.errorMessage$.next(message);
+  }
 
 
   private updatePlayer(player: Player | null): void {

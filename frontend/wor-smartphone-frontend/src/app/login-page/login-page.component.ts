@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GameService } from '../services/game.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {GameService} from '../services/game.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import { LastMessageEnum } from "../model/last-message.enum";
-import { Subscription } from "rxjs";
+import {LastMessageEnum} from "../model/last-message.enum";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-login-page',
@@ -15,6 +15,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   public username: string = "";
   private lastMessageSubscription: Subscription | null = null;
   private idSubs?: Subscription;
+
+  public errorWrongId: boolean = false;
 
   constructor(
     private gameService: GameService,
@@ -32,6 +34,15 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       if (lastMessage === LastMessageEnum.PLAYER_LOGGED_IN_GAME) {
         console.log("Player joined game")
         await this.router.navigate(['/loading']);
+      }
+    });
+
+    this.gameService.errorMessage$.subscribe(e => {
+      if (e !== null) {
+        this.errorWrongId = true;
+        setTimeout(() => {
+          this.errorWrongId = false;
+        }, 4000)
       }
     })
   }
