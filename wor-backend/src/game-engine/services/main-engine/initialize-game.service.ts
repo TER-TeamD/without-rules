@@ -101,6 +101,8 @@ export class InitializeGameService {
 
         const currentGame: Game = tempCurrentGame;
 
+
+
         let isPlayerFound: boolean = false;
         let player: Player | null = null;
         for (const p of currentGame.players) {
