@@ -81,6 +81,6 @@ abstract class PlayerAction {
   }
 
   void afterAnimation(GameController controller, Player player) {
-    controller.nextRound();
+    controller.sendNextActionToTheServer();
   }
 }

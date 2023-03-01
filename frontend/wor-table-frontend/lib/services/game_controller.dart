@@ -148,10 +148,6 @@ class GameController {
     chronometer$.add(null);
   }
 
-  void sendChoosenStack(int chosenStack) {
-    _socketGateway.nextRoundResultActionChoosingStack(chosenStack);
-  }
-
   void chooseStack(int stackNumber) {
     stackChosen$.add(stackNumber);
     promptChooseCard$.add(false);
@@ -180,6 +176,15 @@ class GameController {
     subscription.cancel();
   }
 
+  void sendNextActionToTheServer({ int? cardValue }) {
+    if(gameIsFinished) return;
+    if(cardValue != null) {
+      _socketGateway.nextRoundResultActionChoosingStack(cardValue);
+    } else {
+      _socketGateway.nextRoundResultAction();
+    }
+  }
+
   void nextAnimationStep() {
     animationStep++;
   }
@@ -188,11 +193,6 @@ class GameController {
     var result = game$.value.players.toList(growable: false);
     result.sort((a, b) => a.gameResult.ranking.compareTo(b.gameResult.ranking));
     return result;
-  }
-
-  void nextRound() {
-    Logger.log("=====> ${lastTopic}");
-    _socketGateway.nextRoundResultAction();
   }
 
   Map<String, PositionedPlayerDeckState> getDecks() {

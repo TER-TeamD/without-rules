@@ -39,7 +39,7 @@ class ChooseStackCardPlayerAction extends PlayerAction {
 
   @override
   void afterAnimation(GameController controller, Player player) {
-    controller.sendChoosenStack(choosenStackCardByPlayer!);
+    controller.sendNextActionToTheServer(cardValue: choosenStackCardByPlayer);
   }
 
   @override

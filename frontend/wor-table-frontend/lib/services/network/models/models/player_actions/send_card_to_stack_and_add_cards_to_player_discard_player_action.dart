@@ -46,11 +46,6 @@ class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
   }
 
   @override
-  void afterAnimation(GameController controller, Player player) {
-    controller.nextRound();
-  }
-
-  @override
   Iterable<Widget> buildWidget(
       BuildContext context, SceneData sceneData, Player player) {
     var playedCard = player.playerGameProperty!.playedCard!;
