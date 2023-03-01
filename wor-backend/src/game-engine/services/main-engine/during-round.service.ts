@@ -8,6 +8,7 @@ import {PlayerAlreadyPlayedCardException} from "./exceptions/player-already-play
 import {PlayerDontHaveCardException} from "./exceptions/player-dont-have-card.exception";
 import {GameNotFoundException} from "./exceptions/game-not-found.exception";
 import {RoundIsNotFinishedException} from "./exceptions/round-is-not-finished.exception";
+import {DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS} from "../../config";
 
 @Injectable()
 export class DuringRoundService {
@@ -45,12 +46,16 @@ export class DuringRoundService {
 
         if ((await this.isRoundFinished()) === false) throw new RoundIsNotFinishedException();
 
+        const chronoUpTo: string = new Date(((new Date()).setSeconds((new Date().getSeconds() + DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS)))).toISOString();
+
         currentGame.in_game_property.current_round += 1;
         currentGame.in_game_property.between_round = null;
+        currentGame.in_game_property.chrono_up_to = chronoUpTo;
+
         currentGame.players.forEach(p => {
             p.cards = p.cards.filter(c => c.value !== p.in_player_game_property.played_card.value)
             p.played_cards.push(p.in_player_game_property.played_card)
-
+            p.in_player_game_property.chrono_up_to = chronoUpTo;
             p.in_player_game_property.had_played_turn = false;
             p.in_player_game_property.played_card = null;
         });
@@ -85,7 +90,7 @@ export class DuringRoundService {
         player.in_player_game_property.played_card = player.cards[indexCard];
         player.in_player_game_property.had_played_turn = true;
 
-        return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: "after"});
+        return this.gameModel.findOneAndUpdate({_id: currentGame._id, 'players.id': playerId}, {$set: { 'players.$': player }}, {returnDocument: "after"});
     }
 
 

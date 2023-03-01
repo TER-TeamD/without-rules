@@ -1,4 +1,4 @@
-import {Card, Player, Result, StackCard} from "../schema/game.schema";
+import {Card, Player, StackCard} from "../schema/game.schema";
 
 
 export function shuffle(array: any[]): any[] {
@@ -19,11 +19,7 @@ export function sortStackCardsByHeadCardsIncreasingOrder(array: StackCard[]): St
     })
 }
 
-export function sortResultByCattleHead(array: Result[]): Result[] {
-    return array.sort((r1, r2) => {
-        return (r1.cattle_heads > r2.cattle_heads) ? 1 : ((r1.cattle_heads < r2.cattle_heads) ? -1 : 0)
-    })
-}
+
 
 export function sortCardIncreasingOrder(array: Card[]): Card[] {
     return array.sort((r1, r2) => {

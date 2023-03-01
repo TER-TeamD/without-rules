@@ -49,8 +49,8 @@ describe('GameEngineService', () => {
     expect(player1.is_logged).toBe(false);
     expect(player2.is_logged).toBe(false);
 
-    await gameEngineService.playerJoinGame(player1.id);
-    await gameEngineService.playerJoinGame(player2.id);
+    await gameEngineService.playerJoinGame(player1.id, "William");
+    await gameEngineService.playerJoinGame(player2.id, "Mathilde");
 
     game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
     player1 = game.players[0];
@@ -156,8 +156,8 @@ describe('GameEngineService', () => {
     expect(player1.is_logged).toBe(false);
     expect(player2.is_logged).toBe(false);
 
-    await gameEngineService.playerJoinGame(player1.id);
-    await gameEngineService.playerJoinGame(player2.id);
+    await gameEngineService.playerJoinGame(player1.id, "William");
+    await gameEngineService.playerJoinGame(player2.id, "Mathilde");
 
     game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
     player1 = game.players[0];
@@ -252,8 +252,8 @@ describe('GameEngineService', () => {
     expect(player1.is_logged).toBe(false);
     expect(player2.is_logged).toBe(false);
 
-    await gameEngineService.playerJoinGame(player1.id);
-    await gameEngineService.playerJoinGame(player2.id);
+    await gameEngineService.playerJoinGame(player1.id, "William");
+    await gameEngineService.playerJoinGame(player2.id, "Mahtilde");
 
     game = await EngineUtilsService.getCurrentGame(initializeGameService.gameModel);
     player1 = game.players[0];

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GameService} from '../services/game.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LastMessageEnum} from "../model/last-message.enum";
 import {Subscription} from "rxjs";
 
@@ -9,32 +9,52 @@ import {Subscription} from "rxjs";
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
-export class LoginPageComponent implements OnInit, OnDestroy{
+export class LoginPageComponent implements OnInit, OnDestroy {
 
   public playerId: string = "";
+  public username: string = "";
   private lastMessageSubscription: Subscription | null = null;
+  private idSubs?: Subscription;
+
+  public errorWrongId: boolean = false;
 
   constructor(
     private gameService: GameService,
+    private aroute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    this.idSubs = aroute.queryParamMap.subscribe((_) => {
+      const snap = aroute.snapshot;
+      this.playerId = snap.queryParamMap.get('id') || "";
+    })
+  }
 
   ngOnInit(): void {
-   this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
-     if (lastMessage === LastMessageEnum.PLAYER_LOGGED_IN_GAME) {
-       console.log("Player joined game")
-       await this.router.navigate(['/cards/' + this.playerId]);
-     }
-   })
+    this.lastMessageSubscription = this.gameService.lastMessage$.subscribe(async lastMessage => {
+      if (lastMessage === LastMessageEnum.PLAYER_LOGGED_IN_GAME) {
+        console.log("Player joined game")
+        await this.router.navigate(['/loading']);
+      }
+    });
+
+    this.gameService.errorMessage$.subscribe(e => {
+      if (e !== null) {
+        this.errorWrongId = true;
+        setTimeout(() => {
+          this.errorWrongId = false;
+        }, 4000)
+      }
+    })
   }
 
   public async login() {
-    if (this.playerId.length > 0) {
-      await this.gameService.joinGame(this.playerId);
+    if (this.playerId.length > 0 && this.username.length > 0) {
+      await this.gameService.joinGame(this.playerId, this.username);
     }
   }
 
   ngOnDestroy(): void {
     this.lastMessageSubscription?.unsubscribe();
+    this.idSubs?.unsubscribe();
   }
 }

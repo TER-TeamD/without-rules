@@ -30,3 +30,7 @@ app-login-page {
     align-items: center;
     height: 100%;
 }
+
+app-table-cards {
+    height: 100%;
+}

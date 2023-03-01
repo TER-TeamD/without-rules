@@ -1,0 +1,377 @@
+[
+    {
+        "id": "player1",
+        "username": "Alice",
+        "avatar": "1",
+        "is_logged": true,
+        "cards": [
+            {
+                "state": "hidden",
+                "value": 3,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 10,
+                "cattleHead": 2
+            },
+            {
+                "state": "visible",
+                "value": 8,
+                "cattleHead": 1
+            }
+        ],
+        "played_cards": [
+            {
+                "state": "visible",
+                "value": 5,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 9,
+                "cattleHead": 2
+            }
+        ],
+        "in_player_game_property": {
+            "played_card": {
+                "state": "visible",
+                "value": 4,
+                "cattleHead": 3
+            },
+            "had_played_turn": true,
+            "player_discard": [
+                {
+                    "state": "visible",
+                    "value": 7,
+                    "cattleHead": 3
+                },
+                {
+                    "state": "hidden",
+                    "value": 2,
+                    "cattleHead": 2
+                }
+            ],
+            "chrono_up_to": "2023-02-20T09:00:00Z"
+        },
+        "gameResult": {
+            "cattleHeads": 0,
+            "ranking": 0
+        }
+    },
+    {
+        "id": "player2",
+        "username": "Bob",
+        "avatar": "2",
+        "is_logged": false,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 6,
+                "cattleHead": 2
+            },
+            {
+                "state": "visible",
+                "value": 1,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 11,
+                "cattleHead": 1
+            }
+        ],
+        "played_cards": [
+            {
+                "state": "visible",
+                "value": 4,
+                "cattleHead": 1
+            },
+            {
+                "state": "hidden",
+                "value": 7,
+                "cattleHead": 2
+            }
+        ],
+        "in_player_game_property": null,
+        "gameResult": {
+            "cattleHeads": 0,
+            "ranking": 0
+        }
+    },
+    {
+        "id": "player3",
+        "username": "Charlie",
+        "avatar": "3",
+        "is_logged": true,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 2,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 12,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 8,
+                "cattleHead": 2
+            }
+        ],
+        "played_cards": [],
+        "in_player_game_property": {
+            "played_card": null,
+            "had_played_turn": false,
+            "player_discard": [
+                {
+                    "state": "visible",
+                    "value": 5,
+                    "cattleHead": 3
+                },
+                {
+                    "state": "hidden",
+                    "value": 9,
+                    "cattleHead": 2
+                }
+            ],
+            "in_player_game_property": null,
+            "gameResult": {
+                "cattleHeads": 0,
+                "ranking": 0
+            }
+        }
+    },
+    {
+        "id": "player4",
+        "username": "Alice",
+        "avatar": "4",
+        "is_logged": true,
+        "cards": [
+            {
+                "state": "hidden",
+                "value": 3,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 10,
+                "cattleHead": 2
+            },
+            {
+                "state": "visible",
+                "value": 8,
+                "cattleHead": 1
+            }
+        ],
+        "played_cards": [
+            {
+                "state": "visible",
+                "value": 5,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 9,
+                "cattleHead": 2
+            }
+        ],
+        "in_player_game_property": {
+            "played_card": {
+                "state": "visible",
+                "value": 4,
+                "cattleHead": 3
+            },
+            "had_played_turn": true,
+            "player_discard": [
+                {
+                    "state": "visible",
+                    "value": 7,
+                    "cattleHead": 3
+                },
+                {
+                    "state": "hidden",
+                    "value": 2,
+                    "cattleHead": 2
+                }
+            ],
+            "chrono_up_to": "2023-02-20T09:00:00Z"
+        },
+        "gameResult": {
+            "cattleHeads": 0,
+            "ranking": 0
+        }
+    },
+    {
+        "id": "player5",
+        "username": "Bob",
+        "avatar": "5",
+        "is_logged": false,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 6,
+                "cattleHead": 2
+            },
+            {
+                "state": "visible",
+                "value": 1,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 11,
+                "cattleHead": 1
+            }
+        ],
+        "played_cards": [
+            {
+                "state": "visible",
+                "value": 4,
+                "cattleHead": 1
+            },
+            {
+                "state": "hidden",
+                "value": 7,
+                "cattleHead": 2
+            }
+        ],
+        "in_player_game_property": null,
+        "gameResult": {
+            "cattleHeads": 0,
+            "ranking": 0
+        }
+    },
+    {
+        "id": "player6",
+        "username": "Charlie",
+        "avatar": "6",
+        "is_logged": true,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 2,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 12,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 8,
+                "cattleHead": 2
+            }
+        ],
+        "played_cards": [],
+        "in_player_game_property": {
+            "played_card": null,
+            "had_played_turn": false,
+            "player_discard": [
+                {
+                    "state": "visible",
+                    "value": 5,
+                    "cattleHead": 3
+                },
+                {
+                    "state": "hidden",
+                    "value": 9,
+                    "cattleHead": 2
+                }
+            ],
+            "in_player_game_property": null,
+            "gameResult": {
+                "cattleHeads": 0,
+                "ranking": 0
+            }
+        }
+    },
+    {
+        "id": "player7",
+        "username": "Bob",
+        "avatar": "7",
+        "is_logged": false,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 6,
+                "cattleHead": 2
+            },
+            {
+                "state": "visible",
+                "value": 1,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 11,
+                "cattleHead": 1
+            }
+        ],
+        "played_cards": [
+            {
+                "state": "visible",
+                "value": 4,
+                "cattleHead": 1
+            },
+            {
+                "state": "hidden",
+                "value": 7,
+                "cattleHead": 2
+            }
+        ],
+        "in_player_game_property": null,
+        "gameResult": {
+            "cattleHeads": 0,
+            "ranking": 0
+        }
+    },
+    {
+        "id": "player8",
+        "username": "Charlie",
+        "avatar": "2",
+        "is_logged": true,
+        "cards": [
+            {
+                "state": "visible",
+                "value": 2,
+                "cattleHead": 1
+            },
+            {
+                "state": "visible",
+                "value": 12,
+                "cattleHead": 3
+            },
+            {
+                "state": "hidden",
+                "value": 8,
+                "cattleHead": 2
+            }
+        ],
+        "played_cards": [],
+        "in_player_game_property": {
+            "played_card": null,
+            "had_played_turn": false,
+            "player_discard": [
+                {
+                    "state": "visible",
+                    "value": 5,
+                    "cattleHead": 3
+                },
+                {
+                    "state": "hidden",
+                    "value": 9,
+                    "cattleHead": 2
+                }
+            ],
+            "in_player_game_property": null,
+            "gameResult": {
+                "cattleHeads": 0,
+                "ranking": 0
+            }
+        }
+    }
+]

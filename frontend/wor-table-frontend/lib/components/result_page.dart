@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:worfrontend/services/network/models/socket_models/result.dart';
+import 'package:worfrontend/services/network/models/models/result.dart';
 
 import '../constants.dart';
 
@@ -36,7 +36,11 @@ class ResultPage extends StatelessWidget {
       child: Center(
         child: renderBothDirection(Container(), Column(
           mainAxisSize: MainAxisSize.min,
-          children: getRanking().map((e) => Text(e, style: const TextStyle(color: Colors.white))).toList(),
+          children: [
+            ...getRanking().map((e) => Text(e, style: const TextStyle(color: Colors.white))).toList(),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: () {}, child: const Text("Restart"))
+          ],
         ),
       )),
     );

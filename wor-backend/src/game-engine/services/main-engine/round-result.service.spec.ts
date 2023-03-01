@@ -34,9 +34,9 @@ describe('RoundResultService', () => {
     const playerOneId: string = currentGame.players[0].id
     const playerTwoId: string = currentGame.players[1].id
     const playerThreeId: string = currentGame.players[2].id
-    await initializeGameService.playerJoinGame(playerOneId)
-    await initializeGameService.playerJoinGame(playerTwoId)
-    await initializeGameService.playerJoinGame(playerThreeId)
+    await initializeGameService.playerJoinGame(playerOneId, "")
+    await initializeGameService.playerJoinGame(playerTwoId, "")
+    await initializeGameService.playerJoinGame(playerThreeId, "")
 
     currentGame = await initializeGameService.launchGame();
 

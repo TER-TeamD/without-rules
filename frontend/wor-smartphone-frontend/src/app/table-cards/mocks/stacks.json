@@ -1,0 +1,69 @@
+[
+    {
+        "stackNumber": 1,
+        "stackHead": {
+            "value": 5,
+            "cattleHead": 2
+        },
+        "stackCards": []
+    },
+    {
+        "stackNumber": 2,
+        "stackHead": {
+            "value": 5,
+            "cattleHead": 2
+        },
+        "stackCards": [
+            {
+                "value": 10,
+                "cattleHead": 4
+            },
+            {
+                "value": 7,
+                "cattleHead": 1
+            }
+        ]
+    },
+    {
+        "stackNumber": 3,
+        "stackHead": {
+            "value": 8,
+            "cattleHead": 3
+        },
+        "stackCards": [
+            {
+                "value": 2,
+                "cattleHead": 2
+            },
+            {
+                "value": 4,
+                "cattleHead": 1
+            },
+            {
+                "value": 6,
+                "cattleHead": 3
+            }
+        ]
+    },
+    {
+        "stackNumber": 4,
+        "stackHead": {
+            "value": 8,
+            "cattleHead": 3
+        },
+        "stackCards": [
+            {
+                "value": 1,
+                "cattleHead": 0
+            },
+            {
+                "value": 3,
+                "cattleHead": 1
+            },
+            {
+                "value": 5,
+                "cattleHead": 2
+            }
+        ]
+    }
+]

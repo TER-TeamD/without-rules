@@ -1,29 +1,35 @@
-<div *ngIf="loading" class="loading">
-    <p>Waiting for the game to be launched...</p>
-</div>
-
-<div *ngIf="played" class="loading">
-    <p>Waiting for everyone to play...</p>
-    <p>Results of the round will be on the table !</p>
-</div>
+<div class="main">
+    <app-info-bar [player]="player" [gameStatus]="gameStatus" [timer]="timer" [isTimerVisible]="true"></app-info-bar>
 
 
-
-<div *ngIf="end" class="loading">
-    <p>Game finished...</p>
-    <p>You are {{player?.gameResult?.ranking || ""}} of the game with {{player?.gameResult?.cattleHeads || ""}} cattle heads !</p>
-</div>
-
-<div *ngIf="!loading && !played && !end && player !== null" class="content-container">
-    <app-card [card]="selectedCard"></app-card>
-
-    <div cdkDropList class="cards-container" (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let card of player.cards" cdkDrag>
-            <app-card [card]="card" (click)="selectCard(card)"></app-card>
+    <div class="content-container">
+        <p class="text" [ngStyle]="{'visibility': (timer<=10) ? 'visible' : 'hidden', 'color': 'red'}">You don't have
+            much time left !
+        </p>
+        <p class="text" [ngStyle]="{'visibility': (selectedCard !== null) ? 'hidden' : 'visible'}">Pick a card !</p>
+        <div class="cards-container">
+            <app-card class="card-element" *ngFor="let card of cards; let i = index" (click)="select(card)"
+                [@cardAnimation]="{ value: card.state, params: { degree: (120 / cards.length * i - (120 / (2 * cards.length)) * (cards.length - 1)) } }"
+                [ngStyle]="{'filter': (card !== selectedCard && selectedCard !== null) ? 'blur(10px)' : 'blur(0px)', 'zIndex': (card !== selectedCard && selectedCard !== null) ? 'auto' : 2, 'transition': 'filter 600ms'}"
+                [indicator]="i !== cards.length-1 && card !== selectedCard && cards.length >= 5"
+                [card]="card"></app-card>
+        </div>
+        <div class="buttons" *ngIf="selectedCard !== null">
+            <button type="button" id="button-play" (click)="play()">Play the card</button>
+            <button type="button" id="button-cancel" (click)="cancel()">Cancel</button>
         </div>
     </div>
 
 
 
-    <button type="button" id="button-play" (click)="play()">Play the card</button>
+  <div id="stacks" *ngIf="game != null" [ngStyle]="{'visibility': (selectedCard !== null) ? 'hidden' : 'visible'}">
+    <div class="card-container" *ngFor=" let stack of game.in_game_property.stacks">
+      <div class="number-container">
+        <div class="cards-number">🃏:{{stack.stackCards.length+1}}</div>
+        <div class="cattleheads-number">🐮:{{countCattleHeads(stack)}}</div>
+      </div>
+      <app-card class="stack-{{stack.stackNumber}}" [card]="stack.stackHead"></app-card>
+    </div>
+  </div>
+
 </div>

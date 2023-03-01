@@ -31,9 +31,9 @@ describe('DuringRoundService', () => {
     const playerOneId: string = currentGame.players[0].id
     const playerTwoId: string = currentGame.players[1].id
     const playerThreeId: string = currentGame.players[2].id
-    await initializeGameService.playerJoinGame(playerOneId)
-    await initializeGameService.playerJoinGame(playerTwoId)
-    await initializeGameService.playerJoinGame(playerThreeId)
+    await initializeGameService.playerJoinGame(playerOneId, "William")
+    await initializeGameService.playerJoinGame(playerTwoId, "Mathilde")
+    await initializeGameService.playerJoinGame(playerThreeId, "Roger")
 
     currentGame = await initializeGameService.launchGame();
 
@@ -65,9 +65,9 @@ describe('DuringRoundService', () => {
     const playerOne: string = currentGame.players[0].id
     const playerTwo: string = currentGame.players[1].id
     const playerThree: string = currentGame.players[2].id
-    await initializeGameService.playerJoinGame(playerOne)
-    await initializeGameService.playerJoinGame(playerTwo)
-    await initializeGameService.playerJoinGame(playerThree)
+    await initializeGameService.playerJoinGame(playerOne, "William")
+    await initializeGameService.playerJoinGame(playerTwo, "Mathilde")
+    await initializeGameService.playerJoinGame(playerThree, "Roger")
 
     currentGame = await initializeGameService.launchGame();
 

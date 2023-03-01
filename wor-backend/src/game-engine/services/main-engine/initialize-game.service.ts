@@ -1,12 +1,12 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Card, Game, GameDocument, StackCard} from "../../schema/game.schema";
+import {Card, Game, GameDocument, Player, StackCard} from "../../schema/game.schema";
 import {Model} from "mongoose";
 import {GameNotFoundException} from "./exceptions/game-not-found.exception";
 import {UserNotFoundWhenJoinGameException} from "./exceptions/user-not-found-when-join-game.exception";
 import {NotEnoughPlayersForStartingGameException} from "./exceptions/not-enough-players-for-starting-game.exception";
 import {EngineUtilsService} from "./engine-utils.service";
-import {NUMBER_OF_CARDS_PER_PLAYER, NUMBER_OF_DECKS} from "../../config";
+import {DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS, NUMBER_OF_CARDS_PER_PLAYER, NUMBER_OF_DECKS} from "../../config";
 
 @Injectable()
 export class InitializeGameService {
@@ -39,8 +39,21 @@ export class InitializeGameService {
         }
 
         currentGame = await this.__initiateGameCards(currentGame);
+        currentGame = await this.__initiateChrono(currentGame);
 
         return this.gameModel.findOneAndUpdate({_id: currentGame._id}, currentGame, {returnDocument: 'after'});
+    }
+
+    public __initiateChrono(game: Game): Game {
+
+        const chronoUpTo: string = new Date(((new Date()).setSeconds((new Date().getSeconds() + DURATION_PLAYER_CHOOSE_CARDS_IN_SECONDS)))).toISOString();
+        game.in_game_property.chrono_up_to = chronoUpTo;
+
+        game.players.forEach(p => {
+            p.in_player_game_property.chrono_up_to = chronoUpTo;
+        });
+
+        return game
     }
 
     public __initiateGameCards(game: Game): Game {
@@ -78,7 +91,7 @@ export class InitializeGameService {
      * @exception GameNotFoundException()
      * @exception UserNotFoundWhenJoinGameException()
      */
-    public async playerJoinGame(playerId: string): Promise<Game> {
+    public async playerJoinGame(playerId: string, username: string): Promise<Game> {
 
         const tempCurrentGame: Game | null = await EngineUtilsService.getCurrentGame(this.gameModel);
 
@@ -88,21 +101,28 @@ export class InitializeGameService {
 
         const currentGame: Game = tempCurrentGame;
 
+
+
         let isPlayerFound: boolean = false;
+        let player: Player | null = null;
         for (const p of currentGame.players) {
             if (p.id === playerId) {
+                player = p;
                 isPlayerFound = true;
-                p.is_logged = true;
+                player.is_logged = true;
+                player.username = username;
             }
         }
 
-        if (!isPlayerFound) {
+        if (!isPlayerFound || player === null) {
             throw new UserNotFoundWhenJoinGameException(playerId)
         }
 
+
+
         return this.gameModel.findOneAndUpdate(
-            {_id: currentGame._id},
-            {players: currentGame.players},
+            {_id: currentGame._id, 'players.id': playerId},
+            {$set: { 'players.$': player }},
             {returnDocument: 'after'});
     }
 
@@ -136,4 +156,9 @@ export class InitializeGameService {
 
         return EngineUtilsService.shuffle(cards);
     }
+
+
+
+
+
 }

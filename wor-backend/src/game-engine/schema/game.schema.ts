@@ -8,6 +8,9 @@ export class InGameProperty {
   stacks: StackCard[] = [];
   current_round = 0;
   between_round: BetweenRound | null = null;
+
+  chrono_up_to: string | null = null;
+
 }
 
 export type GameDocument = Game & Document;
@@ -60,6 +63,8 @@ export class StackCard {
 export class Player {
   id: string;
   is_logged: boolean;
+  username: string;
+  avatar: string;
   cards: Card[];
   played_cards: Card[];
   in_player_game_property: InPlayerGameProperty | null;
@@ -67,7 +72,7 @@ export class Player {
   gameResult: PlayerGameResult;
 
   constructor() {
-    this.id = (Math.random() + 1).toString(36).substring(5);
+    this.id = ((Math.random() + 1).toString(36).substring(6)).substring(0,3);
     this.is_logged = false;
     this.cards = [];
     this.in_player_game_property = new InPlayerGameProperty()
@@ -88,6 +93,7 @@ export class InPlayerGameProperty {
   played_card: Card | null;
   had_played_turn: boolean;
   player_discard: Card[] = [];
+  chrono_up_to: string | null = null;
 
   constructor() {
     this.played_card = null
@@ -109,12 +115,6 @@ export class BetweenRound {
 }
 
 
-
-export class Result {
-  id_player: string;
-  cattle_heads: number;
-  rank = 0;
-}
 
 export class PlayerFlipOrder {
   player: Player;
@@ -164,6 +164,7 @@ export class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction extends P
 
 export class ChooseStackCardPlayerAction extends PlayerAction {
   choosen_stack_card_by_player: number | null = null;
+  chrono_up_to: string | null = null;
 
 
   constructor() {

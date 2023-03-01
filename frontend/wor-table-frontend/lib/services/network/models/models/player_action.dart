@@ -1,10 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:worfrontend/models/scene_data.dart';
+import 'package:worfrontend/services/game_controller.dart';
+import 'package:worfrontend/services/network/models/chronometer_data.dart';
+import 'package:worfrontend/services/network/models/models/game.dart';
 import 'package:worfrontend/services/network/models/models/player.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/choose_stack_card_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/next_round_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/send_card_to_stack_and_add_cards_to_player_discard_player_action.dart';
+import 'package:worfrontend/services/network/models/models/player_actions/send_card_to_stack_player_action.dart';
 
 const String sendCardToStack = "SEND_CARD_TO_STACK_CARD";
-const String sendCardToStackAndAddCardToPlayerDiscard = "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
+const String sendCardToStackAndAddCardToPlayerDiscard =
+    "SEND_CARD_TO_STACK_CARD_AND_ADD_CARD_TO_PLAYER_DISCARD";
 const String chooseCardStack = "CHOOSE_STACK_CARD";
 const String nextRound = "NEXT_ROUND";
 
@@ -20,7 +28,8 @@ abstract class PlayerAction {
       case sendCardToStack:
         return SendCardToStackPlayerAction.fromJson(json);
       case sendCardToStackAndAddCardToPlayerDiscard:
-        return SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction.fromJson(json);
+        return SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
+            .fromJson(json);
       case chooseCardStack:
         return ChooseStackCardPlayerAction.fromJson(json);
       case nextRound:
@@ -31,72 +40,47 @@ abstract class PlayerAction {
   }
 
   setComplete() {
-    this.onComplete.add(null);
+    onComplete.add(null);
   }
 
-  Iterable<Widget> buildWidget(BuildContext context, SceneData sceneData, Player player) {
+  Iterable<Widget> buildWidget(
+      BuildContext context, SceneData sceneData, Player player) {
     return [];
   }
 
   toJson();
-}
 
-class SendCardToStackPlayerAction extends PlayerAction {
-  final int stackNumber;
+  void packetLifecycle(GameController controller, Game receivedGame,
+      void Function() packetExecution) {
+    if (controller.gameIsFinished) return;
 
-  SendCardToStackPlayerAction(this.stackNumber) : super(sendCardToStack);
+    controller.resetChooseStack();
 
-  SendCardToStackPlayerAction.fromJson(Map<String, dynamic> json)
-      : this(json['stack_number']);
+    var endChrono = receivedGame.inGameProperty?.chronoUpTo;
+    if (endChrono != null) {
+      controller.createChronometer(ChronometerData(endChrono));
+    } else {
+      controller.stopChronometer();
+    }
 
-  @override
-  toJson() => {
-        'type': type,
-        'stack_number': stackNumber,
-      };
-}
+    executeAction(
+        controller,
+        receivedGame,
+        receivedGame.inGameProperty!.betweenRound!.currentPlayerAction!.player,
+        packetExecution);
+  }
 
-class SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction
-    extends PlayerAction {
-  final int stackNumber;
+  void executeAction(GameController controller, Game receivedGame,
+      Player player, void Function() packetExecution) {
+    packetExecution();
+    startAnimation(controller, player);
+  }
 
-  SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction(this.stackNumber)
-      : super(sendCardToStackAndAddCardToPlayerDiscard);
+  void startAnimation(GameController controller, Player player) {
+    afterAnimation(controller, player);
+  }
 
-  SendCardToStackCardAndAddCardsToPlayerDiscardPlayerAction.fromJson(
-      Map<String, dynamic> json)
-      : this(json['stack_number']);
-
-  @override
-  toJson() => {
-        'type': type,
-        'stack_number': stackNumber,
-      };
-}
-
-class ChooseStackCardPlayerAction extends PlayerAction {
-  final int? choosenStackCardByPlayer;
-
-  ChooseStackCardPlayerAction(this.choosenStackCardByPlayer)
-      : super(chooseCardStack);
-
-  ChooseStackCardPlayerAction.fromJson(Map<String, dynamic> json)
-      : this(json['choosen_stack_card_by_player']);
-
-  @override
-  toJson() => {
-        'type': type,
-        'choosen_stack_card_by_player': choosenStackCardByPlayer,
-      };
-}
-
-class NextRoundPlayerAction extends PlayerAction {
-  NextRoundPlayerAction() : super(nextRound);
-
-  NextRoundPlayerAction.fromJson(Map<String, dynamic> json) : this();
-
-  @override
-  toJson() => {
-        'type': type,
-      };
+  void afterAnimation(GameController controller, Player player) {
+    controller.sendNextActionToTheServer();
+  }
 }

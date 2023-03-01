@@ -1,8 +1,9 @@
-import {Injectable, OnInit} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {WebsocketService} from "./websocket.service";
 import {Player} from "../model/player.model";
-import {LastMessageEnum} from "../model/last-message.enum";
+import {LastGameMessageEnum, LastMessageEnum} from "../model/last-message.enum";
+import {Game} from "../model/game.model";
 
 
 @Injectable({
@@ -11,12 +12,25 @@ import {LastMessageEnum} from "../model/last-message.enum";
 export class GameService {
 
   public player: Player | null = null;
-  public player$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(this.player)
+  public player$: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(this.player);
+
+  public errorMessage: string | null = null;
+  public errorMessage$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.errorMessage);
+
 
   public lastMessage: LastMessageEnum | null = null;
   public lastMessage$: BehaviorSubject<LastMessageEnum | null> = new BehaviorSubject<LastMessageEnum | null>(this.lastMessage);
 
+  public game: Game | null = null;
+  public game$: BehaviorSubject<Game | null> = new BehaviorSubject<Game | null>(this.game);
+
+  public lastGameMessage: LastGameMessageEnum | null = null;
+  public lastGameMessage$: BehaviorSubject<LastGameMessageEnum | null> = new BehaviorSubject<LastGameMessageEnum | null>(this.lastGameMessage);
+
   constructor(private webSocketService: WebsocketService) {
+
+    /* Phone */
+    /**********************************************************************/
     this.webSocketService.playerLoggedInGame$.subscribe(p => {
       this.updatePlayer(p);
       this.updateLastMessage(LastMessageEnum.PLAYER_LOGGED_IN_GAME);
@@ -41,15 +55,55 @@ export class GameService {
       this.updatePlayer(p);
       this.updateLastMessage(LastMessageEnum.NEW_ROUND);
     });
+
+    this.webSocketService.wrongIdPlayer$.subscribe(p => {
+      this.updateError(p);
+      this.updateLastMessage(LastMessageEnum.WRONG_ID_PLAYER);
+    });
+
+
+    /* Table */
+    /**********************************************************************/
+    this.webSocketService.newPlayerPlayedCard$.subscribe(g => {
+      this.updateGame(g);
+      this.updateLastGameMessage(LastGameMessageEnum.PHONE_NEW_PLAYER_PLAYED_CARD);
+    });
+
+    this.webSocketService.flipCardOrder$.subscribe(g => {
+      this.updateGame(g);
+      this.updateLastGameMessage(LastGameMessageEnum.PHONE_FLIP_CARD_ORDER);
+    });
+
+    this.webSocketService.newResultAction$.subscribe(g => {
+      this.updateGame(g);
+      this.updateLastGameMessage(LastGameMessageEnum.PHONE_NEW_RESULT_ACTION);
+    });
+
+    this.webSocketService.newStartGameValue$.subscribe(g => {
+      this.updateGame(g);
+      this.updateLastGameMessage(LastGameMessageEnum.START_GAME_VALUE);
+    });
   }
 
-
-  public async joinGame(playerId: string): Promise<void> {
-    await this.webSocketService.joinGame(playerId);
+  /* Player */
+  public async joinGame(playerId: string, username: string): Promise<void> {
+    await this.webSocketService.joinGame(playerId, username);
   }
 
+  /* Player */
   public async playerPlayedCard(playerId: string, cardValue: number): Promise<void> {
     await this.webSocketService.playerPlayedCard(playerId, cardValue)
+  }
+
+  /* Game (table) */
+  public async tableNextRoundResultAction(choosen_stack: number | null): Promise<void> {
+    await this.webSocketService.tableNextRoundResultAction(choosen_stack);
+  }
+
+
+  private updateError(message: string): void {
+    this.errorMessage = message;
+    this.errorMessage$.next(message);
   }
 
 
@@ -63,8 +117,13 @@ export class GameService {
     this.lastMessage$.next(this.lastMessage);
   }
 
+  private updateGame(game: Game | null): void {
+    this.game = game;
+    this.game$.next(game);
+  }
 
-
-
-
+  private updateLastGameMessage(lastMessage: LastGameMessageEnum): void {
+    this.lastGameMessage = lastMessage;
+    this.lastGameMessage$.next(this.lastGameMessage);
+  }
 }

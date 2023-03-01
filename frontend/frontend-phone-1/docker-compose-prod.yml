@@ -1,0 +1,16 @@
+version: "3.8"
+
+networks:
+  ter-network-prod:
+    driver: bridge
+
+services:
+  frontend-smartphone-1:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "8453:80"
+    networks:
+      - ter-network-prod

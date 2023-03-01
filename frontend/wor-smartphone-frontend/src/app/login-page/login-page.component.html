@@ -1,6 +1,16 @@
 <div class="container-login">
     <div class="form-login">
-        <input type="text" id="input-id" name="playerId" placeholder="Your player ID..." [(ngModel)]="playerId" />
+        <input type="text" class="input-id" name="playerId" placeholder="Your player ID..." [(ngModel)]="playerId"
+            autocomplete="off" />
+        <input type="text" class="input-id" name="username" placeholder="Your username..." [(ngModel)]="username"
+            autocomplete="off" />
         <button type="button" id="button-join" (click)="login()">Join the game</button>
+
+      <div [ngStyle]="{'background-color': '#ffa1a1', display: errorWrongId ? '' : 'none'}">
+        error : Wrong id
+      </div>
     </div>
+
+
+
 </div>

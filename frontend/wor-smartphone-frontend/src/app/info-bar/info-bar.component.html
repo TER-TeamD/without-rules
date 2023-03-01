@@ -1,0 +1,17 @@
+<div class="header"
+    [ngStyle]="{'justifyContent': (gameStatus === 'LOADING' || gameStatus === 'END') ? 'center' : 'space-between'}">
+    <div class="header-left" *ngIf="gameStatus === 'PLAYING' || gameStatus === 'WAITING'" [style.background-color]="colorCattleHeadBackground">
+        <p>🐮</p>
+        <p>{{cattleHeads}}</p>
+    </div>
+
+    <div class="header-center" *ngIf="isTimerVisible" [ngStyle]="{'color': (timer<=10) ? 'red' : 'black'}">
+        <mat-icon>timer</mat-icon>
+        <p>{{timer}}</p>
+    </div>
+
+    <div class="header-right">
+        <img src="{{urlAvatar}}" style="width: 50px; height: 50px;" alt="" />
+        <p>{{player?.username}}</p>
+    </div>
+</div>

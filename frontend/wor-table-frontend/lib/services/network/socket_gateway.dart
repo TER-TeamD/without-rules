@@ -7,22 +7,23 @@ import 'package:socket_io_client/socket_io_client.dart';
 import 'package:worfrontend/errors/server_error.dart';
 import 'package:worfrontend/services/logger.dart';
 import 'package:worfrontend/services/network/models/models/game.dart';
-import 'package:worfrontend/services/network/models/models/player.dart';
 import 'package:worfrontend/services/network/socket_message.dart';
 import 'package:worfrontend/services/network/socket_topics.dart';
 
 import '../error_manager.dart';
+
+import 'models/socket_models/end_game.dart';
+import 'models/socket_models/game_update.dart';
+import 'models/socket_models/player_result_action.dart';
 
 class SocketGateway {
   final Socket socket;
   final Subject<SocketMessage> onMessage;
   final Subject connected = BehaviorSubject();
 
-  SocketGateway(this.socket) : onMessage = PublishSubject();
+  final Subject<MapEntry<String, dynamic>> onAny$ = PublishSubject();
 
-  void log(Map<String, dynamic> json) {
-    Logger.log(jsonEncode(json));
-  }
+  SocketGateway(this.socket) : onMessage = PublishSubject();
 
   listenEvents() {
     socket.onConnect((data) {
@@ -30,17 +31,27 @@ class SocketGateway {
       connected.add(true);
     });
     socket.onAny((String topic, data) {
-      Logger.log("Data received from $topic: $data");
-      if(topic == "disconnect") return;
+      onAny$.add(MapEntry<String, dynamic>(topic, data));
+      if (topic == "disconnect") return;
 
-      if (data != null && data['game'] != null) {
+      if (data != null && data['game'] is Map<String, dynamic>) {
         var game = _decodeJson(data);
+        Logger.log("Received $topic: ${jsonEncode(game.toJson())}");
         Logger.log(game.players.map((e) => e.id).toString());
-      }
 
-      if(data != null && topic != socketTopicsToString(SocketTopics.createNewGame) && data is Map<String, dynamic> && data['game'] != null) {
-        var game = _decodeJson(data);
-        onMessage.add(GameUpdate(game, topic));
+        switch (topic) {
+          case gameCreated:
+            break;
+          case newAction:
+            onMessage.add(PlayerResultActionMessage(game, topic));
+            break;
+          case endGame:
+            onMessage.add(EndGameMessage(game, topic));
+            break;
+          default:
+            onMessage.add(GameUpdate(game, topic));
+            break;
+        }
       }
     });
 
@@ -59,11 +70,10 @@ class SocketGateway {
     }
   }
 
-
   Future<Game> newGame() async {
     var event = "TABLE_NEW_GAME";
     var completer = Completer<Game>();
-    socket.on(socketTopicsToString(SocketTopics.createNewGame), (data) {
+    socket.once(socketTopicsToString(SocketTopics.createNewGame), (data) {
       var game = _decodeJson(data);
       completer.complete(game);
     });
@@ -78,22 +88,18 @@ class SocketGateway {
   }
 
   void allPlayerPlayed() {
-
     var event = "TABLE_ALL_PLAYER_PLAYED";
     emit(event, {});
   }
 
   void nextRoundResultAction() {
     var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
-    emit(event, {
-      'choosen_stack': null
-    });
+    emit(event, {'choosen_stack': null});
   }
+
   void nextRoundResultActionChoosingStack(int stackNumber) {
     var event = "TABLE_NEXT_ROUND_RESULT_ACTION";
-    emit(event, {
-      'choosen_stack': stackNumber
-    });
+    emit(event, {'choosen_stack': stackNumber});
   }
 
   void newResultAction() {
@@ -105,5 +111,4 @@ class SocketGateway {
     Logger.log("Emitting $topic: $data");
     socket.emit(topic, data);
   }
-
 }

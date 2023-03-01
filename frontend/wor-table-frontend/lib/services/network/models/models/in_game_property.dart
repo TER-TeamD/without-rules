@@ -8,25 +8,30 @@ class InGameProperty {
   final List<StackCard> stacks;
   final int currentRound;
   final BetweenRound? betweenRound;
+  final DateTime? chronoUpTo;
 
-  InGameProperty(this.deck, this.stacks, this.currentRound, this.betweenRound);
+  InGameProperty(this.deck, this.stacks, this.currentRound, this.betweenRound,
+      this.chronoUpTo);
 
   InGameProperty.fromJson(Map<String, dynamic> json)
       : deck = (json["deck"] as List<dynamic>)
-            .map((e) => GameCard.fromJson(e))
-            .toList(),
+      .map((e) => GameCard.fromJson(e))
+      .toList(),
         stacks = (json["stacks"] as List<dynamic>)
             .map((e) => StackCard.fromJson(e))
             .toList(),
         currentRound = json["current_round"],
         betweenRound = json['between_round'] == null
             ? null
-            : BetweenRound.fromJson(json['between_round']);
+            : BetweenRound.fromJson(json['between_round']),
+        chronoUpTo = json['chrono_up_to'] == null ? null : DateTime.parse(json['chrono_up_to']);
 
-  toJson() => {
+  toJson() =>
+      {
         'deck': deck.map((e) => e.toJson()).toList(),
         'stacks': stacks.map((e) => e.toJson()).toList(),
         'current_round': currentRound,
         'between_round': betweenRound?.toJson(),
+        'chrono_up_to': chronoUpTo?.toString()
       };
 }

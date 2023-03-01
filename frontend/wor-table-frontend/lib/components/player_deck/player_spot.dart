@@ -4,21 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:worfrontend/components/card_components/card_component.dart';
 import 'package:worfrontend/components/decks.dart';
 import 'package:worfrontend/components/player_deck/rotation_handler.dart';
+import 'package:worfrontend/models/transform.dart';
 
 import '../../constants.dart';
 
 class PlayerSpot extends StatefulWidget {
   final Widget child;
+  final Widget childBottom;
   final Offset position;
   final double rotation;
-  final void Function(DeckTransform)? positionChanged;
+  final void Function(AppTransform)? positionChanged;
 
   const PlayerSpot(
-      {Key? key,
-      required this.child,
-      required this.position,
-      this.rotation = 0,
-      this.positionChanged})
+      {
+        Key? key,
+        required this.child,
+        required this.position,
+        required this.childBottom,
+        this.rotation = 0,
+        this.positionChanged,
+      })
       : super(key: key);
 
   @override
@@ -46,7 +51,7 @@ class _PlayerSpotState extends State<PlayerSpot> {
             color: CARD_BORDER_COLOR,
             width: 4.0,
           ),
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(5.0)),
         ),
         child: SizedBox(
             width: CardComponent.size.dx,
@@ -77,9 +82,20 @@ class _PlayerSpotState extends State<PlayerSpot> {
         });
       },
       rotationEnd: () {
-        widget.positionChanged?.call(DeckTransform(position, rotation));
+        widget.positionChanged?.call(AppTransform(position, rotation));
       },
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant PlayerSpot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.position != widget.position) {
+      position = widget.position;
+    }
+    if (oldWidget.rotation != widget.rotation) {
+      rotation = widget.rotation;
+    }
   }
 
   @override
@@ -118,13 +134,23 @@ class _PlayerSpotState extends State<PlayerSpot> {
                           },
                           onScaleEnd: (_) {
                             widget.positionChanged
-                                ?.call(DeckTransform(position, rotation));
+                                ?.call(AppTransform(position, rotation));
                           },
                           child: content()),
                     ),
+                    Transform.translate(
+                        offset: Offset(0, CardComponent.size.dy + 40),
+                        child: Container(
+                          height: 70.0,
+                          // decoration: BoxDecoration(color: Color.fromRGBO(68, 68, 68, 1.0),),
+                          child: widget.childBottom,
+                        )
+                    ),
                   ],
                 ),
-              ))),
+              )
+          )
+      ),
     );
   }
 }

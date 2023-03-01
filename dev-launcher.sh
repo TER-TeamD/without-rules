@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "Enter :"
 echo "1 if you want to build and run"
 echo "2 if you want to run"
