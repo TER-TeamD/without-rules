@@ -40,7 +40,7 @@ class _AddCardAndGetStackContentState extends State<AddCardAndGetStackContent>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 500));// 8000
+        vsync: this, duration: Duration(milliseconds: 5000));// 8000
     _controller.reset();
     _controller.forward(from: 0);
 
