@@ -32,7 +32,7 @@ class _SlideCardState extends State<SlideCard> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500)); // 2
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500)); // 2
     _controller.addListener(() {
       if(_controller.isCompleted) {
         widget.onDone?.call();
