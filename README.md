@@ -22,9 +22,12 @@ The version number must be an integer and be registered in the set ``SUPPORTED_V
 
 ## Get started
 
-1. Run the backends
-    1. In dev mode : ``docker-compose -f docker-compose.dev.yml up``
-    2. In prod mode : ``docker-compose -f docker-compose.prod.yml up``
+### Production mode
+
+``./prod-launcher.sh`` (after you choose what you want to do)
+
+### Development mode
+1. Run the backend : ``./dev-launcher.sh`` (after you choose what you want to do)
 2. Run the frontends in dev-mod:
     1. For the flutter app (need the flutter sdk), in the flutter app directory : ``flutter pub get`` then ``flutter run``
     2. For the web app, in the angular app directory : ``npm install`` then ``ng serve``
